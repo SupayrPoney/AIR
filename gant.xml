@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><project name="Untitled Gantt Project" company="" webLink="http://" view-date="2017-02-22" view-index="0" gantt-divider-location="263" resource-divider-location="300" version="2.8.1" locale="en_US">
+<?xml version="1.0" encoding="UTF-8"?><project name="InfoViz - AIR" company="AIR GmbH" webLink="http://" view-date="2017-03-10" view-index="0" gantt-divider-location="317" resource-divider-location="300" version="2.8.1" locale="en_US">
     <description/>
     <view zooming-state="default:2" id="gantt-chart">
-        <field id="tpd3" name="Name" width="145" order="0"/>
-        <field id="tpd4" name="Begin date" width="57" order="1"/>
-        <field id="tpd5" name="End date" width="57" order="2"/>
+        <field id="tpd3" name="Name" width="151" order="0"/>
+        <field id="tpd4" name="Begin date" width="88" order="1"/>
+        <field id="tpd5" name="End date" width="74" order="2"/>
     </view>
     <view id="resource-table">
         <field id="0" name="Name" width="210" order="0"/>
@@ -33,19 +33,29 @@
             <taskproperty id="tpd8" name="coordinator" type="default" valuetype="text"/>
             <taskproperty id="tpd9" name="predecessorsr" type="default" valuetype="text"/>
         </taskproperties>
-        <task id="0" name="arXiv" color="#8cb6ce" meeting="false" start="2017-03-13" duration="2" complete="0" expand="true">
+        <task id="0" name="arXiv" color="#8cb6ce" meeting="false" start="2017-03-13" duration="1" complete="0" expand="true">
             <depend id="3" type="2" difference="0" hardness="Strong"/>
+            <depend id="54" type="2" difference="0" hardness="Strong"/>
         </task>
         <task id="1" name="Scopus" color="#8cb6ce" meeting="false" start="2017-03-13" duration="2" complete="0" expand="true">
             <depend id="3" type="2" difference="0" hardness="Strong"/>
         </task>
-        <task id="2" name="Rich Citations" color="#8cb6ce" meeting="false" start="2017-03-13" duration="2" complete="0" expand="true">
+        <task id="2" name="Rich Citations" color="#8cb6ce" meeting="false" start="2017-03-13" duration="4" complete="0" expand="true">
             <depend id="3" type="2" difference="0" hardness="Strong"/>
         </task>
-        <task id="3" name="Data merge" color="#8cb6ce" meeting="false" start="2017-03-15" duration="3" complete="0" expand="true">
+        <task id="3" name="Merge all datasets" color="#8cb6ce" meeting="false" start="2017-03-17" duration="7" complete="0" expand="true">
             <depend id="8" type="2" difference="0" hardness="Strong"/>
         </task>
-        <task id="8" name="Website" color="#8cb6ce" meeting="false" start="2017-03-20" duration="5" complete="0" expand="true"/>
+        <task id="8" name="JSON Rest API" color="#8cb6ce" meeting="false" start="2017-03-28" duration="8" complete="0" expand="true">
+            <depend id="54" type="2" difference="0" hardness="Strong"/>
+        </task>
+        <task id="10" name="Graph in D3.js" color="#8cb6ce" meeting="false" start="2017-03-13" duration="5" complete="0" expand="true">
+            <depend id="54" type="2" difference="0" hardness="Strong"/>
+        </task>
+        <task id="54" name="Use API in graph" color="#8cb6ce" meeting="false" start="2017-04-07" duration="1" complete="0" expand="true">
+            <depend id="56" type="2" difference="0" hardness="Strong"/>
+        </task>
+        <task id="56" name="Query system" color="#8cb6ce" meeting="false" start="2017-04-10" duration="2" complete="0" expand="true"/>
     </tasks>
     <resources/>
     <allocations/>
