@@ -6,4 +6,5 @@ Article International Representation for the course of Information Visualization
 - [ ] Seeing the articles a paper is referenced in
 - [ ] Being able to give an article as input, get all the metadata (?)
 - [ ] See the referencing articles on a map
+
 TODO: Fill
