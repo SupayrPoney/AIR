@@ -28,5 +28,3 @@ Article International Representation for the course of Information Visualization
 A founding paper is a scientific paper that bootstraps a topic and doesn't reference any other paper on that topic. The topic of a paper is determined by its keywords.
 ### Location of a paper
 The location of a paper is the locations of the authors at the time the paper is published. Only the main authors are taken into account. The main authors are determined with a weight factor.
-
-TODO: Fill
