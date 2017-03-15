@@ -2,7 +2,7 @@
 Article International Representation for the course of Information Visualization @VUB 2017
 
 ## Requirements
-### Graph
+### Question 1 - Graph
 - [ ] Be able to give an article(title)/author? as input
 - [ ] See the articles a paper is referenced in / referenced by (as a graph)
 - [ ] Be able to get all the metadata (by hovering on a node)
@@ -10,7 +10,7 @@ Article International Representation for the course of Information Visualization
 - [ ] The founding papers should be easily accessible (through a button for example). 
 - [ ] Same goes for going back to the user's paper.
 
-### Map
+### Question 2 - Map
 - [ ] Being able to see where an article's authors are/were located (at the time of release) (can be multiple places) on a map.
 - [ ] Same goes for the **referenced** papers.
 - [ ] Same goes for the **referencing** papers.
