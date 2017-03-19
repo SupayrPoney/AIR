@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+<script src="{% static "js/datamaps.world.min.js" %}"></script>
+
+<style type="text/css">
+    #map {
+        width: 100%;
+        height: calc(100% - 5px);
+        margin: 0 !important;
+        padding: 0 !important;
+        display: inline-block;
+    }
+    #paper-infos {
+        position: fixed;
+        bottom: 0px;
+        background-color: rgb(55,55,55);
+        padding: 10px;
+        text-align: center;
+        color: white;
+        width: 100%;
+    }
+    #paper-infos > span {
+        color: #FFFFFF;
+    }
+    .tag {
+        padding: 1px 6px;
+        background-color: #F44336; 
+        margin-left: 3px;
+        border-radius: 2px;
+    }
+</style>
+<div id="map">
+</div>
+<div id="paper-infos">
+    <span>Les fourmis de Katmandou</span>
+    <br>
+    <span class="tag">fourmis</span><span class="tag">katmandou</span><span class="tag">népal</span>
+</div>
+<script>
+    var map = new Datamap({
+        element: document.getElementById('map'),
+        responsive: true
+    });
+    window.addEventListener('resize', function() {
+        map.resize();
+    });
+
+</script>
+
+{% endblock content %}
