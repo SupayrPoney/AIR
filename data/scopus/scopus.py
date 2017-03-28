@@ -132,6 +132,7 @@ def get_metadata_by_title(title):
         'creators': scopus_parse_author(creators),
         'affiliation': {'name': affiliation['affiliation-name'],
                         'address': affiliation['address'],
+                        'postal_code': affiliation['institution-profile']['address']['postal-code'],
                         'city': affiliation['city'],
                         'country': affiliation['country']},
         'publication': {'name': simple_metadata['prism:publicationName'],
