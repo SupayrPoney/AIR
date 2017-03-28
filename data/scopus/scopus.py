@@ -111,6 +111,19 @@ def scopus_parse_author(author):
              'lastname': x['ce:surname']} for x in author]
 
 
+def scopus_parse_keywords(full_metadata):
+    if 'authkeywords' in full_metadata and isinstance(full_metadata['authkeywords'], dict):
+        return [x['$'] for sublist in full_metadata['authkeywords'].values() for x in sublist]
+    else:
+        citation_info = full_metadata['item']['bibrecord']['head']['citation-info']
+        if 'author-keywords' in citation_info:
+            return [x['$'] for x in citation_info['author-keywords']['author-keyword']]
+        elif isinstance(full_metadata['idxterms'], dict):
+            return [x['$'] for x in full_metadata['idxterms']['mainterm']]
+        else:
+            pass  # TODO
+
+
 def scopus_parse_reference(reference):
     results = []
     for x in reference:
@@ -159,10 +172,10 @@ def get_metadata_by_title(title):
                         'type': simple_metadata['prism:aggregationType'],
                         'subtype': simple_metadata['subtype'],
                         'subtype_description': simple_metadata['subtypeDescription'],
-                        'number': simple_metadata['article-number'],
+                        # 'number': simple_metadata['article-number'],
                         'source_id': simple_metadata['source-id']},
         'citedby_count': simple_metadata['citedby-count'],
-        'keywords': [x['$'] for sublist in full_metadata['authkeywords'].values() for x in sublist],
+        'keywords': scopus_parse_keywords(full_metadata),
         'authors': scopus_parse_author(full_metadata['authors']['author']),
         'references': scopus_parse_reference(full_metadata['item']['bibrecord']['tail']['bibliography']['reference'])
     }
@@ -177,5 +190,8 @@ if __name__ == '__main__':
     # response = scopus_get_full_metadata_by_eid('2-s2.0-84891048418')
     # print(response)
     response = get_metadata_by_title('a survey on reactive programming')
-    print(response)
+    print(response['title'])
+    for ref in response['references']:
+        resp2 = get_metadata_by_title(ref['title'])
+        print(resp2['title'])
     pass
