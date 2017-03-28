@@ -118,15 +118,17 @@ def get_metadata_by_title(title):
     full_metadata = scopus_get_full_metadata_by_eid(eid)["abstracts-retrieval-response"]
     affiliation_id = full_metadata['affiliation']['@id']
     affiliation = scopus_get_affiliation_by_id(affiliation_id)['affiliation-retrieval-response']
-    creators = full_metadata['coredata']['dc:creator']['author']
+    coredata = full_metadata['coredata']
+    creators = coredata['dc:creator']['author']
     # print(json.dumps(full_metadata))
     # print(json.dumps(simple_metadata))
     # print(affiliation)
     metadata = {
-        'sid': scopus_entry_get_sid(simple_metadata),
-        'eid': eid,
+        # 'sid': scopus_entry_get_sid(simple_metadata),
+        # 'eid': eid,
         'doi': simple_metadata['prism:doi'],
         'title': simple_metadata['dc:title'],
+        'description': coredata['dc:description'],
         'creators': scopus_parse_author(creators),
         'affiliation': {'name': affiliation['affiliation-name'],
                         'address': affiliation['address'],
