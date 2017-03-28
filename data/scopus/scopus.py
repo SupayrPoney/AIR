@@ -58,7 +58,11 @@ def scopus_search_by_title(title):
     params = {
         'query': 'TITLE-ABS-KEY ( "{}" ) '.format(title)
     }
-    return json.loads(requests_get(SEARCH_URL, params=params))
+    res = json.loads(requests_get(SEARCH_URL, params=params))
+    if int(res['search-results']['opensearch:totalResults']) > 0:
+        return res
+    else:
+        return None
 
 
 def scopus_get_simple_metadata_by_eid(eid):
@@ -141,48 +145,49 @@ def scopus_parse_reference(reference):
 
 def get_metadata_by_title(title):
     results = scopus_search_by_title(title)
-    eid = scopus_entry_get_eid(scopus_results_get_first_entry(results))
-    simple_metadata = scopus_results_get_first_entry(scopus_get_simple_metadata_by_eid(eid))
-    full_metadata = scopus_get_full_metadata_by_eid(eid)["abstracts-retrieval-response"]
-    affiliation_id = full_metadata['affiliation']['@id']
-    affiliation = scopus_get_affiliation_by_id(affiliation_id)['affiliation-retrieval-response']
-    coredata = full_metadata['coredata']
-    creators = coredata['dc:creator']['author']
-    # print(json.dumps(full_metadata))
-    # print(json.dumps(simple_metadata))
-    # print(affiliation)
-    metadata = {
-        # 'sid': scopus_entry_get_sid(simple_metadata),
-        # 'eid': eid,
-        'doi': simple_metadata['prism:doi'],
-        'title': simple_metadata['dc:title'],
-        'abstract': full_metadata['item']['bibrecord']['head']['abstracts'],
-        'description': coredata['dc:description'],
-        'creators': scopus_parse_author(creators),
-        'affiliation': {'name': affiliation['affiliation-name'],
-                        'address': affiliation['address'],
-                        'postal_code': affiliation['institution-profile']['address']['postal-code'],
-                        'city': affiliation['city'],
-                        'country': affiliation['country']},
-        'publication': {'name': simple_metadata['prism:publicationName'],
-                        'issn': simple_metadata['prism:issn'],
-                        'e_issn': simple_metadata['prism:eIssn'],
-                        'volume': simple_metadata['prism:volume'],
-                        'issue_identifier': simple_metadata['prism:issueIdentifier'],
-                        'page_range': simple_metadata['prism:pageRange'],
-                        'cover_date': simple_metadata['prism:coverDate'],
-                        'cover_display_date': simple_metadata['prism:coverDisplayDate'],
-                        'type': simple_metadata['prism:aggregationType'],
-                        'subtype': simple_metadata['subtype'],
-                        'subtype_description': simple_metadata['subtypeDescription'],
-                        # 'number': simple_metadata['article-number'],
-                        'source_id': simple_metadata['source-id']},
-        'citedby_count': simple_metadata['citedby-count'],
-        'keywords': scopus_parse_keywords(full_metadata),
-        'authors': scopus_parse_author(full_metadata['authors']['author']),
-        'references': scopus_parse_reference(full_metadata['item']['bibrecord']['tail']['bibliography']['reference'])
-    }
-    return metadata
+    if results is not None:
+        eid = scopus_entry_get_eid(scopus_results_get_first_entry(results))
+        simple_metadata = scopus_results_get_first_entry(scopus_get_simple_metadata_by_eid(eid))
+        full_metadata = scopus_get_full_metadata_by_eid(eid)["abstracts-retrieval-response"]
+        affiliation_id = full_metadata['affiliation']['@id']
+        affiliation = scopus_get_affiliation_by_id(affiliation_id)['affiliation-retrieval-response']
+        coredata = full_metadata['coredata']
+        creators = coredata['dc:creator']['author']
+        # print(json.dumps(full_metadata))
+        # print(json.dumps(simple_metadata))
+        # print(affiliation)
+        metadata = {
+            # 'sid': scopus_entry_get_sid(simple_metadata),
+            # 'eid': eid,
+            'doi': simple_metadata['prism:doi'],
+            'title': simple_metadata['dc:title'],
+            'abstract': full_metadata['item']['bibrecord']['head']['abstracts'],
+            'description': coredata['dc:description'],
+            'creators': scopus_parse_author(creators),
+            'affiliation': {'name': affiliation['affiliation-name'],
+                            'address': affiliation['address'],
+                            'postal_code': affiliation['institution-profile']['address']['postal-code'],
+                            'city': affiliation['city'],
+                            'country': affiliation['country']},
+            'publication': {'name': simple_metadata['prism:publicationName'],
+                            'issn': simple_metadata['prism:issn'],
+                            'e_issn': simple_metadata['prism:eIssn'],
+                            'volume': simple_metadata['prism:volume'],
+                            'issue_identifier': simple_metadata['prism:issueIdentifier'],
+                            'page_range': simple_metadata['prism:pageRange'],
+                            'cover_date': simple_metadata['prism:coverDate'],
+                            'cover_display_date': simple_metadata['prism:coverDisplayDate'],
+                            'type': simple_metadata['prism:aggregationType'],
+                            'subtype': simple_metadata['subtype'],
+                            'subtype_description': simple_metadata['subtypeDescription'],
+                            # 'number': simple_metadata['article-number'],
+                            'source_id': simple_metadata['source-id']},
+            'citedby_count': simple_metadata['citedby-count'],
+            'keywords': scopus_parse_keywords(full_metadata),
+            'authors': scopus_parse_author(full_metadata['authors']['author']),
+            'references': scopus_parse_reference(full_metadata['item']['bibrecord']['tail']['bibliography']['reference'])
+        }
+        return metadata
 
 if __name__ == '__main__':
     # response = scopus_search_by_title('a survey on reactive programming')
