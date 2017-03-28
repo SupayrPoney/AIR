@@ -143,15 +143,32 @@ def scopus_parse_reference(reference):
     return results
 
 
+def scopus_parse_affiliation(affiliation):
+    if isinstance(affiliation, dict):
+        affiliation = [affiliation]
+    res = []
+    for x in affiliation:
+        affiliation_id = x['@id']
+        x = scopus_get_affiliation_by_id(affiliation_id)['affiliation-retrieval-response']
+        try:
+            res.append({'name': x['affiliation-name'],
+                        'address': x['address'],
+                        'postal_code': x['institution-profile']['address']['postal-code'],
+                        'city': x['city'],
+                        'country': x['country']})
+        except KeyError:
+            pass
+    return res
+
+
 def get_metadata_by_title(title):
     results = scopus_search_by_title(title)
     if results is not None:
         eid = scopus_entry_get_eid(scopus_results_get_first_entry(results))
         simple_metadata = scopus_results_get_first_entry(scopus_get_simple_metadata_by_eid(eid))
         full_metadata = scopus_get_full_metadata_by_eid(eid)["abstracts-retrieval-response"]
-        affiliation_id = full_metadata['affiliation']['@id']
-        affiliation = scopus_get_affiliation_by_id(affiliation_id)['affiliation-retrieval-response']
         coredata = full_metadata['coredata']
+        # print(coredata)
         creators = coredata['dc:creator']['author']
         # print(json.dumps(full_metadata))
         # print(json.dumps(simple_metadata))
@@ -164,14 +181,9 @@ def get_metadata_by_title(title):
             'abstract': full_metadata['item']['bibrecord']['head']['abstracts'],
             'description': coredata['dc:description'],
             'creators': scopus_parse_author(creators),
-            'affiliation': {'name': affiliation['affiliation-name'],
-                            'address': affiliation['address'],
-                            'postal_code': affiliation['institution-profile']['address']['postal-code'],
-                            'city': affiliation['city'],
-                            'country': affiliation['country']},
+            'affiliation': scopus_parse_affiliation(full_metadata['affiliation']),
             'publication': {'name': simple_metadata['prism:publicationName'],
                             'issn': simple_metadata['prism:issn'],
-                            'e_issn': simple_metadata['prism:eIssn'],
                             'volume': simple_metadata['prism:volume'],
                             'issue_identifier': simple_metadata['prism:issueIdentifier'],
                             'page_range': simple_metadata['prism:pageRange'],
