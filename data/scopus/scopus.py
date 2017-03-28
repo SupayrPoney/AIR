@@ -111,6 +111,18 @@ def scopus_parse_author(author):
              'lastname': x['ce:surname']} for x in author]
 
 
+def scopus_parse_reference(reference):
+    results = []
+    for x in reference:
+        ref_info = x['ref-info']
+        try:
+            title = ref_info['ref-title']['ref-titletext']
+        except KeyError:
+            title = ref_info['ref-sourcetitle']
+        results.append({'title': title})
+    return results
+
+
 def get_metadata_by_title(title):
     results = scopus_search_by_title(title)
     eid = scopus_entry_get_eid(scopus_results_get_first_entry(results))
@@ -151,7 +163,8 @@ def get_metadata_by_title(title):
                         'source_id': simple_metadata['source-id']},
         'citedby_count': simple_metadata['citedby-count'],
         'keywords': [x['$'] for sublist in full_metadata['authkeywords'].values() for x in sublist],
-        'authors': scopus_parse_author(full_metadata['authors']['author'])
+        'authors': scopus_parse_author(full_metadata['authors']['author']),
+        'references': scopus_parse_reference(full_metadata['item']['bibrecord']['tail']['bibliography']['reference'])
     }
     return metadata
 
