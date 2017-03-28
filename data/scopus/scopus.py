@@ -127,7 +127,7 @@ def get_metadata_by_title(title):
                         'country': affiliation['country']},
         'publication': {'name': simple_metadata['prism:publicationName'],
                         'issn': simple_metadata['prism:issn'],
-                        'e-issn': simple_metadata['prism:eIssn'],
+                        'e_issn': simple_metadata['prism:eIssn'],
                         'volume': simple_metadata['prism:volume'],
                         'issue_identifier': simple_metadata['prism:issueIdentifier'],
                         'page_range': simple_metadata['prism:pageRange'],
@@ -137,9 +137,12 @@ def get_metadata_by_title(title):
                         'subtype': simple_metadata['subtype'],
                         'subtype_description': simple_metadata['subtypeDescription'],
                         'number': simple_metadata['article-number'],
-                        'source-id': simple_metadata['source-id']},
-        'citedby-count': simple_metadata['citedby-count'],
-        'keywords': [x['$'] for sublist in full_metadata['authkeywords'].values() for x in sublist]
+                        'source_id': simple_metadata['source-id']},
+        'citedby_count': simple_metadata['citedby-count'],
+        'keywords': [x['$'] for sublist in full_metadata['authkeywords'].values() for x in sublist],
+        'authors': [{'firstname': x['ce:given-name'],
+                     'initials': x['ce:initials'],
+                     'lastname': x['ce:surname']} for x in full_metadata['authors']['author']]
     }
     return metadata
 
