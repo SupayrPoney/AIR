@@ -1,8 +1,10 @@
 import requests
 import json
 from functools import wraps
+import os
+import hashlib
 
-CACHE_FILE = '.cache'
+CACHE_DIR = '.cache'
 API_KEY = 'a52b0c7edc190b35f2740c8bde849893'
 
 proxies = {
@@ -24,17 +26,15 @@ def tuplize(something):
 def cache(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        key = str(tuplize(args) + tuplize(kwargs))
+        key = hashlib.sha224(str(tuplize(args) + tuplize(kwargs)).encode('utf-8')).hexdigest()
         try:
-            with open(CACHE_FILE, 'r') as f:
+            with open(os.path.join(CACHE_DIR, key), 'r') as f:
                 data = json.load(f)
         except FileNotFoundError:
-            data = {}
-        if key not in data:
-            data[key] = func(*args, **kwargs)
-            with open(CACHE_FILE, 'w') as f:
+            data = func(*args, **kwargs)
+            with open(os.path.join(CACHE_DIR, key), 'w') as f:
                 json.dump(data, f)
-        return data[key]
+        return data
     return wrapper
 
 
