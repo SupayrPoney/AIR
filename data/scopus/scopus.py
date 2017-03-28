@@ -3,6 +3,7 @@ import json
 from functools import wraps
 import os
 import hashlib
+import traceback
 
 CACHE_DIR = '.cache'
 API_KEY = 'a52b0c7edc190b35f2740c8bde849893'
@@ -109,10 +110,22 @@ def scopus_entry_get_eid(entry):
     return entry['eid']
 
 
-def scopus_parse_author(author):
-    return [{'firstname': x['ce:given-name'],
-             'initials': x['ce:initials'],
-             'lastname': x['ce:surname']} for x in author]
+def scopus_parse_author(simple_metadata, full_metadata):
+    try:
+        author = full_metadata['authors']['author']
+    except TypeError:
+        try:
+            author = full_metadata['item']['bibrecord']['head']['author-group']['author']
+        except KeyError:
+            try:
+                return [simple_metadata['dc:creator']]
+            except KeyError:
+                try:
+                    author = full_metadata['coredata']['dc:creator']['author']
+                except KeyError:
+                    print("DIDNT FIND ANY AUTHOR")
+                    return []
+    return [x['ce:indexed-name'] for x in author]
 
 
 def scopus_parse_keywords(full_metadata):
@@ -175,39 +188,46 @@ def get_metadata_by_title(title):
             simple_metadata = scopus_results_get_first_entry(scopus_get_simple_metadata_by_eid(eid))
             full_metadata = scopus_get_full_metadata_by_eid(eid)["abstracts-retrieval-response"]
             coredata = full_metadata['coredata']
-            # print(coredata)
-            # print(json.dumps(full_metadata))
-            # print(json.dumps(simple_metadata))
-            # print(affiliation)
+            publication = {'name': simple_metadata['prism:publicationName'],
+                           'page_range': simple_metadata['prism:pageRange'],
+                           'cover_date': simple_metadata['prism:coverDate'],
+                           'cover_display_date': simple_metadata['prism:coverDisplayDate'],
+                           'type': simple_metadata['prism:aggregationType'],
+                           'subtype': simple_metadata['subtype'],
+                           'subtype_description': simple_metadata['subtypeDescription'],
+                           'source_id': simple_metadata['source-id']}
+            try:
+                publication['issn'] = simple_metadata['prism:issn']
+            except KeyError:
+                pass
+            try:
+                publication['volume'] = simple_metadata['prism:volume']
+            except KeyError:
+                pass
+            try:
+                publication['issue_identifier'] = simple_metadata['prism:issueIdentifier']
+            except KeyError:
+                pass
+            try:
+                publication['number'] = simple_metadata['article-number']
+            except KeyError:
+                pass
             metadata = {
-                # 'sid': scopus_entry_get_sid(simple_metadata),
-                # 'eid': eid,
-                # 'doi': simple_metadata['prism:doi'],
                 'title': simple_metadata['dc:title'],
                 'abstract': full_metadata['item']['bibrecord']['head']['abstracts'],
                 'description': coredata['dc:description'],
                 # 'creators': scopus_parse_author(coredata['dc:creator']['author']), # dont always exist
                 'affiliation': scopus_parse_affiliation(simple_metadata, full_metadata),
-                'publication': {'name': simple_metadata['prism:publicationName'],
-                                'issn': simple_metadata['prism:issn'],
-                                'volume': simple_metadata['prism:volume'],
-                                'issue_identifier': simple_metadata['prism:issueIdentifier'],
-                                'page_range': simple_metadata['prism:pageRange'],
-                                'cover_date': simple_metadata['prism:coverDate'],
-                                'cover_display_date': simple_metadata['prism:coverDisplayDate'],
-                                'type': simple_metadata['prism:aggregationType'],
-                                'subtype': simple_metadata['subtype'],
-                                'subtype_description': simple_metadata['subtypeDescription'],
-                                # 'number': simple_metadata['article-number'],
-                                'source_id': simple_metadata['source-id']},
+                'publication': publication,
                 'citedby_count': simple_metadata['citedby-count'],
                 'keywords': scopus_parse_keywords(full_metadata),
-                'authors': scopus_parse_author(full_metadata['authors']['author']),
+                'authors': scopus_parse_author(simple_metadata, full_metadata),
                 'references': scopus_parse_reference(full_metadata['item']['bibrecord']['tail']['bibliography']['reference'])
             }
             return metadata
         except (KeyError, TypeError, IndexError) as e:
-            print("Something wrong happened", e)
+            print("\x1b[31m", e, "\x1b[0m")
+            traceback.print_exc()
 
 if __name__ == '__main__':
     # response = scopus_search_by_title('a survey on reactive programming')
@@ -217,10 +237,16 @@ if __name__ == '__main__':
     # print(response)
     # response = scopus_get_full_metadata_by_eid('2-s2.0-84891048418')
     # print(response)
+    DEBUG = False
     response = get_metadata_by_title('a survey on reactive programming')
     print(response['title'] + "...\x1b[32mOK\x1b[0m")
     for ref in response['references']:
-        print(ref['title'] + "...", end="")
+        if DEBUG:
+            print(ref['title'] + "...", end="")
         resp2 = get_metadata_by_title(ref['title'])
-        print("\x1b[32mOK\x1b[0m")
+        if DEBUG:
+            if resp2 is None:
+                print("\x1b[31mFAILED\x1b[0m")
+            else:
+                print("\x1b[32mOK\x1b[0m")
     pass
