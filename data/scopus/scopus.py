@@ -193,8 +193,9 @@ if __name__ == '__main__':
     # response = scopus_get_full_metadata_by_eid('2-s2.0-84891048418')
     # print(response)
     response = get_metadata_by_title('a survey on reactive programming')
-    print(response['title'])
+    print(response['title'] + "...\x1b[32mOK\x1b[0m")
     for ref in response['references']:
+        print(ref['title'] + "...", end="")
         resp2 = get_metadata_by_title(ref['title'])
-        print(resp2['title'])
+        print("\x1b[32mOK\x1b[0m")
     pass
