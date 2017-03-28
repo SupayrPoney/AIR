@@ -16,6 +16,7 @@ proxies = {
 SEARCH_URL = 'https://api.elsevier.com/content/search/scopus'
 SIMPLE_METADATA_URL = 'https://api.elsevier.com/content/search/scopus'
 FULL_METADATA_URL = 'https://api.elsevier.com/content/abstract/scopus_id/{}'
+AFFILIATION_URL = 'https://api.elsevier.com/content/affiliation/affiliation_id/{}'
 
 if not os.path.exists(CACHE_DIR):
     os.mkdir(CACHE_DIR)
@@ -85,6 +86,13 @@ def scopus_get_full_metadata_by_eid(eid):
     return json.loads(requests_get(FULL_METADATA_URL.format(sid), params=params))
 
 
+def scopus_get_affiliation_by_id(id):
+    params = {
+        'httpAccept': 'application/json'
+    }
+    return json.loads(requests_get(AFFILIATION_URL.format(id), params=params))
+
+
 def scopus_results_get_first_entry(results):
     return results['search-results']['entry'][0]
 
@@ -102,16 +110,21 @@ def get_metadata_by_title(title):
     eid = scopus_entry_get_eid(scopus_results_get_first_entry(results))
     simple_metadata = scopus_results_get_first_entry(scopus_get_simple_metadata_by_eid(eid))
     full_metadata = scopus_get_full_metadata_by_eid(eid)["abstracts-retrieval-response"]
+    affiliation_id = full_metadata['affiliation']['@id']
+    affiliation = scopus_get_affiliation_by_id(affiliation_id)['affiliation-retrieval-response']
     # print(json.dumps(full_metadata))
+    # print(json.dumps(simple_metadata))
+    # print(affiliation)
     metadata = {
         'sid': scopus_entry_get_sid(simple_metadata),
         'eid': eid,
         'doi': simple_metadata['prism:doi'],
         'title': simple_metadata['dc:title'],
         'creator': simple_metadata['dc:creator'],
-        'affiliation': [{'name': x['affilname'],
-                         'city': x['affiliation-city'],
-                         'country': x['affiliation-country']} for x in simple_metadata['affiliation']],
+        'affiliation': {'name': affiliation['affiliation-name'],
+                        'address': affiliation['address'],
+                        'city': affiliation['city'],
+                        'country': affiliation['country']},
         'publication': {'name': simple_metadata['prism:publicationName'],
                         'issn': simple_metadata['prism:issn'],
                         'e-issn': simple_metadata['prism:eIssn'],
