@@ -101,7 +101,8 @@ def get_metadata_by_title(title):
     results = scopus_search_by_title(title)
     eid = scopus_entry_get_eid(scopus_results_get_first_entry(results))
     simple_metadata = scopus_results_get_first_entry(scopus_get_simple_metadata_by_eid(eid))
-    # full_metadata = scopus_results_get_first_entry(scopus_get_full_metadata_by_eid(eid))
+    full_metadata = scopus_get_full_metadata_by_eid(eid)["abstracts-retrieval-response"]
+    # print(json.dumps(full_metadata))
     metadata = {
         'sid': scopus_entry_get_sid(simple_metadata),
         'eid': eid,
@@ -124,7 +125,8 @@ def get_metadata_by_title(title):
                         'subtype_description': simple_metadata['subtypeDescription'],
                         'number': simple_metadata['article-number'],
                         'source-id': simple_metadata['source-id']},
-        'citedby-count': simple_metadata['citedby-count']
+        'citedby-count': simple_metadata['citedby-count'],
+        'keywords': [x['$'] for sublist in full_metadata['authkeywords'].values() for x in sublist]
     }
     return metadata
 
