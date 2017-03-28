@@ -73,6 +73,17 @@ def scopus_search_by_title(title):
             return None
 
 
+def scopus_find_by_sid(sid):
+    params = {
+        'httpAccept': 'application/json'
+    }
+    res = json.loads(requests_get(FULL_METADATA_URL.format(sid), params=params))
+    if 'abstracts-retrieval-response' in res:
+        return res['abstracts-retrieval-response']
+    else:
+        return None
+
+
 def scopus_get_simple_metadata_by_eid(eid):
     params = {
         'query': 'EID({})'.format(eid),
@@ -162,7 +173,8 @@ def scopus_parse_reference(reference):
                 title = ref_info['ref-sourcetitle']
             except KeyError:
                 title = ref_info['ref-text'].split('.')[0]
-        results.append({'title': title})
+        sid = ref_info['refd-itemidlist']['itemid']['$']
+        results.append({'title': title, 'sid': sid})
     return results
 
 
@@ -188,6 +200,10 @@ def scopus_parse_affiliation(simple_metadata, full_metadata):
         if DEBUG >= 2:
             print("DIDNT FIND ANY AFFILIATION")
         return []
+
+
+def scopus_parse_title(full_metadata):
+    return full_metadata['coredata']['dc:title']
 
 
 def get_metadata_by_title(title):
@@ -224,6 +240,19 @@ def get_metadata_by_title(title):
                 print("\x1b[31m", e, "\x1b[0m")
                 traceback.print_exc()
 
+
+def get_references(metadata):
+    references = []
+    for ref in metadata['references']:
+        ref_md = get_metadata_by_title(ref['title'])
+        if ref_md is None:
+            abstracts = scopus_find_by_sid(ref['sid'])
+            if abstracts is not None:
+                title = scopus_parse_title(abstracts)
+                ref_md = get_metadata_by_title(title)
+        references.append(ref_md)
+    return references
+
 if __name__ == '__main__':
     import sys
     if len(sys.argv) > 2:
@@ -239,28 +268,26 @@ if __name__ == '__main__':
     # response = scopus_get_full_metadata_by_eid('2-s2.0-84891048418')
     # print(response)
 
-    def retrieve(title):
-        if DEBUG >= 1:
-            print(title + "...", end="")
-        response = get_metadata_by_title(title)
-        if DEBUG >= 1:
-            if response is None:
-                print("\x1b[31mFAILED\x1b[0m")
-            else:
-                print("\x1b[32mOK\x1b[0m")
-        return response
-    response = retrieve('a survey on reactive programming')
+    # def retrieve(title):
+    #     if DEBUG >= 1:
+    #         print(title + "...", end="")
+    #     response = get_metadata_by_title(title)
+    #     if DEBUG >= 1:
+    #         if response is None:
+    #             print("\x1b[31mFAILED\x1b[0m")
+    #         else:
+    #             print("\x1b[32mOK\x1b[0m")
+    #     return response
+    response = get_metadata_by_title('a survey on reactive programming')
     good = 1
     total = 1
-    for ref1 in response['references']:
-        resp2 = retrieve(ref1['title'])
+    for ref1 in get_references(response):
         total += 1
-        if resp2 is not None:
+        if ref1 is not None:
             good += 1
-            for ref2 in resp2['references']:
-                resp3 = retrieve(ref2['title'])
+            for ref2 in get_references(ref1):
                 total += 1
-                if resp3 is not None:
+                if ref2 is not None:
                     good += 1
 
     print("SCORE: ", good / total)
