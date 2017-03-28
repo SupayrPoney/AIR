@@ -131,7 +131,10 @@ def scopus_parse_reference(reference):
         try:
             title = ref_info['ref-title']['ref-titletext']
         except KeyError:
-            title = ref_info['ref-sourcetitle']
+            try:
+                title = ref_info['ref-sourcetitle']
+            except KeyError:
+                title = ref_info['ref-text'].split('.')[0]
         results.append({'title': title})
     return results
 
