@@ -4,6 +4,7 @@ from functools import wraps
 import os
 import hashlib
 import traceback
+import string
 
 DEBUG = 0
 
@@ -58,6 +59,7 @@ def requests_get(*args, **kwargs):
 
 
 def scopus_search_by_title(title):
+    title = title.strip(string.punctuation)
     params = {
         'query': 'TITLE-ABS-KEY ( "{}" ) '.format(title)
     }
