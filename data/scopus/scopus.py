@@ -143,22 +143,32 @@ def scopus_parse_reference(reference):
     return results
 
 
-def scopus_parse_affiliation(affiliation):
-    if isinstance(affiliation, dict):
-        affiliation = [affiliation]
-    res = []
-    for x in affiliation:
-        affiliation_id = x['@id']
-        x = scopus_get_affiliation_by_id(affiliation_id)['affiliation-retrieval-response']
+def scopus_parse_affiliation(simple_metadata, full_metadata):
+    try:
+        affiliation = full_metadata['affiliation']
+        if isinstance(affiliation, dict):
+            affiliation = [affiliation]
+        res = []
+        for x in affiliation:
+            affiliation_id = x['@id']
+            x = scopus_get_affiliation_by_id(affiliation_id)['affiliation-retrieval-response']
+            try:
+                res.append({'name': x['affiliation-name'],
+                            'address': x['address'],
+                            'postal_code': x['institution-profile']['address']['postal-code'],
+                            'city': x['city'],
+                            'country': x['country']})
+            except KeyError:
+                pass
+        return res
+    except KeyError:
         try:
-            res.append({'name': x['affiliation-name'],
-                        'address': x['address'],
-                        'postal_code': x['institution-profile']['address']['postal-code'],
-                        'city': x['city'],
-                        'country': x['country']})
+            return [{'name': simple_metadata['affil-name'],
+                     'city': simple_metadata['city'],
+                     'country': simple_metadata['country']}]
         except KeyError:
-            pass
-    return res
+            return []
+    print(affiliation)
 
 
 def get_metadata_by_title(title):
@@ -180,7 +190,7 @@ def get_metadata_by_title(title):
             'abstract': full_metadata['item']['bibrecord']['head']['abstracts'],
             'description': coredata['dc:description'],
             # 'creators': scopus_parse_author(coredata['dc:creator']['author']), # dont always exist
-            'affiliation': scopus_parse_affiliation(full_metadata['affiliation']),
+            'affiliation': scopus_parse_affiliation(simple_metadata, full_metadata),
             'publication': {'name': simple_metadata['prism:publicationName'],
                             'issn': simple_metadata['prism:issn'],
                             'volume': simple_metadata['prism:volume'],
