@@ -169,18 +169,17 @@ def get_metadata_by_title(title):
         full_metadata = scopus_get_full_metadata_by_eid(eid)["abstracts-retrieval-response"]
         coredata = full_metadata['coredata']
         # print(coredata)
-        creators = coredata['dc:creator']['author']
         # print(json.dumps(full_metadata))
         # print(json.dumps(simple_metadata))
         # print(affiliation)
         metadata = {
             # 'sid': scopus_entry_get_sid(simple_metadata),
             # 'eid': eid,
-            'doi': simple_metadata['prism:doi'],
+            # 'doi': simple_metadata['prism:doi'],
             'title': simple_metadata['dc:title'],
             'abstract': full_metadata['item']['bibrecord']['head']['abstracts'],
             'description': coredata['dc:description'],
-            'creators': scopus_parse_author(creators),
+            # 'creators': scopus_parse_author(coredata['dc:creator']['author']), # dont always exist
             'affiliation': scopus_parse_affiliation(full_metadata['affiliation']),
             'publication': {'name': simple_metadata['prism:publicationName'],
                             'issn': simple_metadata['prism:issn'],
