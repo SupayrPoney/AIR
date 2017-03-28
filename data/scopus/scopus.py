@@ -5,7 +5,7 @@ import os
 import hashlib
 import traceback
 
-DEBUG = False
+DEBUG = 0
 
 CACHE_DIR = '.cache'
 API_KEY = 'a52b0c7edc190b35f2740c8bde849893'
@@ -62,10 +62,13 @@ def scopus_search_by_title(title):
         'query': 'TITLE-ABS-KEY ( "{}" ) '.format(title)
     }
     res = json.loads(requests_get(SEARCH_URL, params=params))
-    if int(res['search-results']['opensearch:totalResults']) > 0:
-        return res
+    if 'service-error' in res:
+        print(res)
     else:
-        return None
+        if int(res['search-results']['opensearch:totalResults']) > 0:
+            return res
+        else:
+            return None
 
 
 def scopus_get_simple_metadata_by_eid(eid):
@@ -125,7 +128,7 @@ def scopus_parse_author(simple_metadata, full_metadata):
                 try:
                     author = full_metadata['coredata']['dc:creator']['author']
                 except KeyError:
-                    if DEBUG:
+                    if DEBUG >= 2:
                         print("DIDNT FIND ANY AUTHOR")
                     return []
     return [x['ce:indexed-name'] for x in author]
@@ -141,7 +144,7 @@ def scopus_parse_keywords(full_metadata):
         elif isinstance(full_metadata['idxterms'], dict):
             return [x['$'] for x in full_metadata['idxterms']['mainterm']]
         else:
-            if DEBUG:
+            if DEBUG >= 2:
                 print("DIDNT FIND ANY KEYWORDS")  # TODO
             return []
 
@@ -180,7 +183,7 @@ def scopus_parse_affiliation(simple_metadata, full_metadata):
                 pass
         return res
     except KeyError:
-        if DEBUG:
+        if DEBUG >= 2:
             print("DIDNT FIND ANY AFFILIATION")
         return []
 
@@ -215,11 +218,17 @@ def get_metadata_by_title(title):
             }
             return metadata
         except (KeyError, TypeError, IndexError) as e:
-            if DEBUG:
+            if DEBUG >= 2:
                 print("\x1b[31m", e, "\x1b[0m")
                 traceback.print_exc()
 
 if __name__ == '__main__':
+    import sys
+    if len(sys.argv) > 2:
+        if sys.argv[1] == '-D':
+            DEBUG = int(sys.argv[2])
+        else:
+            DEBUG = 0
     # response = scopus_search_by_title('a survey on reactive programming')
     # print(response['search-results']['entry'])
     # 2-s2.0-84891048418
@@ -227,17 +236,29 @@ if __name__ == '__main__':
     # print(response)
     # response = scopus_get_full_metadata_by_eid('2-s2.0-84891048418')
     # print(response)
-    response = get_metadata_by_title('a survey on reactive programming')
-    good = 0
-    print(response['title'] + "...\x1b[32mOK\x1b[0m")
-    for ref in response['references']:
-        if not DEBUG:
-            print(ref['title'] + "...", end="")
-        resp2 = get_metadata_by_title(ref['title'])
-        if not DEBUG:
-            if resp2 is None:
+
+    def retrieve(title):
+        if DEBUG >= 1:
+            print(title + "...", end="")
+        response = get_metadata_by_title(title)
+        if DEBUG >= 1:
+            if response is None:
                 print("\x1b[31mFAILED\x1b[0m")
             else:
-                good += 1
                 print("\x1b[32mOK\x1b[0m")
-    print("SCORE: ", good / (len(response['references']) + 1))
+        return response
+    response = retrieve('a survey on reactive programming')
+    good = 1
+    total = 1
+    for ref1 in response['references']:
+        resp2 = retrieve(ref1['title'])
+        total += 1
+        if resp2 is not None:
+            good += 1
+            for ref2 in resp2['references']:
+                resp3 = retrieve(ref2['title'])
+                total += 1
+                if resp3 is not None:
+                    good += 1
+
+    print("SCORE: ", good / total)
