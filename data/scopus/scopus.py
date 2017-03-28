@@ -47,13 +47,10 @@ def cache(func):
 
 @cache
 def requests_get(*args, **kwargs):
-    if 'params' in kwargs:
-        params = kwargs['params']
-        del kwargs['params']
-    else:
-        params = {}
-    params['apiKey'] = API_KEY
-    return requests.get(*args, **kwargs, params=params, proxies=proxies).text
+    if 'params' not in kwargs:
+        kwargs['params'] = {}
+    kwargs['params']['apiKey'] = API_KEY
+    return requests.get(*args, **kwargs, proxies=proxies).text
 
 
 def scopus_search_by_title(title):
