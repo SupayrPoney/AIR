@@ -5,6 +5,8 @@ import os
 import hashlib
 import traceback
 
+DEBUG = False
+
 CACHE_DIR = '.cache'
 API_KEY = 'a52b0c7edc190b35f2740c8bde849893'
 # API_KEY = '7f59af901d2d86f78a1fd60c1bf9426a'
@@ -123,7 +125,8 @@ def scopus_parse_author(simple_metadata, full_metadata):
                 try:
                     author = full_metadata['coredata']['dc:creator']['author']
                 except KeyError:
-                    print("DIDNT FIND ANY AUTHOR")
+                    if DEBUG:
+                        print("DIDNT FIND ANY AUTHOR")
                     return []
     return [x['ce:indexed-name'] for x in author]
 
@@ -138,7 +141,8 @@ def scopus_parse_keywords(full_metadata):
         elif isinstance(full_metadata['idxterms'], dict):
             return [x['$'] for x in full_metadata['idxterms']['mainterm']]
         else:
-            print("DIDNT FIND ANY KEYWORDS")  # TODO
+            if DEBUG:
+                print("DIDNT FIND ANY KEYWORDS")  # TODO
             return []
 
 
@@ -176,7 +180,8 @@ def scopus_parse_affiliation(simple_metadata, full_metadata):
                 pass
         return res
     except KeyError:
-        print("DIDNT FIND ANY AFFILIATION")
+        if DEBUG:
+            print("DIDNT FIND ANY AFFILIATION")
         return []
 
 
@@ -196,27 +201,11 @@ def get_metadata_by_title(title):
                            'subtype': simple_metadata['subtype'],
                            'subtype_description': simple_metadata['subtypeDescription'],
                            'source_id': simple_metadata['source-id']}
-            try:
-                publication['issn'] = simple_metadata['prism:issn']
-            except KeyError:
-                pass
-            try:
-                publication['volume'] = simple_metadata['prism:volume']
-            except KeyError:
-                pass
-            try:
-                publication['issue_identifier'] = simple_metadata['prism:issueIdentifier']
-            except KeyError:
-                pass
-            try:
-                publication['number'] = simple_metadata['article-number']
-            except KeyError:
-                pass
+
             metadata = {
                 'title': simple_metadata['dc:title'],
                 'abstract': full_metadata['item']['bibrecord']['head']['abstracts'],
                 'description': coredata['dc:description'],
-                # 'creators': scopus_parse_author(coredata['dc:creator']['author']), # dont always exist
                 'affiliation': scopus_parse_affiliation(simple_metadata, full_metadata),
                 'publication': publication,
                 'citedby_count': simple_metadata['citedby-count'],
@@ -226,8 +215,9 @@ def get_metadata_by_title(title):
             }
             return metadata
         except (KeyError, TypeError, IndexError) as e:
-            print("\x1b[31m", e, "\x1b[0m")
-            traceback.print_exc()
+            if DEBUG:
+                print("\x1b[31m", e, "\x1b[0m")
+                traceback.print_exc()
 
 if __name__ == '__main__':
     # response = scopus_search_by_title('a survey on reactive programming')
@@ -237,16 +227,17 @@ if __name__ == '__main__':
     # print(response)
     # response = scopus_get_full_metadata_by_eid('2-s2.0-84891048418')
     # print(response)
-    DEBUG = False
     response = get_metadata_by_title('a survey on reactive programming')
+    good = 0
     print(response['title'] + "...\x1b[32mOK\x1b[0m")
     for ref in response['references']:
-        if DEBUG:
+        if not DEBUG:
             print(ref['title'] + "...", end="")
         resp2 = get_metadata_by_title(ref['title'])
-        if DEBUG:
+        if not DEBUG:
             if resp2 is None:
                 print("\x1b[31mFAILED\x1b[0m")
             else:
+                good += 1
                 print("\x1b[32mOK\x1b[0m")
-    pass
+    print("SCORE: ", good / (len(response['references']) + 1))
