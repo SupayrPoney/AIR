@@ -128,6 +128,7 @@ def get_metadata_by_title(title):
         # 'eid': eid,
         'doi': simple_metadata['prism:doi'],
         'title': simple_metadata['dc:title'],
+        'abstract': full_metadata['item']['bibrecord']['head']['abstracts'],
         'description': coredata['dc:description'],
         'creators': scopus_parse_author(creators),
         'affiliation': {'name': affiliation['affiliation-name'],
