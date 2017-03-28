@@ -5,8 +5,8 @@ import os
 import hashlib
 
 CACHE_DIR = '.cache'
-# API_KEY = 'a52b0c7edc190b35f2740c8bde849893'
-API_KEY = '7f59af901d2d86f78a1fd60c1bf9426a'
+API_KEY = 'a52b0c7edc190b35f2740c8bde849893'
+# API_KEY = '7f59af901d2d86f78a1fd60c1bf9426a'
 
 proxies = {
     'http': 'socks5://localhost:22080',
@@ -81,17 +81,64 @@ def scopus_get_citing_papers_by_eid(eid):
 
 def scopus_get_full_metadata_by_eid(eid):
     simple_metadata = scopus_get_simple_metadata_by_eid(eid)
-    sid = simple_metadata['search-results']['entry'][0]['dc:identifier'].split(':')[-1]
+    sid = scopus_entry_get_sid(scopus_results_get_first_entry(simple_metadata))
     params = {
         'httpAccept': 'application/json'
     }
-    return requests_get(FULL_METADATA_URL.format(sid), params=params)
+    return json.loads(requests_get(FULL_METADATA_URL.format(sid), params=params))
+
+
+def scopus_results_get_first_entry(results):
+    return results['search-results']['entry'][0]
+
+
+def scopus_entry_get_sid(entry):
+    return entry['dc:identifier'].split(':')[-1]
+
+
+def scopus_entry_get_eid(entry):
+    return entry['eid']
+
+
+def get_metadata_by_title(title):
+    results = scopus_search_by_title(title)
+    eid = scopus_entry_get_eid(scopus_results_get_first_entry(results))
+    simple_metadata = scopus_results_get_first_entry(scopus_get_simple_metadata_by_eid(eid))
+    # full_metadata = scopus_results_get_first_entry(scopus_get_full_metadata_by_eid(eid))
+    metadata = {
+        'sid': scopus_entry_get_sid(simple_metadata),
+        'eid': eid,
+        'doi': simple_metadata['prism:doi'],
+        'title': simple_metadata['dc:title'],
+        'creator': simple_metadata['dc:creator'],
+        'affiliation': [{'name': x['affilname'],
+                         'city': x['affiliation-city'],
+                         'country': x['affiliation-country']} for x in simple_metadata['affiliation']],
+        'publication': {'name': simple_metadata['prism:publicationName'],
+                        'issn': simple_metadata['prism:issn'],
+                        'e-issn': simple_metadata['prism:eIssn'],
+                        'volume': simple_metadata['prism:volume'],
+                        'issue_identifier': simple_metadata['prism:issueIdentifier'],
+                        'page_range': simple_metadata['prism:pageRange'],
+                        'cover_date': simple_metadata['prism:coverDate'],
+                        'cover_display_date': simple_metadata['prism:coverDisplayDate'],
+                        'type': simple_metadata['prism:aggregationType'],
+                        'subtype': simple_metadata['subtype'],
+                        'subtype_description': simple_metadata['subtypeDescription'],
+                        'number': simple_metadata['article-number'],
+                        'source-id': simple_metadata['source-id']},
+        'citedby-count': simple_metadata['citedby-count']
+    }
+    return metadata
 
 if __name__ == '__main__':
     # response = scopus_search_by_title('a survey on reactive programming')
-    # print(json.loads(response)['search-results']['entry'])
+    # print(response['search-results']['entry'])
     # 2-s2.0-84891048418
     # response = scopus_get_simple_metadata_by_eid('2-s2.0-84891048418')
     # print(response)
-    response = scopus_get_full_metadata_by_eid('2-s2.0-84891048418')
+    # response = scopus_get_full_metadata_by_eid('2-s2.0-84891048418')
+    # print(response)
+    response = get_metadata_by_title('a survey on reactive programming')
     print(response)
+    pass
