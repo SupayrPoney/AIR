@@ -105,6 +105,12 @@ def scopus_entry_get_eid(entry):
     return entry['eid']
 
 
+def scopus_parse_author(author):
+    return [{'firstname': x['ce:given-name'],
+             'initials': x['ce:initials'],
+             'lastname': x['ce:surname']} for x in author]
+
+
 def get_metadata_by_title(title):
     results = scopus_search_by_title(title)
     eid = scopus_entry_get_eid(scopus_results_get_first_entry(results))
@@ -112,6 +118,7 @@ def get_metadata_by_title(title):
     full_metadata = scopus_get_full_metadata_by_eid(eid)["abstracts-retrieval-response"]
     affiliation_id = full_metadata['affiliation']['@id']
     affiliation = scopus_get_affiliation_by_id(affiliation_id)['affiliation-retrieval-response']
+    creators = full_metadata['coredata']['dc:creator']['author']
     # print(json.dumps(full_metadata))
     # print(json.dumps(simple_metadata))
     # print(affiliation)
@@ -120,7 +127,7 @@ def get_metadata_by_title(title):
         'eid': eid,
         'doi': simple_metadata['prism:doi'],
         'title': simple_metadata['dc:title'],
-        'creator': simple_metadata['dc:creator'],
+        'creators': scopus_parse_author(creators),
         'affiliation': {'name': affiliation['affiliation-name'],
                         'address': affiliation['address'],
                         'city': affiliation['city'],
@@ -140,9 +147,7 @@ def get_metadata_by_title(title):
                         'source_id': simple_metadata['source-id']},
         'citedby_count': simple_metadata['citedby-count'],
         'keywords': [x['$'] for sublist in full_metadata['authkeywords'].values() for x in sublist],
-        'authors': [{'firstname': x['ce:given-name'],
-                     'initials': x['ce:initials'],
-                     'lastname': x['ce:surname']} for x in full_metadata['authors']['author']]
+        'authors': scopus_parse_author(full_metadata['authors']['author'])
     }
     return metadata
 
