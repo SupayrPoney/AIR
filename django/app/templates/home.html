@@ -41,6 +41,18 @@
     #map-container {
 
     }
+    div.tooltip {   
+        position: absolute;         
+        text-align: center;         
+        width: 60px;                    
+        height: 28px;                   
+        padding: 2px;               
+        font: 12px sans-serif;      
+        background: lightsteelblue; 
+        border: 0px;        
+        border-radius: 8px;         
+        pointer-events: none;           
+    }
 </style>
 
 <div id="graph-container">
@@ -114,6 +126,10 @@
 
     var left_column_offset = ((container_height-((data.prev.length-1)*dot_space)-dot_radius*2)/2)-(dot_radius*1.5);
     var right_column_offset = ((container_height-((data.next.length-1)*dot_space)-dot_radius*2)/2)-(dot_radius*1.5);
+
+    var tooltip = d3.select("body").append("div")   
+    .attr("class", "tooltip")               
+    .style("opacity", 0);
 
     var y = left_column_offset;
     var links = svg.selectAll("link")
@@ -208,7 +224,22 @@
     .attr("r", dot_radius)
     .attr("fill", COLOR_PREV)
     .attr("stroke", "black")
-    .attr("stroke-width", CIRCLE_STROKE);
+    .attr("stroke-width", CIRCLE_STROKE)
+    .on("mouseover", function(d) {
+        d3.select(this).style("cursor", "pointer");      
+        tooltip.transition()        
+            .duration(200)      
+            .style("opacity", .9);      
+        tooltip .html(d.name)  
+            .style("left", (d3.select(this).attr("cx")) + "px")     
+            .style("top", (d3.select(this).attr("cy")) + "px");    
+        })
+    .on("mouseout", function(d) {
+        d3.select(this).style("cursor", "default");     
+        tooltip.transition()        
+            .duration(500)      
+            .style("opacity", 0);   
+        });
 
     svg.selectAll("node")
     .data(data.curr)
@@ -228,9 +259,18 @@
         },
         "mouseover": function(d) {
             d3.select(this).style("cursor", "pointer");
+            tooltip.transition()        
+                .duration(200)      
+                .style("opacity", .9);      
+            tooltip .html(d.name)  
+                .style("left", (d3.select(this).attr("cx")) + "px")     
+                .style("top", (d3.select(this).attr("cy")) + "px"); 
         },
         "mouseout": function(d) {
             d3.select(this).style("cursor", "default");
+            tooltip.transition()        
+                .duration(500)      
+                .style("opacity", 0);
         }
     });
 
@@ -248,7 +288,24 @@
     .attr("r", dot_radius)
     .attr("fill", COLOR_NEXT)
     .attr("stroke", "black")
-    .attr("stroke-width", CIRCLE_STROKE);
+    .attr("stroke-width", CIRCLE_STROKE)
+    .on({
+        "mouseover": function(d) {  
+            d3.select(this).style("cursor", "pointer");    
+            tooltip.transition()        
+                .duration(200)      
+                .style("opacity", .9);      
+            tooltip .html(d.name)  
+                .style("left", (d3.select(this).attr("cx")) + "px")     
+                .style("top", (d3.select(this).attr("cy")) + "px");    
+        },
+        "mouseout": function(d) {    
+            d3.select(this).style("cursor", "default"); 
+            tooltip.transition()        
+                .duration(500)      
+                .style("opacity", 0);   
+        }
+    });
 
     //#### MAP ####
 
