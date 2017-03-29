@@ -7,6 +7,8 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
 <script src="{% static "js/datamaps.world.min.js" %}"></script>
 
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
 <script src="https://d3js.org/d3-zoom.v1.min.js"></script>
 
 <style type="text/css">
@@ -22,6 +24,7 @@
     }
     #paper-infos > span {
         color: #FFFFFF;
+        font-size: 16px;
     }
     .tag {
         padding: 1px 6px;
@@ -44,6 +47,10 @@
     hr {
         margin-top: 5px;
         margin-bottom: 5px;
+    }
+    body{
+        font-family: 'Roboto', sans-serif;
+        
     }
     div.tooltip {   
         color: white;
@@ -68,7 +75,7 @@
 </div>
 
 <div id="paper-infos">
-    <span>A Survey on Reactive Programming</span>
+    <span><b>A Survey on Reactive Programming</b></span>
     <br>
     <span class="tag">Reactive programming </span><span class="tag">interactive applications</span><span class="tag">event-driven</span>
 </div>
