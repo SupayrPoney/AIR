@@ -64,7 +64,7 @@
     const CIRCLE_STROKE = 3;
 
     var data = {
-       prec: [{
+       prev: [{
         name: "A"
        }, {
         name: "B"
@@ -112,12 +112,12 @@
     var dot_space = 100;
     var col_offset = 400;
 
-    var left_column_offset = ((container_height-((data.prec.length-1)*dot_space)-dot_radius*2)/2)-(dot_radius*1.5);
+    var left_column_offset = ((container_height-((data.prev.length-1)*dot_space)-dot_radius*2)/2)-(dot_radius*1.5);
     var right_column_offset = ((container_height-((data.next.length-1)*dot_space)-dot_radius*2)/2)-(dot_radius*1.5);
 
     var y = left_column_offset;
     var links = svg.selectAll("link")
-    .data(data.prec)
+    .data(data.prev)
     .enter()
     .append("line")
     .attr("class", "link")
@@ -138,7 +138,7 @@
 
     var y = left_column_offset;
     var links = svg.selectAll("link")
-    .data(data.prec)
+    .data(data.prev)
     .enter()
     .append("line")
     .attr("class", "link")
@@ -192,12 +192,14 @@
     .attr("fill", "none")
     .attr("stroke", "black")
 
+    // NODES
+
     var y = left_column_offset;
     svg.selectAll("node")
-    .data(data.prec)
+    .data(data.prev)
     .enter()
     .append("circle")
-    .attr("class", "node")
+    .attr("class", "prev-node node")
     .attr("cx", mid_width-col_offset)
     .attr("cy", function(d) {
         y = y+dot_space;
@@ -212,20 +214,32 @@
     .data(data.curr)
     .enter()
     .append("circle")
-    .attr("class", "node")
+    .attr("class", "curr-node node")
     .attr("cx", mid_width)
     .attr("cy", mid_height)
     .attr("r", dot_radius)
     .attr("fill", COLOR_CURR)
     .attr("stroke", "black")
-    .attr("stroke-width", CIRCLE_STROKE);
+    .attr("stroke-width", CIRCLE_STROKE)
+    .on({
+        "click": function(d) {
+            var speed = 750; // Durée de l'animation (en ms)
+            $('html, body').animate( { scrollTop: $("#map-container").offset().top }, speed ); 
+        },
+        "mouseover": function(d) {
+            d3.select(this).style("cursor", "pointer");
+        },
+        "mouseout": function(d) {
+            d3.select(this).style("cursor", "default");
+        }
+    });
 
     var y = right_column_offset;
     svg.selectAll("node")
     .data(data.next)
     .enter()
     .append("circle")
-    .attr("class", "node")
+    .attr("class", "next-node node")
     .attr("cx", mid_width+col_offset)
     .attr("cy", function(d) {
         y = y+dot_space;
