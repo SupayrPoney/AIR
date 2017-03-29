@@ -60,7 +60,9 @@
     }
 
     .nav_text {
-        background: blue;
+        position: absolute;         
+        text-align: center;         
+        width: 100%;                           
     }
 
 </style>
@@ -387,11 +389,12 @@
     .on({
         "mouseover": function(d) {
             d3.select(this).style("cursor", "pointer");   
-            
+            nav_text.html("Currently displayed paper.")
+            .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")     
+            .style("top", (container_height-15) + "px"); 
         },
         "mouseout": function(d) {
             d3.select(this).style("cursor", "default"); 
-            
         }
     });
 
@@ -402,18 +405,57 @@
         .attr("r", NAV_DOT_RADIUS)
         .attr("fill", (i==1 ? COLOR_PREV : COLOR_PRIMARY))
         .attr("stroke", "white")
-        .attr("stroke-width", NAV_DOT_STROKE_WIDTH);
-
-        svg.append("circle")
-        .attr("cx", mid_width+(i*NAV_DOT_SPACE))
-        .attr("cy", container_height-NAV_OFFSET)
-        .attr("r", NAV_DOT_RADIUS)
-        .attr("fill", (i==1 ? COLOR_NEXT : COLOR_PRIMARY))
-        .attr("stroke", "white")
-        .attr("stroke-width", NAV_DOT_STROKE_WIDTH);
+        .attr("stroke-width", NAV_DOT_STROKE_WIDTH)
+        .on({
+            "mouseover": function(d) {
+                d3.select(this).style("cursor", "pointer");
+                nav_text.html("Navigate to the th node on the path to a founding paper.")
+                .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")  
+                .style("top", (container_height-15) + "px");
+            },
+            "mouseout": function(d) {
+                d3.select(this).style("cursor", "default");
+            }
+        });
     }
 
+    svg.append("circle")
+    .attr("cx", mid_width+NAV_DOT_SPACE)
+    .attr("cy", container_height-NAV_OFFSET)
+    .attr("r", NAV_DOT_RADIUS)
+    .attr("fill", COLOR_NEXT)
+    .attr("stroke", "white")
+    .attr("stroke-width", NAV_DOT_STROKE_WIDTH)
+    .on({
+        "mouseover": function(d) {
+            d3.select(this).style("cursor", "pointer");
+            nav_text.html("Navigate to a randomly selected paper referenced in the currently selected paper.")
+            .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")  
+            .style("top", (container_height-15) + "px");
+        },
+        "mouseout": function(d) {
+            d3.select(this).style("cursor", "default");
+        }
+    });
 
+    svg.append("circle")
+    .attr("cx", mid_width-(NAV_LENGTH/2)-NAV_EXTREMITY+5)
+    .attr("cy", container_height-NAV_OFFSET)
+    .attr("r", NAV_DOT_RADIUS)
+    .attr("fill", COLOR_PRIMARY)
+    .attr("stroke", "white")
+    .attr("stroke-width", NAV_DOT_STROKE_WIDTH)
+    .on({
+        "mouseover": function(d) {
+            d3.select(this).style("cursor", "pointer");
+            nav_text.html("Navigate to a founding paper.")
+            .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")  
+            .style("top", (container_height-15) + "px");
+        },
+        "mouseout": function(d) {
+            d3.select(this).style("cursor", "default");
+        }
+    });
 
     //#### MAP ####
 
