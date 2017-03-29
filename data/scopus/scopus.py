@@ -55,7 +55,8 @@ def requests_get(*args, **kwargs):
     if 'params' not in kwargs:
         kwargs['params'] = {}
     kwargs['params']['apiKey'] = API_KEY
-    return requests.get(*args, **kwargs, proxies=proxies).text
+    kwargs['params']['httpAccept'] = 'application/json'
+    return requests.get(*args, **kwargs, proxies=proxies).json()
 
 
 def scopus_search_by_title(title):
@@ -63,7 +64,7 @@ def scopus_search_by_title(title):
     params = {
         'query': 'TITLE-ABS-KEY ( "{}" ) '.format(title)
     }
-    res = json.loads(requests_get(SEARCH_URL, params=params))
+    res = requests_get(SEARCH_URL, params=params)
     if 'service-error' in res:
         print(res)
     else:
@@ -74,10 +75,7 @@ def scopus_search_by_title(title):
 
 
 def scopus_find_by_sid(sid):
-    params = {
-        'httpAccept': 'application/json'
-    }
-    res = json.loads(requests_get(FULL_METADATA_URL.format(sid), params=params))
+    res = requests_get(FULL_METADATA_URL.format(sid))
     if 'abstracts-retrieval-response' in res:
         return res['abstracts-retrieval-response']
     else:
@@ -86,34 +84,27 @@ def scopus_find_by_sid(sid):
 
 def scopus_get_simple_metadata_by_eid(eid):
     params = {
-        'query': 'EID({})'.format(eid),
-        'httpAccept': 'application/json'
+        'query': 'EID({})'.format(eid)
     }
-    return json.loads(requests_get(SIMPLE_METADATA_URL, params=params))
+    return requests_get(SIMPLE_METADATA_URL, params=params)
 
 
 def scopus_get_citing_papers_by_eid(eid):
     params = {
-        'query': 'REFEID({})'.format(eid),
-        'httpAccept': 'application/json'
+        'query': 'REFEID({})'.format(eid)
     }
-    return json.loads(requests_get(SIMPLE_METADATA_URL, params=params))
+    return requests_get(SIMPLE_METADATA_URL, params=params)
 
 
 def scopus_get_full_metadata_by_eid(eid):
     simple_metadata = scopus_get_simple_metadata_by_eid(eid)
     sid = scopus_entry_get_sid(scopus_results_get_first_entry(simple_metadata))
-    params = {
-        'httpAccept': 'application/json'
-    }
-    return json.loads(requests_get(FULL_METADATA_URL.format(sid), params=params))
+    return requests_get(FULL_METADATA_URL.format(sid))
 
 
 def scopus_get_affiliation_by_id(id):
-    params = {
-        'httpAccept': 'application/json'
-    }
-    return json.loads(requests_get(AFFILIATION_URL.format(id), params=params))
+    res = requests_get(AFFILIATION_URL.format(id))
+    return res
 
 
 def scopus_results_get_first_entry(results):
