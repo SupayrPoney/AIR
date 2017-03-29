@@ -18,10 +18,10 @@ proxies = {
 }
 
 SEARCH_URL = 'https://api.elsevier.com/content/search/scopus'
-SIMPLE_METADATA_URL = 'https://api.elsevier.com/content/search/scopus'
-FULL_METADATA_URL = 'https://api.elsevier.com/content/abstract/scopus_id/{}'
+ABSTRACT_SID_URL = 'https://api.elsevier.com/content/abstract/scopus_id/{}'
 AFFILIATION_URL = 'https://api.elsevier.com/content/affiliation/affiliation_id/{}'
 
+# requests and cache
 if not os.path.exists(CACHE_DIR):
     os.mkdir(CACHE_DIR)
 
@@ -59,6 +59,7 @@ def requests_get(*args, **kwargs):
     return requests.get(*args, **kwargs, proxies=proxies).json()
 
 
+# search/find on scopus
 def scopus_search_by_title(title):
     title = title.strip(string.punctuation)
     params = {
@@ -74,39 +75,34 @@ def scopus_search_by_title(title):
             return None
 
 
+def scopus_search_by_eid(eid):
+    params = {
+        'query': 'EID({})'.format(eid)
+    }
+    return requests_get(SEARCH_URL, params=params)
+
+
 def scopus_find_by_sid(sid):
-    res = requests_get(FULL_METADATA_URL.format(sid))
+    res = requests_get(ABSTRACT_SID_URL.format(sid))
     if 'abstracts-retrieval-response' in res:
         return res['abstracts-retrieval-response']
     else:
         return None
 
 
-def scopus_get_simple_metadata_by_eid(eid):
-    params = {
-        'query': 'EID({})'.format(eid)
-    }
-    return requests_get(SIMPLE_METADATA_URL, params=params)
-
-
-def scopus_get_citing_papers_by_eid(eid):
+def scopus_search_citing_papers_by_eid(eid):
     params = {
         'query': 'REFEID({})'.format(eid)
     }
-    return requests_get(SIMPLE_METADATA_URL, params=params)
+    return requests_get(SEARCH_URL, params=params)
 
 
-def scopus_get_full_metadata_by_eid(eid):
-    simple_metadata = scopus_get_simple_metadata_by_eid(eid)
-    sid = scopus_entry_get_sid(scopus_results_get_first_entry(simple_metadata))
-    return requests_get(FULL_METADATA_URL.format(sid))
-
-
-def scopus_get_affiliation_by_id(id):
-    res = requests_get(AFFILIATION_URL.format(id))
+def scopus_find_affiliation_by_id(affiliation_id):
+    res = requests_get(AFFILIATION_URL.format(affiliation_id))
     return res
 
 
+# parse scopus results
 def scopus_results_get_first_entry(results):
     return results['search-results']['entry'][0]
 
@@ -119,7 +115,8 @@ def scopus_entry_get_eid(entry):
     return entry['eid']
 
 
-def scopus_parse_author(simple_metadata, full_metadata):
+def scopus_parse_author(full_metadata):
+    coredata = full_metadata['coredata']
     try:
         author = full_metadata['authors']['author']
     except TypeError:
@@ -127,10 +124,10 @@ def scopus_parse_author(simple_metadata, full_metadata):
             author = full_metadata['item']['bibrecord']['head']['author-group']['author']
         except KeyError:
             try:
-                return [simple_metadata['dc:creator']]
+                return [coredata['dc:creator']]
             except KeyError:
                 try:
-                    author = full_metadata['coredata']['dc:creator']['author']
+                    author = coredata['dc:creator']['author']
                 except KeyError:
                     if DEBUG >= 2:
                         print("DIDNT FIND ANY AUTHOR")
@@ -177,7 +174,7 @@ def scopus_parse_affiliation(full_metadata):
         res = []
         for x in affiliation:
             affiliation_id = x['@id']
-            x = scopus_get_affiliation_by_id(affiliation_id)['affiliation-retrieval-response']
+            x = scopus_find_affiliation_by_id(affiliation_id)['affiliation-retrieval-response']
             try:
                 res.append({'name': x['affiliation-name'],
                             'address': x['address'],
@@ -210,14 +207,14 @@ def scopus_parse_full_metadata(full_metadata):
                        'source_id': coredata['source-id']}
 
         metadata = {
-            'title': full_metadata['coredata']['dc:title'],
+            'title': coredata['dc:title'],
             'abstract': full_metadata['item']['bibrecord']['head']['abstracts'],
             # 'description': coredata['dc:description'],
             'affiliation': scopus_parse_affiliation(full_metadata),
             'publication': publication,
             'citedby_count': coredata['citedby-count'],
             'keywords': scopus_parse_keywords(full_metadata),
-            'authors': scopus_parse_author(coredata, full_metadata),
+            'authors': scopus_parse_author(full_metadata),
             'references': scopus_parse_reference(full_metadata['item']['bibrecord']['tail']['bibliography']['reference'])
         }
         return metadata
@@ -230,8 +227,8 @@ def scopus_parse_full_metadata(full_metadata):
 def get_metadata_by_title(title):
     results = scopus_search_by_title(title)
     if results is not None:
-        eid = scopus_entry_get_eid(scopus_results_get_first_entry(results))
-        full_metadata = scopus_get_full_metadata_by_eid(eid)["abstracts-retrieval-response"]
+        sid = scopus_entry_get_sid(scopus_results_get_first_entry(results))
+        full_metadata = scopus_find_by_sid(sid)
         return scopus_parse_full_metadata(full_metadata)
 
 
@@ -253,13 +250,6 @@ if __name__ == '__main__':
             DEBUG = int(sys.argv[2])
         else:
             DEBUG = 0
-    # response = scopus_search_by_title('a survey on reactive programming')
-    # print(response['search-results']['entry'])
-    # 2-s2.0-84891048418
-    # response = scopus_get_simple_metadata_by_eid('2-s2.0-84891048418')
-    # print(response)
-    # response = scopus_get_full_metadata_by_eid('2-s2.0-84891048418')
-    # print(response)
 
     # def retrieve(title):
     #     if DEBUG >= 1:
