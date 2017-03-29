@@ -142,7 +142,7 @@ def scopus_parse_author(full_metadata):
     ret = []
 
     for a in authors:
-        if a not in ret:
+        if a not in ret and a is not None:
             ret.append(a)
     return ret
 
