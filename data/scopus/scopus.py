@@ -67,7 +67,9 @@ def scopus_search_by_title(title):
     }
     res = requests_get(SEARCH_URL, params=params)
     if 'service-error' in res:
-        print(res)
+        if DEBUG >= 2:
+            print(title)
+            print(res)
     else:
         if int(res['search-results']['opensearch:totalResults']) > 0:
             return res
@@ -160,7 +162,10 @@ def scopus_parse_reference(reference):
             try:
                 title = ref_info['ref-sourcetitle']
             except KeyError:
-                title = ref_info['ref-text'].split('.')[0]
+                try:
+                    title = ref_info['ref-text'].split('.')[0]
+                except KeyError:
+                    title = ''
         sid = ref_info['refd-itemidlist']['itemid']['$']
         results.append({'title': title, 'sid': sid})
     return results
@@ -194,6 +199,16 @@ def scopus_parse_title(full_metadata):
     return full_metadata['coredata']['dc:title']
 
 
+def scopus_parse_doi(full_metadata):
+    try:
+        return full_metadata['coredata']['prism:doi']
+    except KeyError:
+        try:
+            return full_metadata['item']['bibrecord']['item-info']['itemidlist']['ce:doi']
+        except KeyError:
+            return None
+
+
 def scopus_parse_full_metadata(full_metadata):
     try:
         coredata = full_metadata['coredata']
@@ -207,6 +222,7 @@ def scopus_parse_full_metadata(full_metadata):
                        'source_id': coredata['source-id']}
 
         metadata = {
+            'doi': scopus_parse_doi(full_metadata),
             'title': coredata['dc:title'],
             'abstract': full_metadata['item']['bibrecord']['head']['abstracts'],
             # 'description': coredata['dc:description'],
@@ -238,8 +254,7 @@ def get_references(metadata):
         ref_md = get_metadata_by_title(ref['title'])
         if ref_md is None:
             full_metadata = scopus_find_by_sid(ref['sid'])
-            if full_metadata is not None:
-                ref_md = scopus_parse_full_metadata(full_metadata)
+            ref_md = scopus_parse_full_metadata(full_metadata)
         references.append(ref_md)
     return references
 
@@ -272,5 +287,5 @@ if __name__ == '__main__':
                 total += 1
                 if ref2 is not None:
                     good += 1
-
+    print("TOTAL: ", total)
     print("SCORE: ", good / total)
