@@ -67,7 +67,9 @@ def scopus_search_by_title(title):
     }
     res = requests_get(SEARCH_URL, params=params)
     if 'service-error' in res:
-        print(res)
+        if DEBUG >= 2:
+            print(title)
+            print(res)
     else:
         if int(res['search-results']['opensearch:totalResults']) > 0:
             return res
@@ -160,7 +162,10 @@ def scopus_parse_reference(reference):
             try:
                 title = ref_info['ref-sourcetitle']
             except KeyError:
-                title = ref_info['ref-text'].split('.')[0]
+                try:
+                    title = ref_info['ref-text'].split('.')[0]
+                except KeyError:
+                    title = ''
         sid = ref_info['refd-itemidlist']['itemid']['$']
         results.append({'title': title, 'sid': sid})
     return results
@@ -238,8 +243,7 @@ def get_references(metadata):
         ref_md = get_metadata_by_title(ref['title'])
         if ref_md is None:
             full_metadata = scopus_find_by_sid(ref['sid'])
-            if full_metadata is not None:
-                ref_md = scopus_parse_full_metadata(full_metadata)
+            ref_md = scopus_parse_full_metadata(full_metadata)
         references.append(ref_md)
     return references
 
