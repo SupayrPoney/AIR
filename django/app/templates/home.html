@@ -20,7 +20,7 @@
     #paper-infos {
         position: fixed;
         bottom: 0px;
-        background-color: rgb(55,55,55);
+        background-color: #1A537F; 
         padding: 10px;
         text-align: center;
         color: white;
@@ -31,7 +31,8 @@
     }
     .tag {
         padding: 1px 6px;
-        background-color: #F44336; 
+        color: black !important;
+        background-color: #FFE74C; 
         margin-left: 3px;
         border-radius: 2px;
     }
@@ -48,10 +49,10 @@
         element: document.getElementById('map'),
         responsive: true,
         fills: {
-            'prev': '#FF4413', //FFA100
-            'curr': '#DC15F1', //B201C4
-            'next': '#3338F3', //01B3BB
-            defaultFill: "#D2EDD2" // D6F2D6
+            'prev': '#FF5964', //FFA100
+            'curr': '#FFE74C', //B201C4
+            'next': '#6BF178', //01B3BB
+            defaultFill: "#1A537F" // D6F2D6
         },
     });
     window.addEventListener('resize', function() {
@@ -59,10 +60,10 @@
     });
 
     var bombs = [{
-        radius: 8,
+        radius: 12,
         location: 'Université Libre de Bruxelles',
         fillKey: 'prev',
-        borderWidth: 0.5,
+        borderWidth: 1,
         paper: "Les fourmis c'est vraiment cool.",
         date: '1953-08-12',
         latitude: 50.813102, 
@@ -70,10 +71,10 @@
         fillOpacity: 1.0
       },
       {
-        radius: 8,
+        radius: 12,
         location: 'Université de Toronto',
         fillKey: 'next',
-        borderWidth: 0.5,
+        borderWidth: 1,
         paper: "Un four et de la mie.",
         date: '1953-08-12',
         latitude: 43.662220,
@@ -81,10 +82,10 @@
         fillOpacity: 1.0
       },
       {
-        radius: 8,
+        radius: 12,
         location: 'Kathmandu University School of Management',
         fillKey: 'curr',
-        borderWidth: 0.5,
+        borderWidth: 1,
         paper: "Les fourmis de Katmandou.",
         date: '1953-08-12',
         latitude: 27.669768, 

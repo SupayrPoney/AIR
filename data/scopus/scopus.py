@@ -70,6 +70,7 @@ def scopus_search_by_title(title):
         if DEBUG >= 2:
             print(title)
             print(res)
+        return None
     else:
         if int(res['search-results']['opensearch:totalResults']) > 0:
             return res
@@ -269,10 +270,12 @@ def get_references_metadata(metadata):
 
     references = []
     for ref in metadata['references']:
-        ref_md = get_metadata_by_title(ref['title'])
-        if ref_md is None:
-            full_metadata = scopus_find_by_sid(ref['sid'])
+        full_metadata = scopus_find_by_sid(ref['sid'])
+        ref_md = None
+        if full_metadata is not None:
             ref_md = scopus_parse_full_metadata(full_metadata)
+        if ref_md is None:
+            ref_md = get_metadata_by_title(ref['title'])
         references.append(ref_md)
     return references
 
