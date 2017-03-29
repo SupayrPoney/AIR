@@ -70,6 +70,7 @@ def scopus_search_by_title(title):
         if DEBUG >= 2:
             print(title)
             print(res)
+        return None
     else:
         if int(res['search-results']['opensearch:totalResults']) > 0:
             return res
@@ -253,16 +254,19 @@ def get_metadata_by_title(title):
         return scopus_parse_full_metadata(full_metadata)
 
 
-def get_references(metadata):
-    references = None
-    if metadata['references'] is not None:
-        references = []
-        for ref in metadata['references']:
+def get_references_metadata(metadata):
+    if metadata['references'] is None:
+        return None
+
+    references = []
+    for ref in metadata['references']:
+        full_metadata = scopus_find_by_sid(ref['sid'])
+        ref_md = None
+        if full_metadata is not None:
+            ref_md = scopus_parse_full_metadata(full_metadata)
+        if ref_md is None:
             ref_md = get_metadata_by_title(ref['title'])
-            if ref_md is None:
-                full_metadata = scopus_find_by_sid(ref['sid'])
-                ref_md = scopus_parse_full_metadata(full_metadata)
-            references.append(ref_md)
+        references.append(ref_md)
     return references
 
 if __name__ == '__main__':
@@ -286,14 +290,14 @@ if __name__ == '__main__':
     response = get_metadata_by_title('a survey on reactive programming')
     good = 1
     total = 1
-    references1 = get_references(response)
+    references1 = get_references_metadata(response)
     if references1 is not None:
         print(len([x for x in references1 if x is not None]))
         for ref1 in references1:
             total += 1
             if ref1 is not None:
                 good += 1
-                references2 = get_references(ref1)
+                references2 = get_references_metadata(ref1)
                 if references2 is not None:
                     for ref2 in references2:
                         total += 1
