@@ -199,6 +199,16 @@ def scopus_parse_title(full_metadata):
     return full_metadata['coredata']['dc:title']
 
 
+def scopus_parse_doi(full_metadata):
+    try:
+        return full_metadata['coredata']['prism:doi']
+    except KeyError:
+        try:
+            return full_metadata['item']['bibrecord']['item-info']['itemidlist']['ce:doi']
+        except KeyError:
+            return None
+
+
 def scopus_parse_full_metadata(full_metadata):
     try:
         coredata = full_metadata['coredata']
@@ -212,6 +222,7 @@ def scopus_parse_full_metadata(full_metadata):
                        'source_id': coredata['source-id']}
 
         metadata = {
+            'doi': scopus_parse_doi(full_metadata),
             'title': coredata['dc:title'],
             'abstract': full_metadata['item']['bibrecord']['head']['abstracts'],
             # 'description': coredata['dc:description'],
