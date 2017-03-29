@@ -152,23 +152,28 @@ def scopus_parse_keywords(full_metadata):
             return []
 
 
-def scopus_parse_reference(reference):
-    results = []
-    for x in reference:
-        ref_info = x['ref-info']
-        try:
-            title = ref_info['ref-title']['ref-titletext']
-        except KeyError:
+def scopus_parse_reference(full_metadata):
+    try:
+        reference = full_metadata['item']['bibrecord']['tail']['bibliography']['reference']
+    except KeyError:
+        return None
+    else:
+        results = []
+        for x in reference:
+            ref_info = x['ref-info']
             try:
-                title = ref_info['ref-sourcetitle']
+                title = ref_info['ref-title']['ref-titletext']
             except KeyError:
                 try:
-                    title = ref_info['ref-text'].split('.')[0]
+                    title = ref_info['ref-sourcetitle']
                 except KeyError:
-                    title = ''
-        sid = ref_info['refd-itemidlist']['itemid']['$']
-        results.append({'title': title, 'sid': sid})
-    return results
+                    try:
+                        title = ref_info['ref-text'].split('.')[0]
+                    except KeyError:
+                        title = ''
+            sid = ref_info['refd-itemidlist']['itemid']['$']
+            results.append({'title': title, 'sid': sid})
+        return results
 
 
 def scopus_parse_affiliation(full_metadata):
@@ -231,7 +236,7 @@ def scopus_parse_full_metadata(full_metadata):
             'citedby_count': coredata['citedby-count'],
             'keywords': scopus_parse_keywords(full_metadata),
             'authors': scopus_parse_author(full_metadata),
-            'references': scopus_parse_reference(full_metadata['item']['bibrecord']['tail']['bibliography']['reference'])
+            'references': scopus_parse_reference(full_metadata)
         }
         return metadata
     except (KeyError, TypeError, IndexError) as e:
@@ -249,13 +254,15 @@ def get_metadata_by_title(title):
 
 
 def get_references(metadata):
-    references = []
-    for ref in metadata['references']:
-        ref_md = get_metadata_by_title(ref['title'])
-        if ref_md is None:
-            full_metadata = scopus_find_by_sid(ref['sid'])
-            ref_md = scopus_parse_full_metadata(full_metadata)
-        references.append(ref_md)
+    references = None
+    if metadata['references'] is not None:
+        references = []
+        for ref in metadata['references']:
+            ref_md = get_metadata_by_title(ref['title'])
+            if ref_md is None:
+                full_metadata = scopus_find_by_sid(ref['sid'])
+                ref_md = scopus_parse_full_metadata(full_metadata)
+            references.append(ref_md)
     return references
 
 if __name__ == '__main__':
@@ -279,13 +286,18 @@ if __name__ == '__main__':
     response = get_metadata_by_title('a survey on reactive programming')
     good = 1
     total = 1
-    for ref1 in get_references(response):
-        total += 1
-        if ref1 is not None:
-            good += 1
-            for ref2 in get_references(ref1):
-                total += 1
-                if ref2 is not None:
-                    good += 1
+    references1 = get_references(response)
+    if references1 is not None:
+        print(len([x for x in references1 if x is not None]))
+        for ref1 in references1:
+            total += 1
+            if ref1 is not None:
+                good += 1
+                references2 = get_references(ref1)
+                if references2 is not None:
+                    for ref2 in references2:
+                        total += 1
+                        if ref2 is not None:
+                            good += 1
     print("TOTAL: ", total)
     print("SCORE: ", good / total)
