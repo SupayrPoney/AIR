@@ -70,6 +70,7 @@ def scopus_search_by_title(title):
         if DEBUG >= 2:
             print(title)
             print(res)
+        return None
     else:
         if int(res['search-results']['opensearch:totalResults']) > 0:
             return res
@@ -141,11 +142,17 @@ def scopus_parse_keywords(full_metadata):
     if 'authkeywords' in full_metadata and isinstance(full_metadata['authkeywords'], dict):
         return [x['$'] for sublist in full_metadata['authkeywords'].values() for x in sublist]
     else:
-        citation_info = full_metadata['item']['bibrecord']['head']['citation-info']
+        citation_info = full_metadata.get('item', {}).get('bibrecord', {}).get('head', {}).get('citation-info')
+        if citation_info is None:
+            return []
+
         if 'author-keywords' in citation_info:
             return [x['$'] for x in citation_info['author-keywords']['author-keyword']]
         elif isinstance(full_metadata['idxterms'], dict):
-            return [x['$'] for x in full_metadata['idxterms']['mainterm']]
+            terms = full_metadata['idxterms']['mainterm']
+            if isinstance(terms, str):
+                return [terms]
+            return [x['$'] for x in terms]
         else:
             if DEBUG >= 2:
                 print("DIDNT FIND ANY KEYWORDS")  # TODO
@@ -153,27 +160,31 @@ def scopus_parse_keywords(full_metadata):
 
 
 def scopus_parse_reference(full_metadata):
-    try:
-        reference = full_metadata['item']['bibrecord']['tail']['bibliography']['reference']
-    except KeyError:
+    tail = full_metadata.get('item', {}).get('bibrecord', {}).get('tail', {})
+    if tail is None:
         return None
-    else:
-        results = []
-        for x in reference:
-            ref_info = x['ref-info']
+
+    reference = tail.get('bibliography', {}).get('reference', None)
+    if reference is None:
+        return None
+
+    results = []
+    for x in reference:
+        ref_info = x['ref-info']
+        try:
+            title = ref_info['ref-title']['ref-titletext']
+        except KeyError:
             try:
-                title = ref_info['ref-title']['ref-titletext']
+                title = ref_info['ref-sourcetitle']
             except KeyError:
                 try:
-                    title = ref_info['ref-sourcetitle']
+                    title = ref_info['ref-text'].split('.')[0]
+                    # TODO : check proportion
                 except KeyError:
-                    try:
-                        title = ref_info['ref-text'].split('.')[0]
-                    except KeyError:
-                        title = ''
-            sid = ref_info['refd-itemidlist']['itemid']['$']
-            results.append({'title': title, 'sid': sid})
-        return results
+                    title = ''
+        sid = ref_info['refd-itemidlist']['itemid']['$']
+        results.append({'title': title, 'sid': sid})
+    return results
 
 
 def scopus_parse_affiliation(full_metadata):
@@ -215,34 +226,34 @@ def scopus_parse_doi(full_metadata):
 
 
 def scopus_parse_full_metadata(full_metadata):
-    try:
-        coredata = full_metadata['coredata']
-        publication = {'name': coredata['prism:publicationName'],
-                       # 'page_range': coredata['prism:pageRange'],
-                       'cover_date': coredata['prism:coverDate'],
-                       # 'cover_display_date': coredata['prism:coverDisplayDate'],
-                       'type': coredata['prism:aggregationType'],
-                       # 'subtype': coredata['subtype'],
-                       # 'subtype_description': coredata['subtypeDescription'],
-                       'source_id': coredata['source-id']}
+    if full_metadata is None:
+        return None
 
-        metadata = {
-            'doi': scopus_parse_doi(full_metadata),
-            'title': coredata['dc:title'],
-            'abstract': full_metadata['item']['bibrecord']['head']['abstracts'],
-            # 'description': coredata['dc:description'],
-            'affiliation': scopus_parse_affiliation(full_metadata),
-            'publication': publication,
-            'citedby_count': coredata['citedby-count'],
-            'keywords': scopus_parse_keywords(full_metadata),
-            'authors': scopus_parse_author(full_metadata),
-            'references': scopus_parse_reference(full_metadata)
-        }
-        return metadata
-    except (KeyError, TypeError, IndexError) as e:
-        if DEBUG >= 2:
-            print("\x1b[31m", e, "\x1b[0m")
-            traceback.print_exc()
+    coredata = full_metadata['coredata']
+    publication = {
+        'name': coredata.get('prism:publicationName', None),
+        'cover_date': coredata.get('prism:coverDate', None),
+        'type': coredata.get('prism:aggregationType', None),
+        'source_id': coredata.get('source-id', None),
+        'page_range': coredata.get('prism:pageRange', None),
+        'cover_display_date': coredata.get('prism:coverDisplayDate', None),
+        'subtype': coredata.get('subtype', None),
+        'subtype_description': coredata.get('subtypeDescription', None),
+    }
+
+    metadata = {
+        'doi': scopus_parse_doi(full_metadata),
+        'title': coredata['dc:title'],
+        'abstract': full_metadata.get('item', {}).get('bibrecord', {}).get('head', {}).get('abstracts', None),
+        'description': coredata.get('dc:description', None),
+        'affiliation': scopus_parse_affiliation(full_metadata),
+        'publication': publication,
+        'citedby_count': coredata.get('citedby-count', None),
+        'keywords': scopus_parse_keywords(full_metadata),
+        'authors': scopus_parse_author(full_metadata),
+        'references': scopus_parse_reference(full_metadata)
+    }
+    return metadata
 
 
 def get_metadata_by_title(title):
@@ -253,16 +264,19 @@ def get_metadata_by_title(title):
         return scopus_parse_full_metadata(full_metadata)
 
 
-def get_references(metadata):
-    references = None
-    if metadata['references'] is not None:
-        references = []
-        for ref in metadata['references']:
+def get_references_metadata(metadata):
+    if metadata['references'] is None:
+        return None
+
+    references = []
+    for ref in metadata['references']:
+        full_metadata = scopus_find_by_sid(ref['sid'])
+        ref_md = None
+        if full_metadata is not None:
+            ref_md = scopus_parse_full_metadata(full_metadata)
+        if ref_md is None:
             ref_md = get_metadata_by_title(ref['title'])
-            if ref_md is None:
-                full_metadata = scopus_find_by_sid(ref['sid'])
-                ref_md = scopus_parse_full_metadata(full_metadata)
-            references.append(ref_md)
+        references.append(ref_md)
     return references
 
 if __name__ == '__main__':
@@ -286,14 +300,14 @@ if __name__ == '__main__':
     response = get_metadata_by_title('a survey on reactive programming')
     good = 1
     total = 1
-    references1 = get_references(response)
+    references1 = get_references_metadata(response)
     if references1 is not None:
         print(len([x for x in references1 if x is not None]))
         for ref1 in references1:
             total += 1
             if ref1 is not None:
                 good += 1
-                references2 = get_references(ref1)
+                references2 = get_references_metadata(ref1)
                 if references2 is not None:
                     for ref2 in references2:
                         total += 1
