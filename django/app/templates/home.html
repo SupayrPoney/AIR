@@ -116,8 +116,8 @@
          author: "Bob Reynders , Dominique Devriese , Frank Piessens",
          year: "2014",
          keywords: "Functional Reactive Programming, FRP, Multitier Web Framework", 
-         affiliation: "KU Leuven", 
-         location: [50.877954, 4.700295]
+         affiliation: "University of Singapore", 
+         location: [1.296643, 103.776394]
        }, {
         name:"Reactive programming with reactive variables",
         author: "Christopher Schuster , Cormac Flanagan", 
@@ -273,7 +273,7 @@
                 .duration(500)      
                 .style("opacity", 0);   
         }
-    });
+    }); 
 
     svg.selectAll("node")
     .data(data.curr)
@@ -357,40 +357,24 @@
         map.resize();
     });
 
-    var bombs = [{
-        radius: 12,
-        location: 'Université Libre de Bruxelles',
-        fillKey: 'prev',
-        borderWidth: 1,
-        paper: "Les fourmis c'est vraiment cool.",
-        date: '1953-08-12',
-        latitude: 50.813102, 
-        longitude: 4.383510,
-        fillOpacity: 1.0
-      },
-      {
-        radius: 12,
-        location: 'Université de Toronto',
-        fillKey: 'next',
-        borderWidth: 1,
-        paper: "Un four et de la mie.",
-        date: '1953-08-12',
-        latitude: 43.662220,
-        longitude: -79.395141,
-        fillOpacity: 1.0
-      },
-      {
-        radius: 12,
-        location: 'Kathmandu University School of Management',
-        fillKey: 'curr',
-        borderWidth: 1,
-        paper: "Les fourmis de Katmandou.",
-        date: '1953-08-12',
-        latitude: 27.669768, 
-        longitude: 85.333947,
-        fillOpacity: 1.0
-      },
-    ];
+    var bombs = []
+    Object.keys(data).forEach(function (el) {
+        data[el].map(function (obj) {
+            bombs.push({
+                radius: 12,
+                location: obj.affiliation,
+                fillKey: el,
+                borderWidth: 1,
+                paper: obj.name,
+                date: obj.year,
+                latitude: obj.location[0], 
+                longitude: obj.location[1],
+                fillOpacity: 1.0
+            })
+        })
+        
+    })
+
     map.bubbles(bombs, {
         popupTemplate: function (geo, data) {
                 return ['<div class="hoverinfo">' +  data.paper + '<br>',
