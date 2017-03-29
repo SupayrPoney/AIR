@@ -264,6 +264,10 @@ def scopus_parse_doi(full_metadata):
             return None
 
 
+def scopus_parse_eid(full_metadata):
+    return full_metadata.get('coredata', {}).get('eid')
+
+
 def scopus_parse_full_metadata(full_metadata):
     if full_metadata is None:
         return None
@@ -281,6 +285,7 @@ def scopus_parse_full_metadata(full_metadata):
     }
 
     metadata = {
+        'eid': scopus_parse_eid(full_metadata),
         'doi': scopus_parse_doi(full_metadata),
         'title': coredata['dc:title'],
         'abstract': full_metadata.get('item', {}).get('bibrecord', {}).get('head', {}).get('abstracts', None),
