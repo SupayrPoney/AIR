@@ -26,6 +26,8 @@ def api(request):
                 break
 
     if paper is not None:
+        paper["left"] = entrypoint.left_of(paper)
+        paper["right"] = entrypoint.right_of(paper)
         return JsonResponse(paper)
     else:
         raise Http404("No paper for you, sorry")
