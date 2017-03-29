@@ -10,21 +10,15 @@
 <script src="https://d3js.org/d3-zoom.v1.min.js"></script>
 
 <style type="text/css">
-    #map {
-        width: 100%;
-        height: calc(100% - 5px);
-        margin: 0 !important;
-        padding: 0 !important;
-        display: inline-block;
-    }
     #paper-infos {
         position: fixed;
-        bottom: 0px;
+        top: 0px;
         background-color: rgb(55,55,55);
         padding: 10px;
         text-align: center;
         color: white;
         width: 100%;
+        height: 65px;
     }
     #paper-infos > span {
         color: #FFFFFF;
@@ -35,17 +29,201 @@
         margin-left: 3px;
         border-radius: 2px;
     }
+    #graph-container, #map-container, #graph-container svg {
+        width: 100vw;
+        height: calc(100vh - 65px);
+    }
+
+    #graph-container {
+        margin-top: 65px;
+        background-color: salmon;
+    }
+    #map-container {
+        background-color: crimson;
+    }
 </style>
-<div id="map">
+
+<div id="graph-container">
+    <svg xmlns="http://www.w3.org/2000/svg"></svg>
 </div>
+<div id="map-container">
+
+</div>
+
 <div id="paper-infos">
     <span>Les fourmis de Katmandou</span>
     <br>
     <span class="tag">fourmis</span><span class="tag">katmandou</span><span class="tag">népal</span>
 </div>
+
 <script>
+    var data = {
+       prec: [{
+        name: "A"
+       }, {
+        name: "B"
+       }, {
+        name: "cool"
+       }, {
+        name: "plop"
+       }, {
+        name: "f"
+       }, {
+        name: "e"
+       }],
+       curr: [{
+         name: "C"
+       }],
+       next: [{
+         name: "D"
+       }, {
+         name: "E"
+       }]
+     };
+
+    var c10 = d3.scale.category10();
+    var svg = d3.select("#graph-container svg");
+
+    svg.append('svg:defs').append('svg:marker')
+    .attr('id', 'mid-arrow')
+    .attr('viewBox', '0 -5 10 10')
+    .attr('refX', 6)
+    .attr('markerWidth', 10)
+    .attr('markerHeight', 10)
+    .attr('orient', 'auto')
+    .append('svg:path')
+    .attr('d', 'M0,-5L10,0L0,5L6,0')
+    .attr('fill', '#000');
+
+    var container_width = parseInt(window.getComputedStyle(svg[0][0], null).getPropertyValue("width"));
+    var container_height = parseInt(window.getComputedStyle(svg[0][0], null).getPropertyValue("height"));
+    var mid_width = container_width/2;
+    var mid_height = container_height/2;
+
+    var dot_radius = 40;
+    var dot_space = 100;
+    var col_offset = 400;
+
+    var left_column_offset = ((container_height-((data.prec.length-1)*dot_space)-dot_radius*2)/2)-(dot_radius*1.5);
+    var right_column_offset = ((container_height-((data.next.length-1)*dot_space)-dot_radius*2)/2)-(dot_radius*1.5);
+
+    var y = left_column_offset;
+    var links = svg.selectAll("link")
+    .data(data.prec)
+    .enter()
+    .append("line")
+    .attr("class", "link")
+    .attr("x1", function(l) {
+        y = y+dot_space;
+        d3.select(this).attr("y1", y);
+        return mid_width-col_offset;
+    })
+    .attr("x2", function(l) {
+        const x1 = parseInt(d3.select(this).attr("x1"));
+        const y1 = parseInt(d3.select(this).attr("y1"));
+        d3.select(this).attr("y2", y1+(mid_height-y1)/2);
+        return x1+(col_offset/2);
+    })
+    .attr("fill", "none")
+    .attr("stroke", "black")
+    .attr("marker-end", 'url(#mid-arrow)');
+
+    var y = left_column_offset;
+    var links = svg.selectAll("link")
+    .data(data.prec)
+    .enter()
+    .append("line")
+    .attr("class", "link")
+    .attr("x1", function(l) {
+        y = y+dot_space;
+        d3.select(this).attr("y1", y+(mid_height-y)/2);
+        return mid_width-(col_offset/2);
+    })
+    .attr("x2", function(l) {
+        d3.select(this).attr("y2", mid_height);
+        return mid_width;
+    })
+    .attr("fill", "none")
+    .attr("stroke", "black")
+
+    var y = right_column_offset;
+    var links = svg.selectAll("link")
+    .data(data.next)
+    .enter()
+    .append("line")
+    .attr("class", "link")
+    .attr("x1", function(l) {
+        d3.select(this).attr("y1", mid_height);
+        return mid_width;
+    })
+    .attr("x2", function(l) {
+        y = y + dot_space;
+        d3.select(this).attr("y2", mid_height+(mid_height-y)/2);
+        return mid_width+(col_offset/2);
+    })
+    .attr("fill", "none")
+    .attr("stroke", "black")
+    .attr("marker-end", 'url(#mid-arrow)');
+
+    var y = right_column_offset;
+    var links = svg.selectAll("link")
+    .data(data.next)
+    .enter()
+    .append("line")
+    .attr("class", "link")
+    .attr("x2", function(l) {
+        y = y+dot_space;
+        d3.select(this).attr("y2", y);
+        return mid_width+col_offset;
+    })
+    .attr("x1", function(l) {
+        const y2 = parseInt(d3.select(this).attr("y2"));
+        d3.select(this).attr("y1", mid_height+(mid_height-y2)/2);
+        return mid_width-(col_offset/2);
+    })
+    .attr("fill", "none")
+    .attr("stroke", "black")
+
+    var y = left_column_offset;
+    svg.selectAll("node")
+    .data(data.prec)
+    .enter()
+    .append("circle")
+    .attr("class", "node")
+    .attr("cx", mid_width-col_offset)
+    .attr("cy", function(d) {
+        y = y+dot_space;
+        return y
+    }.bind(y))
+    .attr("r", dot_radius)
+    .attr("fill", "red");
+
+    svg.selectAll("node")
+    .data(data.curr)
+    .enter()
+    .append("circle")
+    .attr("class", "node")
+    .attr("cx", mid_width)
+    .attr("cy", mid_height)
+    .attr("r", dot_radius)
+    .attr("fill", "yellow");
+
+    var y = right_column_offset;
+    svg.selectAll("node")
+    .data(data.next)
+    .enter()
+    .append("circle")
+    .attr("class", "node")
+    .attr("cx", mid_width+col_offset)
+    .attr("cy", function(d) {
+        y = y+dot_space;
+        return y
+    }.bind(y))
+    .attr("r", dot_radius)
+    .attr("fill", "green");
+
     var map = new Datamap({
-        element: document.getElementById('map'),
+        element: document.getElementById('map-container'),
         responsive: true,
         fills: {
             'prev': '#FF4413', //FFA100
