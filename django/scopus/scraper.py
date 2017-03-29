@@ -7,7 +7,7 @@ import string
 
 DEBUG = 0
 
-CACHE_DIR = '.cache'
+CACHE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), '.cache')
 API_KEY = 'a52b0c7edc190b35f2740c8bde849893'
 # API_KEY = '7f59af901d2d86f78a1fd60c1bf9426a'
 
@@ -19,7 +19,7 @@ proxies = {
 SEARCH_URL = 'https://api.elsevier.com/content/search/scopus'
 ABSTRACT_SID_URL = 'https://api.elsevier.com/content/abstract/scopus_id/{}'
 AFFILIATION_URL = 'https://api.elsevier.com/content/affiliation/affiliation_id/{}'
-
+ABSTRACT_DOI_URL = 'https://api.elsevier.com/content/abstract/doi/{}'
 # requests and cache
 if not os.path.exists(CACHE_DIR):
     os.mkdir(CACHE_DIR)
@@ -92,6 +92,11 @@ def scopus_search_by_eid(eid):
 
 def scopus_find_by_sid(sid):
     res = requests_get(ABSTRACT_SID_URL.format(sid))
+    return res.get('abstracts-retrieval-response')
+
+
+def scopus_find_doi(doi):
+    res = requests_get(ABSTRACT_DOI_URL.format(doi))
     return res.get('abstracts-retrieval-response')
 
 
@@ -296,6 +301,18 @@ def get_metadata_by_title(title):
         sid = scopus_entry_get_sid(scopus_results_get_first_entry(results))
         full_metadata = scopus_find_by_sid(sid)
         return scopus_parse_full_metadata(full_metadata)
+
+
+def get_metadata_by_doi(doi):
+    resp = scopus_find_doi(doi)
+    if resp is not None:
+        return scopus_parse_full_metadata(resp)
+
+
+def get_metadata_by_sid(sid):
+    resp = scopus_find_by_sid(sid)
+    if resp is not None:
+        return scopus_parse_full_metadata(resp)
 
 
 def get_references_metadata(metadata):
