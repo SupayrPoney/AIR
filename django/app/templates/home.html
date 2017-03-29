@@ -13,7 +13,7 @@
     #paper-infos {
         position: fixed;
         top: 0px;
-        background-color: rgb(55,55,55);
+        background-color: #1A537F; 
         padding: 10px;
         text-align: center;
         color: white;
@@ -25,7 +25,8 @@
     }
     .tag {
         padding: 1px 6px;
-        background-color: #F44336; 
+        color: black !important;
+        background-color: #FFE74C; 
         margin-left: 3px;
         border-radius: 2px;
     }
@@ -36,10 +37,9 @@
 
     #graph-container {
         margin-top: 65px;
-        background-color: salmon;
     }
     #map-container {
-        background-color: crimson;
+
     }
 </style>
 
@@ -57,6 +57,12 @@
 </div>
 
 <script>
+    const COLOR_PREV = '#FF5964';
+    const COLOR_CURR = '#FFE74C';
+    const COLOR_NEXT = '#6BF178';
+    const COLOR_PRIMARY = "#1A537F";
+    const CIRCLE_STROKE = 3;
+
     var data = {
        prec: [{
         name: "A"
@@ -74,10 +80,12 @@
        curr: [{
          name: "C"
        }],
-       next: [{
-         name: "D"
-       }, {
+       next: [ {
          name: "E"
+       }, {
+        name:"plop2"
+       }, {
+        name: "girafe"
        }]
      };
 
@@ -178,8 +186,8 @@
     })
     .attr("x1", function(l) {
         const y2 = parseInt(d3.select(this).attr("y2"));
-        d3.select(this).attr("y1", mid_height+(mid_height-y2)/2);
-        return mid_width-(col_offset/2);
+        d3.select(this).attr("y1", mid_height-(mid_height-y2)/2);
+        return mid_width+(col_offset/2);
     })
     .attr("fill", "none")
     .attr("stroke", "black")
@@ -196,7 +204,9 @@
         return y
     }.bind(y))
     .attr("r", dot_radius)
-    .attr("fill", "red");
+    .attr("fill", COLOR_PREV)
+    .attr("stroke", "black")
+    .attr("stroke-width", CIRCLE_STROKE);
 
     svg.selectAll("node")
     .data(data.curr)
@@ -206,7 +216,9 @@
     .attr("cx", mid_width)
     .attr("cy", mid_height)
     .attr("r", dot_radius)
-    .attr("fill", "yellow");
+    .attr("fill", COLOR_CURR)
+    .attr("stroke", "black")
+    .attr("stroke-width", CIRCLE_STROKE);
 
     var y = right_column_offset;
     svg.selectAll("node")
@@ -220,16 +232,20 @@
         return y
     }.bind(y))
     .attr("r", dot_radius)
-    .attr("fill", "green");
+    .attr("fill", COLOR_NEXT)
+    .attr("stroke", "black")
+    .attr("stroke-width", CIRCLE_STROKE);
+
+    //#### MAP ####
 
     var map = new Datamap({
         element: document.getElementById('map-container'),
         responsive: true,
         fills: {
-            'prev': '#FF4413', //FFA100
-            'curr': '#DC15F1', //B201C4
-            'next': '#3338F3', //01B3BB
-            defaultFill: "#D2EDD2" // D6F2D6
+            'prev': COLOR_PREV,
+            'curr': COLOR_CURR,
+            'next': COLOR_NEXT,
+            defaultFill: COLOR_PRIMARY
         },
     });
     window.addEventListener('resize', function() {
@@ -237,10 +253,10 @@
     });
 
     var bombs = [{
-        radius: 8,
+        radius: 12,
         location: 'Université Libre de Bruxelles',
         fillKey: 'prev',
-        borderWidth: 0.5,
+        borderWidth: 1,
         paper: "Les fourmis c'est vraiment cool.",
         date: '1953-08-12',
         latitude: 50.813102, 
@@ -248,10 +264,10 @@
         fillOpacity: 1.0
       },
       {
-        radius: 8,
+        radius: 12,
         location: 'Université de Toronto',
         fillKey: 'next',
-        borderWidth: 0.5,
+        borderWidth: 1,
         paper: "Un four et de la mie.",
         date: '1953-08-12',
         latitude: 43.662220,
@@ -259,10 +275,10 @@
         fillOpacity: 1.0
       },
       {
-        radius: 8,
+        radius: 12,
         location: 'Kathmandu University School of Management',
         fillKey: 'curr',
-        borderWidth: 0.5,
+        borderWidth: 1,
         paper: "Les fourmis de Katmandou.",
         date: '1953-08-12',
         latitude: 27.669768, 
