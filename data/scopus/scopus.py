@@ -272,5 +272,5 @@ if __name__ == '__main__':
                 total += 1
                 if ref2 is not None:
                     good += 1
-
+    print("TOTAL: ", total)
     print("SCORE: ", good / total)
