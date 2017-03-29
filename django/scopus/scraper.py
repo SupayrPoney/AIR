@@ -104,7 +104,11 @@ def scopus_search_citing_papers_by_eid(eid):
     params = {
         'query': 'REFEID({})'.format(eid)
     }
-    return requests_get(SEARCH_URL, params=params)
+    r = requests_get(SEARCH_URL, params=params)
+    entries = r.get('search-results', {}).get('entry', {})
+    if len(entries) == 0 or "error" in lod(entries)[0]:
+        return None
+    return lod(entries)
 
 
 def scopus_find_affiliation_by_id(affiliation_id):
@@ -118,7 +122,7 @@ def scopus_results_get_first_entry(results):
 
 
 def scopus_entry_get_sid(entry):
-    return entry['dc:identifier'].split(':')[-1]
+    return entry.get('dc:identifier', "").split(':')[-1]
 
 
 def scopus_entry_get_eid(entry):
@@ -298,6 +302,22 @@ def scopus_parse_full_metadata(full_metadata):
         'references': scopus_parse_reference(full_metadata)
     }
     return metadata
+
+
+def parse_citers(results_set):
+    if results_set is None:
+        return None
+    return [
+        {
+            "title": p.get("dc:title"),
+            "sid": scopus_entry_get_sid(p),
+        }
+        for p in results_set
+    ]
+
+
+def get_citers_by_eid(eid):
+    return parse_citers(scopus_search_citing_papers_by_eid(eid))
 
 
 def get_metadata_by_title(title):

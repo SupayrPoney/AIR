@@ -7,6 +7,8 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
 <script src="{% static "js/datamaps.world.min.js" %}"></script>
 
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
 <script src="https://d3js.org/d3-zoom.v1.min.js"></script>
 
 <style type="text/css">
@@ -22,6 +24,7 @@
     }
     #paper-infos > span {
         color: #FFFFFF;
+        font-size: 16px;
     }
     .tag {
         padding: 1px 6px;
@@ -44,6 +47,10 @@
     hr {
         margin-top: 5px;
         margin-bottom: 5px;
+    }
+    body{
+        font-family: 'Roboto', sans-serif;
+        
     }
     div.tooltip {   
         color: white;
@@ -75,9 +82,9 @@
 </div>
 
 <div id="paper-infos">
-    <span>Les fourmis de Katmandou</span>
+    <span><b>A Survey on Reactive Programming</b></span>
     <br>
-    <span class="tag">fourmis</span><span class="tag">katmandou</span><span class="tag">népal</span>
+    <span class="tag">Reactive programming </span><span class="tag">interactive applications</span><span class="tag">event-driven</span>
 </div>
 
 <script>
@@ -92,34 +99,46 @@
         name: "Implementation of the data-flow synchronous language SIGNAL", 
         author: "Pascalin Amagbégnon , Loïc Besnard , Paul Le Guernic",
         year: "1995",
-        keywords: ""
+        keywords: "", 
+        affiliation: "IRSA-INRIA",
+        location: [48.116282, -1.639774]
        }, {
         name: "Alma-O: an imperative language that supports declarative programming", 
         author: "Krzysztof R. Apt , Jacob Brunekreef , Vincent Partington , Andrea Schaerf", 
         year: "1998",
-        keywords: "Laguages, declarative programming, imperative programming, search"
+        keywords: "Laguages, declarative programming, imperative programming, search", 
+        affiliation: "University of Amsterdam", 
+        location: [52.355818, 4.955726]
        }, {
         name: "The synchronous languages 12 years later",
         author: "A., Caspi, P., Edwards, S. A., Halbwachs, N., Guernic, P. L., Robert, and Simone, D",
         year: "2003",
-        keywords: "Embedded systems, Esterel, formal methods, Lustre, real-time systems, Signal, synchronous languages"
+        keywords: "Embedded systems, Esterel, formal methods, Lustre, real-time systems, Signal, synchronous languages", 
+        affiliation: "IRSA-INRIA",
+        location: [48.116282, -1.639774]
        }],
        curr: [{
          name: "A Survey on Reactive Programming",
          author: "Engineer Bainomugisha , Andoni Lombide Carreton,Tom van Cutsem, Stijn Mostinckx, Wolfgang de Meuter", 
          year: "2013",
-         keywords: "Design, Languages, Reactive programming, interactive applications, event-driven applications, dataflow programming, functional reactive programming, reactive systems"
-       }],
+         keywords: "Design, Languages, Reactive programming, interactive applications, event-driven applications, dataflow programming, functional reactive programming, reactive systems", 
+         affiliation: " Vrije Universiteit Brussel", 
+         location: [50.823165, 4.392326]
+        }],
        next: [ {
          name: "Multi-Tier Functional Reactive Programming for the Web", 
          author: "Bob Reynders , Dominique Devriese , Frank Piessens",
          year: "2014",
-         keywords: "Functional Reactive Programming, FRP, Multitier Web Framework"
+         keywords: "Functional Reactive Programming, FRP, Multitier Web Framework", 
+         affiliation: "University of Singapore", 
+         location: [1.296643, 103.776394]
        }, {
         name:"Reactive programming with reactive variables",
         author: "Christopher Schuster , Cormac Flanagan", 
         year: "2016", 
-        keywords: "Reactive Programming, Syntax Extension, JavaScript"
+        keywords: "Reactive Programming, Syntax Extension, JavaScript", 
+        affiliation: "University of California", 
+        location: [32.880060, -117.234014]
        
        }]
      };
@@ -268,7 +287,7 @@
                 .duration(500)      
                 .style("opacity", 0);   
         }
-    });
+    }); 
 
     svg.selectAll("node")
     .data(data.curr)
@@ -473,40 +492,24 @@
         map.resize();
     });
 
-    var bombs = [{
-        radius: 12,
-        location: 'Université Libre de Bruxelles',
-        fillKey: 'prev',
-        borderWidth: 1,
-        paper: "Les fourmis c'est vraiment cool.",
-        date: '1953-08-12',
-        latitude: 50.813102, 
-        longitude: 4.383510,
-        fillOpacity: 1.0
-      },
-      {
-        radius: 12,
-        location: 'Université de Toronto',
-        fillKey: 'next',
-        borderWidth: 1,
-        paper: "Un four et de la mie.",
-        date: '1953-08-12',
-        latitude: 43.662220,
-        longitude: -79.395141,
-        fillOpacity: 1.0
-      },
-      {
-        radius: 12,
-        location: 'Kathmandu University School of Management',
-        fillKey: 'curr',
-        borderWidth: 1,
-        paper: "Les fourmis de Katmandou.",
-        date: '1953-08-12',
-        latitude: 27.669768, 
-        longitude: 85.333947,
-        fillOpacity: 1.0
-      },
-    ];
+    var bombs = []
+    Object.keys(data).forEach(function (el) {
+        data[el].map(function (obj) {
+            bombs.push({
+                radius: 12,
+                location: obj.affiliation,
+                fillKey: el,
+                borderWidth: 1,
+                paper: obj.name,
+                date: obj.year,
+                latitude: obj.location[0], 
+                longitude: obj.location[1],
+                fillOpacity: 1.0
+            })
+        })
+        
+    })
+
     map.bubbles(bombs, {
         popupTemplate: function (geo, data) {
                 return ['<div class="hoverinfo">' +  data.paper + '<br>',
