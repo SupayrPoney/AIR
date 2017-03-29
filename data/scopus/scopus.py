@@ -49,6 +49,14 @@ def cache(func):
     return wrapper
 
 
+def lod(x):
+    return [x] if isinstance(x, dict) else x
+
+
+def fd(x):
+    return x if x else {}
+
+
 @cache
 def requests_get(*args, params={}, **kwargs):
     params['apiKey'] = API_KEY
@@ -113,23 +121,25 @@ def scopus_entry_get_eid(entry):
 
 
 def scopus_parse_author(full_metadata):
-    coredata = full_metadata['coredata']
-    try:
-        author = full_metadata['authors']['author']
-    except TypeError:
-        try:
-            author = full_metadata['item']['bibrecord']['head']['author-group']['author']
-        except KeyError:
-            try:
-                return [coredata['dc:creator']]
-            except KeyError:
-                try:
-                    author = coredata['dc:creator']['author']
-                except KeyError:
-                    if DEBUG >= 2:
-                        print("DIDNT FIND ANY AUTHOR")
-                    return []
-    return [x['ce:indexed-name'] for x in author]
+    coredata = full_metadata.get('coredata', {})
+
+    authors = []
+
+    authors += lod(fd(full_metadata.get('authors', {})).get('author', []))
+
+    groups = lod(full_metadata.get('item').get('bibrecord').get('head').get('author-group', []))
+    for gr in groups:
+        authors += lod(gr.get('author', []))
+
+    authors += lod(coredata.get('dc:creator', {}).get("author", []))
+
+    authors = [x.get('ce:indexed-name') for x in authors if x]
+    ret = []
+
+    for a in authors:
+        if a not in ret:
+            ret.append(a)
+    return ret
 
 
 def scopus_parse_keywords(full_metadata):
@@ -181,12 +191,6 @@ def scopus_parse_reference(full_metadata):
 
 
 def scopus_parse_affiliation(full_metadata):
-    def lod(x):
-        return [x] if isinstance(x, dict) else x
-
-    def fd(x):
-        return x if x else {}
-
     unparsed_affiliations = lod(full_metadata.get('affiliation', {}))
 
     authors = full_metadata.get("coredata", {}).get("dc:creator", {}).get("author", [])
