@@ -44,8 +44,7 @@
     div.tooltip {   
         position: absolute;         
         text-align: center;         
-        width: 60px;                    
-        height: 28px;                   
+        width: 360px;                   
         padding: 2px;               
         font: 12px sans-serif;      
         background: lightsteelblue; 
@@ -230,7 +229,7 @@
         tooltip.transition()        
             .duration(200)      
             .style("opacity", .9);      
-        tooltip .html(d.name)  
+        tooltip .html("<b>"+d.name+"</b>")  
             .style("left", (d3.select(this).attr("cx")) + "px")     
             .style("top", (d3.select(this).attr("cy")) + "px");    
         })
