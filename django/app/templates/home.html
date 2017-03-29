@@ -41,16 +41,21 @@
     #map-container {
 
     }
+    hr {
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
     div.tooltip {   
+        color: white;
+        box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 1px 5px 0 rgba(0,0,0,0.12),0 3px 1px -2px rgba(0,0,0,0.2);
         position: absolute;         
         text-align: center;         
-        width: 60px;                    
-        height: 28px;                   
-        padding: 2px;               
+        width: 360px;                   
+        padding: 10px 5px;               
         font: 12px sans-serif;      
-        background: lightsteelblue; 
+        background: #1A537F; 
         border: 0px;        
-        border-radius: 8px;         
+        border-radius: 3px;         
         pointer-events: none;           
     }
 
@@ -82,30 +87,45 @@
 
     var data = {
        prev: [{
-        name: "A"
+        name: "Implementation of the data-flow synchronous language SIGNAL", 
+        author: "Pascalin Amagbégnon , Loïc Besnard , Paul Le Guernic",
+        year: "1995",
+        keywords: ""
        }, {
-        name: "B"
+        name: "Alma-O: an imperative language that supports declarative programming", 
+        author: "Krzysztof R. Apt , Jacob Brunekreef , Vincent Partington , Andrea Schaerf", 
+        year: "1998",
+        keywords: "Laguages, declarative programming, imperative programming, search"
        }, {
-        name: "cool"
-       }, {
-        name: "plop"
-       }, {
-        name: "f"
-       }, {
-        name: "e"
+        name: "The synchronous languages 12 years later",
+        author: "A., Caspi, P., Edwards, S. A., Halbwachs, N., Guernic, P. L., Robert, and Simone, D",
+        year: "2003",
+        keywords: "Embedded systems, Esterel, formal methods, Lustre, real-time systems, Signal, synchronous languages"
        }],
        curr: [{
-         name: "C"
+         name: "A Survey on Reactive Programming",
+         author: "Engineer Bainomugisha , Andoni Lombide Carreton,Tom van Cutsem, Stijn Mostinckx, Wolfgang de Meuter", 
+         year: "2013",
+         keywords: "Design, Languages, Reactive programming, interactive applications, event-driven applications, dataflow programming, functional reactive programming, reactive systems"
        }],
        next: [ {
-         name: "E"
+         name: "Multi-Tier Functional Reactive Programming for the Web", 
+         author: "Bob Reynders , Dominique Devriese , Frank Piessens",
+         year: "2014",
+         keywords: "Functional Reactive Programming, FRP, Multitier Web Framework"
        }, {
-        name:"plop2"
-       }, {
-        name: "girafe"
+        name:"Reactive programming with reactive variables",
+        author: "Christopher Schuster , Cormac Flanagan", 
+        year: "2016", 
+        keywords: "Reactive Programming, Syntax Extension, JavaScript"
+       
        }]
      };
 
+     // function computeDivSize(div) {
+     //    var size = window.getComputedStyle(div, null);
+
+     // }
     var c10 = d3.scale.category10();
     var svg = d3.select("#graph-container svg");
 
@@ -230,21 +250,23 @@
     .attr("fill", COLOR_PREV)
     .attr("stroke", "black")
     .attr("stroke-width", CIRCLE_STROKE)
-    .on("mouseover", function(d) {
-        d3.select(this).style("cursor", "pointer");      
-        tooltip.transition()        
-            .duration(200)      
-            .style("opacity", .9);      
-        tooltip .html(d.name)  
-            .style("left", (d3.select(this).attr("cx")) + "px")     
-            .style("top", (d3.select(this).attr("cy")) + "px");    
-        })
-    .on("mouseout", function(d) {
-        d3.select(this).style("cursor", "default");     
-        tooltip.transition()        
-            .duration(500)      
-            .style("opacity", 0);   
-        });
+    .on({
+        "mouseover": function(d) {  
+            d3.select(this).style("cursor", "pointer");    
+            tooltip.transition()        
+                .duration(200)      
+                .style("opacity", .95);      
+            tooltip .html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +"<hr>"+ d.keywords.split(", ").join(" | "))  
+                .style("left", (d3.select(this).attr("cx") - $(tooltip[0][0]).width()/2) + "px")     
+                .style("top", (d3.select(this).attr("cy") - $(tooltip[0][0]).height()) + "px");    
+        },
+        "mouseout": function(d) {    
+            d3.select(this).style("cursor", "default"); 
+            tooltip.transition()        
+                .duration(500)      
+                .style("opacity", 0);   
+        }
+    });
 
     svg.selectAll("node")
     .data(data.curr)
@@ -266,10 +288,10 @@
             d3.select(this).style("cursor", "pointer");
             tooltip.transition()        
                 .duration(200)      
-                .style("opacity", .9);      
-            tooltip .html(d.name)  
-                .style("left", (d3.select(this).attr("cx")) + "px")     
-                .style("top", (d3.select(this).attr("cy")) + "px"); 
+                .style("opacity", .95);      
+            tooltip .html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +"<hr>"+ d.keywords.split(", ").join(" | "))  
+                .style("left", (d3.select(this).attr("cx") - $(tooltip[0][0]).width()/2) + "px")     
+                .style("top", (d3.select(this).attr("cy") - $(tooltip[0][0]).height()) + "px");    
         },
         "mouseout": function(d) {
             d3.select(this).style("cursor", "default");
@@ -299,10 +321,10 @@
             d3.select(this).style("cursor", "pointer");    
             tooltip.transition()        
                 .duration(200)      
-                .style("opacity", .9);      
-            tooltip .html(d.name)  
-                .style("left", (d3.select(this).attr("cx")) + "px")     
-                .style("top", (d3.select(this).attr("cy")) + "px");    
+                .style("opacity", .95);      
+            tooltip .html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +"<hr>"+ d.keywords.split(", ").join(" | "))  
+                .style("left", (d3.select(this).attr("cx") - $(tooltip[0][0]).width()/2) + "px")     
+                .style("top", (d3.select(this).attr("cy") - $(tooltip[0][0]).height()) + "px");    
         },
         "mouseout": function(d) {    
             d3.select(this).style("cursor", "default"); 

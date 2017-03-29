@@ -3,12 +3,11 @@ import json
 from functools import wraps
 import os
 import hashlib
-import traceback
 import string
 
 DEBUG = 0
 
-CACHE_DIR = '.cache'
+CACHE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), '.cache')
 API_KEY = 'a52b0c7edc190b35f2740c8bde849893'
 # API_KEY = '7f59af901d2d86f78a1fd60c1bf9426a'
 
@@ -20,7 +19,7 @@ proxies = {
 SEARCH_URL = 'https://api.elsevier.com/content/search/scopus'
 ABSTRACT_SID_URL = 'https://api.elsevier.com/content/abstract/scopus_id/{}'
 AFFILIATION_URL = 'https://api.elsevier.com/content/affiliation/affiliation_id/{}'
-
+ABSTRACT_DOI_URL = 'https://api.elsevier.com/content/abstract/doi/{}'
 # requests and cache
 if not os.path.exists(CACHE_DIR):
     os.mkdir(CACHE_DIR)
@@ -50,13 +49,19 @@ def cache(func):
     return wrapper
 
 
+def lod(x):
+    return [x] if isinstance(x, dict) else x
+
+
+def fd(x):
+    return x if x else {}
+
+
 @cache
-def requests_get(*args, **kwargs):
-    if 'params' not in kwargs:
-        kwargs['params'] = {}
-    kwargs['params']['apiKey'] = API_KEY
-    kwargs['params']['httpAccept'] = 'application/json'
-    return requests.get(*args, **kwargs, proxies=proxies).json()
+def requests_get(*args, params={}, **kwargs):
+    params['apiKey'] = API_KEY
+    params['httpAccept'] = 'application/json'
+    return requests.get(*args, proxies=proxies, params=params, **kwargs).json()
 
 
 # search/find on scopus
@@ -87,10 +92,12 @@ def scopus_search_by_eid(eid):
 
 def scopus_find_by_sid(sid):
     res = requests_get(ABSTRACT_SID_URL.format(sid))
-    if 'abstracts-retrieval-response' in res:
-        return res['abstracts-retrieval-response']
-    else:
-        return None
+    return res.get('abstracts-retrieval-response')
+
+
+def scopus_find_doi(doi):
+    res = requests_get(ABSTRACT_DOI_URL.format(doi))
+    return res.get('abstracts-retrieval-response')
 
 
 def scopus_search_citing_papers_by_eid(eid):
@@ -119,44 +126,45 @@ def scopus_entry_get_eid(entry):
 
 
 def scopus_parse_author(full_metadata):
-    coredata = full_metadata['coredata']
-    try:
-        author = full_metadata['authors']['author']
-    except TypeError:
-        try:
-            author = full_metadata['item']['bibrecord']['head']['author-group']['author']
-        except KeyError:
-            try:
-                return [coredata['dc:creator']]
-            except KeyError:
-                try:
-                    author = coredata['dc:creator']['author']
-                except KeyError:
-                    if DEBUG >= 2:
-                        print("DIDNT FIND ANY AUTHOR")
-                    return []
-    return [x['ce:indexed-name'] for x in author]
+    coredata = full_metadata.get('coredata', {})
+
+    authors = []
+
+    authors += lod(fd(full_metadata.get('authors', {})).get('author', []))
+
+    groups = lod(full_metadata.get('item').get('bibrecord').get('head').get('author-group', []))
+    for gr in groups:
+        authors += lod(gr.get('author', []))
+
+    authors += lod(coredata.get('dc:creator', {}).get("author", []))
+
+    authors = [x.get('ce:indexed-name') for x in authors if x]
+    ret = []
+
+    for a in authors:
+        if a not in ret and a is not None:
+            ret.append(a)
+    return ret
 
 
 def scopus_parse_keywords(full_metadata):
     if 'authkeywords' in full_metadata and isinstance(full_metadata['authkeywords'], dict):
         return [x['$'] for sublist in full_metadata['authkeywords'].values() for x in sublist]
-    else:
-        citation_info = full_metadata.get('item', {}).get('bibrecord', {}).get('head', {}).get('citation-info')
-        if citation_info is None:
-            return []
 
-        if 'author-keywords' in citation_info:
-            return [x['$'] for x in citation_info['author-keywords']['author-keyword']]
-        elif isinstance(full_metadata['idxterms'], dict):
-            terms = full_metadata['idxterms']['mainterm']
-            if isinstance(terms, str):
-                return [terms]
-            return [x['$'] for x in terms]
-        else:
-            if DEBUG >= 2:
-                print("DIDNT FIND ANY KEYWORDS")  # TODO
-            return []
+    citation_info = full_metadata.get('item', {}).get('bibrecord', {}).get('head', {}).get('citation-info')
+    if citation_info is None:
+        return []
+
+    if 'author-keywords' in citation_info:
+        return [x['$'] for x in citation_info['author-keywords']['author-keyword']]
+
+    if isinstance(full_metadata['idxterms'], dict):
+        terms = full_metadata['idxterms']['mainterm']
+        if isinstance(terms, str):
+            return [terms]
+        return [x['$'] for x in terms]
+
+    return []
 
 
 def scopus_parse_reference(full_metadata):
@@ -188,27 +196,58 @@ def scopus_parse_reference(full_metadata):
 
 
 def scopus_parse_affiliation(full_metadata):
-    try:
-        affiliation = full_metadata['affiliation']
-        if isinstance(affiliation, dict):
-            affiliation = [affiliation]
-        res = []
-        for x in affiliation:
-            affiliation_id = x['@id']
-            x = scopus_find_affiliation_by_id(affiliation_id)['affiliation-retrieval-response']
-            try:
-                res.append({'name': x['affiliation-name'],
-                            'address': x['address'],
-                            'postal_code': x['institution-profile']['address']['postal-code'],
-                            'city': x['city'],
-                            'country': x['country']})
-            except KeyError:
-                pass
-        return res
-    except KeyError:
-        if DEBUG >= 2:
-            print("DIDNT FIND ANY AFFILIATION")
-        return []
+    unparsed_affiliations = lod(full_metadata.get('affiliation', {}))
+
+    authors = full_metadata.get("coredata", {}).get("dc:creator", {}).get("author", [])
+    authors += fd(full_metadata.get("authors", {})).get("author", [])
+    authors += lod(full_metadata.get("item", {}).get('bibrecord', {}).get('head', {}).get("author-group", {}))
+    for author in authors:
+        unparsed_affiliations += lod(author.get("affiliation", {}))
+
+    affiliation_ids = [x.get("@id", x.get("@afid")) for x in unparsed_affiliations]
+    affiliation_ids = set(affiliation_ids).difference(set([None]))
+    affiliations = []
+
+    for idx in affiliation_ids:
+        aff = scopus_find_affiliation_by_id(idx)['affiliation-retrieval-response']
+
+        name = aff.get("affiliation-name")
+        if name is None:
+            name = aff.get("institution-profile", {}).get("name-variant", {}).get("$")
+        if name is None:
+            name = aff.get("institution-profile", {}).get("preferred-name", {}).get("$")
+        if name is None:
+            name = aff.get("institution-profile", {}).get("sort-name")
+        if name is None:
+            variants = aff.get("name-variants", {}).get("name-variant", [])
+            for var in variants:
+                name = var.get("name-variant", {}).get("$")
+                if name is not None:
+                    break
+
+        address = aff.get("address")
+        if address is None:
+            address = aff.get("institution-profile", {}).get("address", {}).get("address-part")
+
+        city = aff.get("city")
+        if city is None:
+            city = aff.get("institution-profile", {}).get("address", {}).get("city")
+
+        country = aff.get("country")
+        if country is None:
+            country = aff.get("institution-profile", {}).get("address", {}).get("country")
+
+        postal = aff.get("institution-profile", {}).get("address", {}).get("postal-code")
+
+        affiliations.append({
+            'name': name,
+            'address': address,
+            'postal_code': postal,
+            'city': city,
+            'country': country,
+        })
+
+    return affiliations
 
 
 def scopus_parse_title(full_metadata):
@@ -223,6 +262,10 @@ def scopus_parse_doi(full_metadata):
             return full_metadata['item']['bibrecord']['item-info']['itemidlist']['ce:doi']
         except KeyError:
             return None
+
+
+def scopus_parse_eid(full_metadata):
+    return full_metadata.get('coredata', {}).get('eid')
 
 
 def scopus_parse_full_metadata(full_metadata):
@@ -242,6 +285,7 @@ def scopus_parse_full_metadata(full_metadata):
     }
 
     metadata = {
+        'eid': scopus_parse_eid(full_metadata),
         'doi': scopus_parse_doi(full_metadata),
         'title': coredata['dc:title'],
         'abstract': full_metadata.get('item', {}).get('bibrecord', {}).get('head', {}).get('abstracts', None),
@@ -262,6 +306,18 @@ def get_metadata_by_title(title):
         sid = scopus_entry_get_sid(scopus_results_get_first_entry(results))
         full_metadata = scopus_find_by_sid(sid)
         return scopus_parse_full_metadata(full_metadata)
+
+
+def get_metadata_by_doi(doi):
+    resp = scopus_find_doi(doi)
+    if resp is not None:
+        return scopus_parse_full_metadata(resp)
+
+
+def get_metadata_by_sid(sid):
+    resp = scopus_find_by_sid(sid)
+    if resp is not None:
+        return scopus_parse_full_metadata(resp)
 
 
 def get_references_metadata(metadata):
