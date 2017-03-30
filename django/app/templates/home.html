@@ -79,8 +79,7 @@
 
     .nav_text {
         position: absolute;         
-        text-align: center;         
-        width: 100%;                           
+        text-align: center;                        
     }
 
 </style>
@@ -378,7 +377,8 @@
     const NAV_HISTORY_SIZE = 3;
 
     var nav_text = d3.select("body").append("div")   
-    .attr("class", "nav_text");
+    .attr("class", "nav_text")
+    .style("opacity", 0);
 
     svg
     .append("line")
@@ -418,6 +418,9 @@
     .attr("stroke-width", NAV_DOT_STROKE_WIDTH)
     .on({
         "mouseover": function(d) {
+            nav_text.transition()        
+                .duration(200)      
+                .style("opacity", .95);  
             d3.select(this).style("cursor", "pointer");   
             nav_text.html("Currently displayed article.")
             .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")     
@@ -425,6 +428,9 @@
         },
         "mouseout": function(d) {
             d3.select(this).style("cursor", "default"); 
+            nav_text.transition()        
+            .duration(500)      
+            .style("opacity", 0);  
         }
     });
 
@@ -438,6 +444,9 @@
         .attr("stroke-width", NAV_DOT_STROKE_WIDTH)
         .on({
             "mouseover": function(d) {
+                nav_text.transition()        
+                .duration(200)      
+                .style("opacity", .95);   
                 d3.select(this).style("cursor", "pointer");
                 nav_text.html("Navigate to the th node on the path to a founding article.")
                 .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")  
@@ -445,6 +454,9 @@
             },
             "mouseout": function(d) {
                 d3.select(this).style("cursor", "default");
+                nav_text.transition()        
+                .duration(500)      
+                .style("opacity", 0);
             }
         });
     }
@@ -458,6 +470,9 @@
     .attr("stroke-width", NAV_DOT_STROKE_WIDTH)
     .on({
         "mouseover": function(d) {
+            nav_text.transition()        
+            .duration(200)      
+            .style("opacity", .95);
             d3.select(this).style("cursor", "pointer");
             nav_text.html("Navigate randomly to an article that reference the selected article.")
             .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")  
@@ -465,6 +480,9 @@
         },
         "mouseout": function(d) {
             d3.select(this).style("cursor", "default");
+            nav_text.transition()        
+            .duration(500)      
+            .style("opacity", 0); 
         }
     });
 
@@ -477,12 +495,18 @@
     .attr("stroke-width", NAV_DOT_STROKE_WIDTH)
     .on({
         "mouseover": function(d) {
+            nav_text.transition()        
+            .duration(200)      
+            .style("opacity", .95);
             d3.select(this).style("cursor", "pointer");
-            nav_text.html("Navigate to a founding paper.")
+            nav_text.html("Navigate to a founding article.")
             .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")  
             .style("top", (container_height-15) + "px");
         },
         "mouseout": function(d) {
+            nav_text.transition()        
+            .duration(500)      
+            .style("opacity", 0); 
             d3.select(this).style("cursor", "default");
         }
     });
