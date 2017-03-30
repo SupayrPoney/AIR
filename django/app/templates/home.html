@@ -160,15 +160,26 @@
     var c10 = d3.scale.category10();
     var svg = d3.select("#graph-container svg");
 
+    // svg.append('svg:defs').append('svg:marker')
+    // .attr('id', 'mid-arrow')
+    // .attr('viewBox', '0 -5 10 10')
+    // .attr('refX', 6)
+    // .attr('markerWidth', 10)
+    // .attr('markerHeight', 10)
+    // .attr('orient', 'auto')
+    // .append('svg:path')
+    // .attr('d', 'M0,-5L10,0L0,5L6,0')
+    // .attr('fill', '#000');
+
     svg.append('svg:defs').append('svg:marker')
     .attr('id', 'mid-arrow')
     .attr('viewBox', '0 -5 10 10')
-    .attr('refX', 6)
+    .attr('refX', 4)
     .attr('markerWidth', 10)
     .attr('markerHeight', 10)
     .attr('orient', 'auto')
     .append('svg:path')
-    .attr('d', 'M0,-5L10,0L0,5L6,0')
+    .attr('d', 'M10,-5L0,0L10,5L6,0')
     .attr('fill', '#000');
 
     var container_width = parseInt(window.getComputedStyle(svg[0][0], null).getPropertyValue("width"));
@@ -513,7 +524,7 @@
 
     //#### LEGEND ####
 
-    const LEGEND_LENGTH = 100
+    const LEGEND_LENGTH = 66
     const LEGEND_H_OFFSET = 30
     const LEGEND_V_OFFSET = 50
     const LEGEND_TEXT_OFFSET = 10
@@ -542,7 +553,7 @@
     svg.append("text")
     .attr("x", container_width-LEGEND_LENGTH-LEGEND_H_OFFSET)
     .attr("y", container_height-LEGEND_V_OFFSET-LEGEND_TEXT_OFFSET)
-    .text("is referenced by")
+    .text("references")
 
     //#### MAP ####
 
