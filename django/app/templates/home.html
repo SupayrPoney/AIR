@@ -511,6 +511,39 @@
         }
     });
 
+    //#### LEGEND ####
+
+    const LEGEND_LENGTH = 100
+    const LEGEND_H_OFFSET = 30
+    const LEGEND_V_OFFSET = 50
+    const LEGEND_TEXT_OFFSET = 10
+
+    svg
+    .append("line")
+    .attr("class", "legend-line")
+    .attr("x1", container_width-LEGEND_LENGTH-LEGEND_H_OFFSET)
+    .attr("y1", container_height-LEGEND_V_OFFSET)
+    .attr("x2", container_width-(LEGEND_LENGTH/2)-LEGEND_H_OFFSET)
+    .attr("y2", container_height-LEGEND_V_OFFSET)
+    .attr("fill", "none")
+    .attr("stroke", "black")
+    .attr("marker-end", 'url(#mid-arrow)');
+
+    svg
+    .append("line")
+    .attr("class", "legend-line")
+    .attr("x1", container_width-(LEGEND_LENGTH/2)-LEGEND_H_OFFSET)
+    .attr("y1", container_height-LEGEND_V_OFFSET)
+    .attr("x2", container_width-LEGEND_H_OFFSET)
+    .attr("y2", container_height-LEGEND_V_OFFSET)
+    .attr("fill", "none")
+    .attr("stroke", "black")
+
+    svg.append("text")
+    .attr("x", container_width-LEGEND_LENGTH-LEGEND_H_OFFSET)
+    .attr("y", container_height-LEGEND_V_OFFSET-LEGEND_TEXT_OFFSET)
+    .text("is referenced by")
+
     //#### MAP ####
 
     var map = new Datamap({
