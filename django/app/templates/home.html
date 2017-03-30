@@ -29,10 +29,21 @@
     .tag {
         padding: 1px 6px;
         color: black !important;
-        background-color: #FFE74C; 
         margin-left: 3px;
         border-radius: 2px;
+        display: inline-block;
+        margin-top: 3px;
     }
+    .curr-tag {
+        background-color: #FFE74C; 
+    }
+    .prev-tag {
+        background-color: #FF5964;
+    }
+    .next-tag {
+        background-color: #6BF178;
+    }
+
     #graph-container, #map-container, #graph-container svg {
         width: 100vw;
         height: calc(100vh - 65px);
@@ -84,7 +95,7 @@
 <div id="paper-infos">
     <span><b>A Survey on Reactive Programming</b></span>
     <br>
-    <span class="tag">Reactive programming </span><span class="tag">interactive applications</span><span class="tag">event-driven</span>
+    <span class="tag curr-tag">Reactive programming </span><span class="tag curr-tag">interactive applications</span><span class="tag curr-tag">event-driven</span>
 </div>
 
 <script>
@@ -277,7 +288,7 @@
             tooltip.transition()        
                 .duration(200)      
                 .style("opacity", .95);      
-            tooltip .html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +"<hr>"+ d.keywords.split(", ").join(" | "))  
+            tooltip .html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +'<hr><span class="tag prev-tag">'+ d.keywords.split(", ").join('</span><span class="tag prev-tag">')+"</span>")  
                 .style("left", (d3.select(this).attr("cx") - $(tooltip[0][0]).width()/2) + "px")     
                 .style("top", (d3.select(this).attr("cy") - $(tooltip[0][0]).height()) + "px");    
         },
@@ -310,7 +321,7 @@
             tooltip.transition()        
                 .duration(200)      
                 .style("opacity", .95);      
-            tooltip .html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +"<hr>"+ d.keywords.split(", ").join(" | "))  
+            tooltip .html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +'<hr><span class="tag curr-tag">'+ d.keywords.split(", ").join('</span><span class="tag curr-tag">')+"</span>")  
                 .style("left", (d3.select(this).attr("cx") - $(tooltip[0][0]).width()/2) + "px")     
                 .style("top", (d3.select(this).attr("cy") - $(tooltip[0][0]).height()) + "px");    
         },
@@ -343,7 +354,7 @@
             tooltip.transition()        
                 .duration(200)      
                 .style("opacity", .95);      
-            tooltip .html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +"<hr>"+ d.keywords.split(", ").join(" | "))  
+            tooltip .html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +'<hr><span class="tag next-tag">'+ d.keywords.split(", ").join('</span><span class="tag next-tag">')+"</span>")
                 .style("left", (d3.select(this).attr("cx") - $(tooltip[0][0]).width()/2) + "px")     
                 .style("top", (d3.select(this).attr("cy") - $(tooltip[0][0]).height()) + "px");    
         },
@@ -408,7 +419,7 @@
     .on({
         "mouseover": function(d) {
             d3.select(this).style("cursor", "pointer");   
-            nav_text.html("Currently displayed paper.")
+            nav_text.html("Currently displayed article.")
             .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")     
             .style("top", (container_height-15) + "px"); 
         },
@@ -428,7 +439,7 @@
         .on({
             "mouseover": function(d) {
                 d3.select(this).style("cursor", "pointer");
-                nav_text.html("Navigate to the th node on the path to a founding paper.")
+                nav_text.html("Navigate to the th node on the path to a founding article.")
                 .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")  
                 .style("top", (container_height-15) + "px");
             },
@@ -448,7 +459,7 @@
     .on({
         "mouseover": function(d) {
             d3.select(this).style("cursor", "pointer");
-            nav_text.html("Navigate to a randomly selected paper referenced in the currently selected paper.")
+            nav_text.html("Navigate randomly to an article that reference the selected article.")
             .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")  
             .style("top", (container_height-15) + "px");
         },
