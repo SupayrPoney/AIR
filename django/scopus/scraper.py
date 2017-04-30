@@ -174,11 +174,11 @@ def scopus_parse_keywords(full_metadata):
 def scopus_parse_reference(full_metadata):
     tail = full_metadata.get('item', {}).get('bibrecord', {}).get('tail', {})
     if tail is None:
-        return None
+        return []
 
     reference = tail.get('bibliography', {}).get('reference', None)
     if reference is None:
-        return None
+        return []
 
     results = []
     for x in reference:
