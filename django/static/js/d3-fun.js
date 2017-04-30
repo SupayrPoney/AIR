@@ -457,44 +457,54 @@ svg.append("text")
 
 //#### MAP ####
 
-var map = new Datamap({
-    element: document.getElementById('map-container'),
-    responsive: true,
-    fills: {
-        'prev': COLOR_PREV,
-        'curr': COLOR_CURR,
-        'next': COLOR_NEXT,
-        defaultFill: COLOR_PRIMARY
-    },
-});
-window.addEventListener('resize', function() {
-    map.resize();
-});
+var mymap = L.map('map-container').setView([51.505, -0.09], 2);
 
-var bombs = []
-Object.keys(data).forEach(function (el) {
-    data[el].map(function (obj) {
-        bombs.push({
-            radius: 12,
-            location: obj.affiliation,
-            fillKey: el,
-            borderWidth: 1,
-            borderColor: 'rgba(0, 0, 0, 0.4)',
-            paper: obj.name,
-            date: obj.year,
-            latitude: obj.location[0], 
-            longitude: obj.location[1],
-            fillOpacity: 1.0
-        })
-    })
+L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+    maxZoom: 18,
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+        '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+        'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    id: 'mapbox.streets'
+}).addTo(mymap);
+
+// var map = new Datamap({
+//     element: document.getElementById('map-container'),
+//     responsive: true,
+//     fills: {
+//         'prev': COLOR_PREV,
+//         'curr': COLOR_CURR,
+//         'next': COLOR_NEXT,
+//         defaultFill: COLOR_PRIMARY
+//     },
+// });
+// window.addEventListener('resize', function() {
+//     map.resize();
+// });
+
+// var bombs = []
+// Object.keys(data).forEach(function (el) {
+//     data[el].map(function (obj) {
+//         bombs.push({
+//             radius: 12,
+//             location: obj.affiliation,
+//             fillKey: el,
+//             borderWidth: 1,
+//             borderColor: 'rgba(0, 0, 0, 0.4)',
+//             paper: obj.name,
+//             date: obj.year,
+//             latitude: obj.location[0], 
+//             longitude: obj.location[1],
+//             fillOpacity: 1.0
+//         })
+//     })
     
-})
+// })
 
 
-map.bubbles(bombs, {
-    popupTemplate: function (geo, data) {
-            return ['<div class="hoverinfo">' +  data.paper + '<br>',
-            data.date + "<br>" + data.location,
-            '</div>'].join('');
-    }
-});
+// map.bubbles(bombs, {
+//     popupTemplate: function (geo, data) {
+//             return ['<div class="hoverinfo">' +  data.paper + '<br>',
+//             data.date + "<br>" + data.location,
+//             '</div>'].join('');
+//     }
+// });
