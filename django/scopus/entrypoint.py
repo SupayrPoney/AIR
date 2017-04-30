@@ -6,8 +6,8 @@ from scopus import geo
 def pre_process(fn):
     def inner(*args, **kwargs):
         paper = fn(*args, **kwargs)
-        paper["left"] = left_of(paper)
-        paper["right"] = right_of(paper)
+        paper["next"] = next_of(paper)
+        paper["prev"] = prev_of(paper)
         for aff in paper["affiliation"]:
             aff["geo"] = geo.geocode(aff["city"], aff["country"])
         return paper
@@ -29,7 +29,7 @@ def title(title):
     return get_metadata_by_title(title)
 
 
-def right_of(paper):
+def prev_of(paper):
     return [
         {
             "title": x['title'],
@@ -43,7 +43,7 @@ def right_of(paper):
     ]
 
 
-def left_of(paper):
+def next_of(paper):
     citers = get_citers_by_eid(paper['eid'])
     if citers is None:
         citers = []
