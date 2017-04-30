@@ -15,7 +15,7 @@
     #paper-infos {
         position: fixed;
         top: 0px;
-        background-color: #1A537F; 
+        background-color: #1A537F;
         padding: 10px;
         text-align: center;
         color: white;
@@ -35,7 +35,7 @@
         margin-top: 3px;
     }
     .curr-tag {
-        background-color: #FFE74C; 
+        background-color: #FFE74C;
     }
     .prev-tag {
         background-color: #4CEAFF;
@@ -61,25 +61,25 @@
     }
     body{
         font-family: 'Roboto', sans-serif;
-        
+
     }
-    div.tooltip {   
+    div.tooltip {
         color: white;
         box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 1px 5px 0 rgba(0,0,0,0.12),0 3px 1px -2px rgba(0,0,0,0.2);
-        position: absolute;         
-        text-align: center;         
-        width: 360px;                   
-        padding: 10px 5px;               
-        font: 12px sans-serif;      
-        background: #1A537F; 
-        border: 0px;        
-        border-radius: 3px;         
-        pointer-events: none;           
+        position: absolute;
+        text-align: center;
+        width: 360px;
+        padding: 10px 5px;
+        font: 12px sans-serif;
+        background: #1A537F;
+        border: 0px;
+        border-radius: 3px;
+        pointer-events: none;
     }
 
     .nav_text {
-        position: absolute;         
-        text-align: center;                        
+        position: absolute;
+        text-align: center;
     }
 
 </style>
@@ -116,50 +116,50 @@
 
     var data = {
        prev: [{
-        name: "Implementation of the data-flow synchronous language SIGNAL", 
+        name: "Implementation of the data-flow synchronous language SIGNAL",
         author: "Pascalin Amagbégnon , Loïc Besnard , Paul Le Guernic",
         year: "1995",
-        keywords: "", 
+        keywords: "",
         affiliation: "IRSA-INRIA",
         location: [48.116282, -1.639774]
        }, {
-        name: "Alma-O: an imperative language that supports declarative programming", 
-        author: "Krzysztof R. Apt , Jacob Brunekreef , Vincent Partington , Andrea Schaerf", 
+        name: "Alma-O: an imperative language that supports declarative programming",
+        author: "Krzysztof R. Apt , Jacob Brunekreef , Vincent Partington , Andrea Schaerf",
         year: "1998",
-        keywords: "Laguages, declarative programming, imperative programming, search", 
-        affiliation: "University of Amsterdam", 
+        keywords: "Laguages, declarative programming, imperative programming, search",
+        affiliation: "University of Amsterdam",
         location: [52.355818, 4.955726]
        }, {
         name: "The synchronous languages 12 years later",
         author: "A., Caspi, P., Edwards, S. A., Halbwachs, N., Guernic, P. L., Robert, and Simone, D",
         year: "2003",
-        keywords: "Embedded systems, Esterel, formal methods, Lustre, real-time systems, Signal, synchronous languages", 
+        keywords: "Embedded systems, Esterel, formal methods, Lustre, real-time systems, Signal, synchronous languages",
         affiliation: "IRSA-INRIA",
         location: [48.116282, -1.639774]
        }],
        curr: [{
          name: "A Survey on Reactive Programming",
-         author: "Engineer Bainomugisha , Andoni Lombide Carreton,Tom van Cutsem, Stijn Mostinckx, Wolfgang de Meuter", 
+         author: "Engineer Bainomugisha , Andoni Lombide Carreton,Tom van Cutsem, Stijn Mostinckx, Wolfgang de Meuter",
          year: "2013",
-         keywords: "Design, Languages, Reactive programming, interactive applications, event-driven applications, dataflow programming, functional reactive programming, reactive systems", 
-         affiliation: " Vrije Universiteit Brussel", 
+         keywords: "Design, Languages, Reactive programming, interactive applications, event-driven applications, dataflow programming, functional reactive programming, reactive systems",
+         affiliation: " Vrije Universiteit Brussel",
          location: [50.823165, 4.392326]
         }],
        next: [ {
-         name: "Multi-Tier Functional Reactive Programming for the Web", 
+         name: "Multi-Tier Functional Reactive Programming for the Web",
          author: "Bob Reynders , Dominique Devriese , Frank Piessens",
          year: "2014",
-         keywords: "Functional Reactive Programming, FRP, Multitier Web Framework", 
-         affiliation: "University of Singapore", 
+         keywords: "Functional Reactive Programming, FRP, Multitier Web Framework",
+         affiliation: "University of Singapore",
          location: [1.296643, 103.776394]
        }, {
         name:"Reactive programming with reactive variables",
-        author: "Christopher Schuster , Cormac Flanagan", 
-        year: "2016", 
-        keywords: "Reactive Programming, Syntax Extension, JavaScript", 
-        affiliation: "University of California", 
+        author: "Christopher Schuster , Cormac Flanagan",
+        year: "2016",
+        keywords: "Reactive Programming, Syntax Extension, JavaScript",
+        affiliation: "University of California",
         location: [32.880060, -117.234014]
-       
+
        }]
      };
 
@@ -204,8 +204,8 @@
     var left_column_offset = ((container_height-((data.prev.length-1)*dot_space)-dot_radius*2)/2)-(dot_radius*1.5);
     var right_column_offset = ((container_height-((data.next.length-1)*dot_space)-dot_radius*2)/2)-(dot_radius*1.5);
 
-    var tooltip = d3.select("body").append("div")   
-    .attr("class", "tooltip")               
+    var tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
     .style("opacity", 0);
 
     var y = left_column_offset;
@@ -303,22 +303,22 @@
     .attr("stroke", "black")
     .attr("stroke-width", CIRCLE_STROKE)
     .on({
-        "mouseover": function(d) {  
-            d3.select(this).style("cursor", "pointer");    
-            tooltip.transition()        
-                .duration(200)      
-                .style("opacity", .95);      
-            tooltip .html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +'<hr><span class="tag prev-tag">'+ d.keywords.split(", ").join('</span><span class="tag prev-tag">')+"</span>")  
-                .style("left", (d3.select(this).attr("cx") - $(tooltip[0][0]).width()/2) + "px")     
-                .style("top", (d3.select(this).attr("cy") - $(tooltip[0][0]).height()) + "px");    
+        "mouseover": function(d) {
+            d3.select(this).style("cursor", "pointer");
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", .95);
+            tooltip .html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +'<hr><span class="tag prev-tag">'+ d.keywords.split(", ").join('</span><span class="tag prev-tag">')+"</span>")
+                .style("left", (d3.select(this).attr("cx") - $(tooltip[0][0]).width()/2) + "px")
+                .style("top", (d3.select(this).attr("cy") - $(tooltip[0][0]).height()) + "px");
         },
-        "mouseout": function(d) {    
-            d3.select(this).style("cursor", "default"); 
-            tooltip.transition()        
-                .duration(500)      
-                .style("opacity", 0);   
+        "mouseout": function(d) {
+            d3.select(this).style("cursor", "default");
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
         }
-    }); 
+    });
 
     svg.selectAll("node")
     .data(data.curr)
@@ -334,21 +334,21 @@
     .on({
         "click": function(d) {
             var speed = 750;
-            $('html, body').animate( { scrollTop: $("#map-container").offset().top }, speed ); 
+            $('html, body').animate( { scrollTop: $("#map-container").offset().top }, speed );
         },
         "mouseover": function(d) {
             d3.select(this).style("cursor", "pointer");
-            tooltip.transition()        
-                .duration(200)      
-                .style("opacity", .95);      
-            tooltip .html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +'<hr><span class="tag curr-tag">'+ d.keywords.split(", ").join('</span><span class="tag curr-tag">')+"</span>")  
-                .style("left", (d3.select(this).attr("cx") - $(tooltip[0][0]).width()/2) + "px")     
-                .style("top", (d3.select(this).attr("cy") - $(tooltip[0][0]).height()) + "px");    
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", .95);
+            tooltip .html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +'<hr><span class="tag curr-tag">'+ d.keywords.split(", ").join('</span><span class="tag curr-tag">')+"</span>")
+                .style("left", (d3.select(this).attr("cx") - $(tooltip[0][0]).width()/2) + "px")
+                .style("top", (d3.select(this).attr("cy") - $(tooltip[0][0]).height()) + "px");
         },
         "mouseout": function(d) {
             d3.select(this).style("cursor", "default");
-            tooltip.transition()        
-                .duration(500)      
+            tooltip.transition()
+                .duration(500)
                 .style("opacity", 0);
         }
     });
@@ -369,20 +369,20 @@
     .attr("stroke", "black")
     .attr("stroke-width", CIRCLE_STROKE)
     .on({
-        "mouseover": function(d) {  
-            d3.select(this).style("cursor", "pointer");    
-            tooltip.transition()        
-                .duration(200)      
-                .style("opacity", .95);      
+        "mouseover": function(d) {
+            d3.select(this).style("cursor", "pointer");
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", .95);
             tooltip .html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +'<hr><span class="tag next-tag">'+ d.keywords.split(", ").join('</span><span class="tag next-tag">')+"</span>")
-                .style("left", (d3.select(this).attr("cx") - $(tooltip[0][0]).width()/2) + "px")     
-                .style("top", (d3.select(this).attr("cy") - $(tooltip[0][0]).height()) + "px");    
+                .style("left", (d3.select(this).attr("cx") - $(tooltip[0][0]).width()/2) + "px")
+                .style("top", (d3.select(this).attr("cy") - $(tooltip[0][0]).height()) + "px");
         },
-        "mouseout": function(d) {    
-            d3.select(this).style("cursor", "default"); 
-            tooltip.transition()        
-                .duration(500)      
-                .style("opacity", 0);   
+        "mouseout": function(d) {
+            d3.select(this).style("cursor", "default");
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
         }
     });
 
@@ -397,7 +397,7 @@
     const NAV_DOT_SPACE = 25;
     const NAV_HISTORY_SIZE = 3;
 
-    var nav_text = d3.select("body").append("div")   
+    var nav_text = d3.select("body").append("div")
     .attr("class", "nav_text")
     .style("opacity", 0);
 
@@ -439,19 +439,19 @@
     .attr("stroke-width", NAV_DOT_STROKE_WIDTH)
     .on({
         "mouseover": function(d) {
-            nav_text.transition()        
-                .duration(200)      
-                .style("opacity", .95);  
-            d3.select(this).style("cursor", "pointer");   
+            nav_text.transition()
+                .duration(200)
+                .style("opacity", .95);
+            d3.select(this).style("cursor", "pointer");
             nav_text.html("Currently displayed article.")
-            .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")     
-            .style("top", (container_height-15) + "px"); 
+            .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")
+            .style("top", (container_height-15) + "px");
         },
         "mouseout": function(d) {
-            d3.select(this).style("cursor", "default"); 
-            nav_text.transition()        
-            .duration(500)      
-            .style("opacity", 0);  
+            d3.select(this).style("cursor", "default");
+            nav_text.transition()
+            .duration(500)
+            .style("opacity", 0);
         }
     });
 
@@ -465,18 +465,18 @@
         .attr("stroke-width", NAV_DOT_STROKE_WIDTH)
         .on({
             "mouseover": function(d) {
-                nav_text.transition()        
-                .duration(200)      
-                .style("opacity", .95);   
+                nav_text.transition()
+                .duration(200)
+                .style("opacity", .95);
                 d3.select(this).style("cursor", "pointer");
                 nav_text.html("Navigate to the th node on the path to a founding article.")
-                .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")  
+                .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")
                 .style("top", (container_height-15) + "px");
             },
             "mouseout": function(d) {
                 d3.select(this).style("cursor", "default");
-                nav_text.transition()        
-                .duration(500)      
+                nav_text.transition()
+                .duration(500)
                 .style("opacity", 0);
             }
         });
@@ -491,19 +491,19 @@
     .attr("stroke-width", NAV_DOT_STROKE_WIDTH)
     .on({
         "mouseover": function(d) {
-            nav_text.transition()        
-            .duration(200)      
+            nav_text.transition()
+            .duration(200)
             .style("opacity", .95);
             d3.select(this).style("cursor", "pointer");
             nav_text.html("Navigate randomly to an article that reference the selected article.")
-            .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")  
+            .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")
             .style("top", (container_height-15) + "px");
         },
         "mouseout": function(d) {
             d3.select(this).style("cursor", "default");
-            nav_text.transition()        
-            .duration(500)      
-            .style("opacity", 0); 
+            nav_text.transition()
+            .duration(500)
+            .style("opacity", 0);
         }
     });
 
@@ -516,18 +516,18 @@
     .attr("stroke-width", NAV_DOT_STROKE_WIDTH)
     .on({
         "mouseover": function(d) {
-            nav_text.transition()        
-            .duration(200)      
+            nav_text.transition()
+            .duration(200)
             .style("opacity", .95);
             d3.select(this).style("cursor", "pointer");
             nav_text.html("Navigate to a founding article.")
-            .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")  
+            .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")
             .style("top", (container_height-15) + "px");
         },
         "mouseout": function(d) {
-            nav_text.transition()        
-            .duration(500)      
-            .style("opacity", 0); 
+            nav_text.transition()
+            .duration(500)
+            .style("opacity", 0);
             d3.select(this).style("cursor", "default");
         }
     });
@@ -592,12 +592,12 @@
                 borderColor: 'rgba(0, 0, 0, 0.4)',
                 paper: obj.name,
                 date: obj.year,
-                latitude: obj.location[0], 
+                latitude: obj.location[0],
                 longitude: obj.location[1],
                 fillOpacity: 1.0
             })
         })
-        
+
     })
 
 
