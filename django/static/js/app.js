@@ -23,21 +23,35 @@ function get_by_sid(sid, onSuccess, onError) {
 }
 
 function get_prev(metadata, onSuccess, onError) {
-    for (var i = 0; i < metadata.prev.length; i++) {
-        $.ajax({
-            url: metadata.prev[i].url,
-            success: onSuccess,
-            error: onError
-        })
+    function lol(res, i) {
+        console.log(i)
+        if (metadata.prev[i]) {
+            $.ajax({
+                url: metadata.prev[i].url,
+                success: (data) => lol(res.concat[data], i + 1),
+                error: (error) => lol(res, i + 1)
+            })
+        }
+        else {
+            onSuccess(res)
+        }
     }
+    lol([], 0)
 }
 
 function get_next(metadata, onSuccess, onError) {
-    for (var i = 0; i < metadata.next.length; i++) {
-        $.ajax({
-            url: metadata.next[i].url,
-            success: onSuccess,
-            error: onError
-        })
+    function lol(res, i) {
+        console.log(i)
+        if (metadata.next[i]) {
+            $.ajax({
+                url: metadata.next[i].url,
+                success: (data) => lol(res.concat[data], i + 1),
+                error: (error) => lol(res, i + 1)
+            })
+        }
+        else {
+            onSuccess(res)
+        }
     }
+    lol([], 0)
 }
