@@ -1,0 +1,69 @@
+#paper-infos {
+    position: fixed;
+    top: 0px;
+    background-color: #1A537F; 
+    padding: 10px;
+    text-align: center;
+    color: white;
+    width: 100%;
+    height: 65px;
+}
+#paper-infos > span {
+    color: #FFFFFF;
+    font-size: 16px;
+}
+.tag {
+    padding: 1px 6px;
+    color: black !important;
+    margin-left: 3px;
+    border-radius: 2px;
+    display: inline-block;
+    margin-top: 3px;
+}
+.curr-tag {
+    background-color: #FFE74C; 
+}
+.prev-tag {
+    background-color: #4CEAFF;
+}
+.next-tag {
+    background-color: #6BF178;
+}
+
+#graph-container, #map-container, #graph-container svg {
+    width: 100vw;
+    height: calc(100vh - 65px);
+}
+
+#graph-container {
+    margin-top: 65px;
+}
+#map-container {
+
+}
+hr {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+body{
+    font-family: 'Roboto', sans-serif;
+    
+}
+div.tooltip {   
+    color: white;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 1px 5px 0 rgba(0,0,0,0.12),0 3px 1px -2px rgba(0,0,0,0.2);
+    position: absolute;         
+    text-align: center;         
+    width: 360px;                   
+    padding: 10px 5px;               
+    font: 12px sans-serif;      
+    background: #1A537F; 
+    border: 0px;        
+    border-radius: 3px;         
+    pointer-events: none;           
+}
+
+.nav_text {
+    position: absolute;         
+    text-align: center;                        
+}
