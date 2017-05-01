@@ -1,17 +1,45 @@
-#paper-infos {
-    position: fixed;
-    top: 0px;
-    background-color: #1A537F; 
-    padding: 10px;
-    text-align: center;
-    color: white;
-    width: 100%;
-    height: 65px;
+/* HTML */
+
+hr {
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
-#paper-infos > span {
-    color: #FFFFFF;
-    font-size: 16px;
+
+body{
+    font-family: 'Roboto', sans-serif;
 }
+
+h1 {
+    font-size: 30px;
+}
+
+form {      
+    margin: 50px auto;
+}
+
+/* Common */
+
+.interactive:hover { cursor: pointer; }
+.curr { background-color: #FFE74C; }
+.prev { background-color: #4CEAFF; }
+.next { background-color: #6BF178; }
+.main { background-color: #1A537F; }
+
+/* Graph */
+
+#graph-container, #flex-container svg {
+    width: 80vw;
+    height: 100vh;
+}
+
+#flex-container{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-around;
+    width: 100vw;
+    height: 100vh;
+}
+
 .tag {
     padding: 1px 6px;
     color: black !important;
@@ -20,15 +48,82 @@
     display: inline-block;
     margin-top: 3px;
 }
-.curr-tag {
-    background-color: #FFE74C; 
+
+div.tooltip {   
+    color: white;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 1px 5px 0 rgba(0,0,0,0.12),0 3px 1px -2px rgba(0,0,0,0.2);
+    position: absolute;         
+    text-align: center;         
+    width: 360px;                   
+    padding: 10px 5px;               
+    font: 12px sans-serif;      
+    background: #1A537F; 
+    border: 0px;        
+    border-radius: 3px;         
+    pointer-events: none;           
 }
-.prev-tag {
-    background-color: #4CEAFF;
+
+.nav_text {
+    position: absolute;         
+    text-align: center;                        
 }
-.next-tag {
-    background-color: #6BF178;
+
+/* Graph > paper-info */
+
+#paper-infos {
+    position: fixed;
+    top: 0px;
+    padding: 10px;
+    text-align: center;
+    color: white;
+    width: 100%;
+    height: 65px;
 }
+
+#paper-infos > span {
+    color: white;
+    font-size: 16px;
+}
+
+/* Graph > sidebar/search */
+
+#flex-container search {
+    position: relative;
+    height: 100vh;
+    float:left;
+    padding: 20px;
+    color:white;
+    width: 20vw;
+}
+
+.search {
+    padding:8px 15px;
+    background-color: #F5F5F5;
+    border:0px solid #dbdbdb;
+}
+
+.button {
+    position:relative;
+    padding:6px 8px;
+    border:2px solid white;
+    background-color: white;
+    color:#1A537F;
+    width: 60px;
+
+}
+.button:hover  {
+    background-color:#fafafa;
+    color:#1A537F;
+}
+
+/* Map */
+
+#map-container {
+    width: 100vw;
+    height: 100vh;
+}
+
+/* Map > marker/cluster */
 
 .marker {
     width:30px;
@@ -51,25 +146,21 @@ div .marker{
     flex-direction: row;
 }
 
-.top-clust {
-    justify-content: center;
-    bottom: -4px;
-    position: relative;
-} 
-
 .cluster{
     background: none;
     border: none;
 }
 
-#graph-container, #map-container, #graph-container svg {
-    width: 100vw;
-    height: calc(100vh - 65px);
+.top-clust {
+    justify-content: center;
+    bottom: -4px;
+    position: relative;
 }
+
+/* Map > filter/legend */
 
 #filter-box {
     position: absolute;
-    background-color: #1A537F;
     bottom: 4%;
     z-index: 1000;
     left: 2%;
@@ -104,19 +195,16 @@ div .marker{
     transition: width .5s linear, padding-left 0s linear .5s;
 }
 
-.interactive:hover {
-    cursor: pointer;
-}
-
 #filter-box:hover .map-legend {
     width: 83%;
     padding-left: 5px;
     transition: padding-left 0s, width .5s linear;
 }
+ 
+/* Map > back button */
 
 #back {
     position: absolute;
-    background-color: #1A537F;
     z-index: 1000;
     color: white;
     opacity: 0.7;
@@ -132,36 +220,4 @@ div .marker{
     transition: opacity .5s ease-in-out, box-shadow .5s ease-in-out, width .5s linear;
     box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 1px 5px 0 rgba(0,0,0,0.12),0 3px 1px -2px rgba(0,0,0,0.2);
     transition: opacity .5s ease-in-out, box-shadow .5s ease-in-out;
-}
-
-#graph-container {
-    margin-top: 65px;
-}
-#map-container {
-}
-hr {
-    margin-top: 5px;
-    margin-bottom: 5px;
-}
-body{
-    font-family: 'Roboto', sans-serif;
-    
-}
-div.tooltip {   
-    color: white;
-    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 1px 5px 0 rgba(0,0,0,0.12),0 3px 1px -2px rgba(0,0,0,0.2);
-    position: absolute;         
-    text-align: center;         
-    width: 360px;                   
-    padding: 10px 5px;               
-    font: 12px sans-serif;      
-    background: #1A537F; 
-    border: 0px;        
-    border-radius: 3px;         
-    pointer-events: none;           
-}
-
-.nav_text {
-    position: absolute;         
-    text-align: center;                        
 }

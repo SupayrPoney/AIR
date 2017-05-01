@@ -11,6 +11,7 @@
 
 <script src="https://d3js.org/d3-zoom.v1.min.js"></script>
 
+
 <link rel="stylesheet" type="text/css" href="{% static "css/style.css" %}">
 <link rel="stylesheet" type="text/css" href="{% static "css/MarkerCluster.Default.css" %}">
 <link rel="stylesheet" type="text/css" href="{% static "css/MarkerCluster.css" %}">
@@ -20,39 +21,47 @@
 <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js" integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg==" crossorigin=""></script>
 <script type="text/javascript" src="{% static "js/leaflet.markercluster.js" %}"></script>
 
-<div id="graph-container">
-    <svg xmlns="http://www.w3.org/2000/svg"></svg>
-</div>
+<div id= "flex-container">
+    <search class="main">
+        <form>
+            <input type="text" class="search" placeholder="Enter title.." required>
+            <input type="button" class="button" value="Search">
+        </form>
+        <br>
+        <span><b>Keywords</b></span>
+        <br>
+        <span class="tag curr">Reactive programming </span><span class="tag curr">interactive applications</span><span class="tag curr">event-driven</span>
+    </search>
+    <div id="graph-container">
+        <svg xmlns="http://www.w3.org/2000/svg">
+        </svg>
+    </div>
+</div>    
+
 <div id="map-container">
-    <div id="back" class="interactive" onclick="go_back()"> 
+    <div id="back" class="interactive main" onclick="go_back()"> 
         <span class="glyphicon glyphicon-menu-up"></span> Back
     </div>
-    <div id="filter-box">
+    <div id="filter-box" class="main">
         <div class="legend-container">
-            <span class="marker prev-tag interactive" onclick="toggle_filter(this, 'prev')">
+            <span class="marker prev interactive" onclick="toggle_filter(this, 'prev')">
                 <span class="glyphicon glyphicon-ok"></span>
             </span>
             <span class="map-legend">Cited paper's authors.</span>
         </div>
         <div class="legend-container">
-            <span class="marker curr-tag interactive" onclick="toggle_filter(this, 'curr')">
+            <span class="marker curr interactive" onclick="toggle_filter(this, 'curr')">
                 <span class="glyphicon glyphicon-ok"></span>
             </span>
             <span class="map-legend">Current paper's authors.</span>
         </div>
         <div class="legend-container">
-            <span class="marker next-tag interactive" onclick="toggle_filter(this, 'next')">
+            <span class="marker next interactive" onclick="toggle_filter(this, 'next')">
                 <span class="glyphicon glyphicon-ok"></span>
             </span>
             <span class="map-legend">Citing paper's authors.</span>
         </div>      
     </div>
-</div>
-
-<div id="paper-infos">
-    <span><b>A Survey on Reactive Programming</b></span>
-    <br>
-    <span class="tag curr-tag">Reactive programming </span><span class="tag curr-tag">interactive applications</span><span class="tag curr-tag">event-driven</span>
 </div>
 
 <script type="text/javascript" src="{% static "js/d3-fun.js" %}"></script>

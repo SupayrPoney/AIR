@@ -53,23 +53,8 @@ var data = {
    }]
  };
 
- // function computeDivSize(div) {
- //    var size = window.getComputedStyle(div, null);
-
- // }
 var c10 = d3.scale.category10();
 var svg = d3.select("#graph-container svg");
-
-// svg.append('svg:defs').append('svg:marker')
-// .attr('id', 'mid-arrow')
-// .attr('viewBox', '0 -5 10 10')
-// .attr('refX', 6)
-// .attr('markerWidth', 10)
-// .attr('markerHeight', 10)
-// .attr('orient', 'auto')
-// .append('svg:path')
-// .attr('d', 'M0,-5L10,0L0,5L6,0')
-// .attr('fill', '#000');
 
 svg.append('svg:defs').append('svg:marker')
 .attr('id', 'mid-arrow')
@@ -84,9 +69,9 @@ svg.append('svg:defs').append('svg:marker')
 
 var container_width = parseInt(window.getComputedStyle(svg[0][0], null).getPropertyValue("width"));
 var container_height = parseInt(window.getComputedStyle(svg[0][0], null).getPropertyValue("height"));
+var SIDEBAR_OFFSET = parseInt(window.getComputedStyle($("search")[0], null).getPropertyValue("width"));
 var mid_width = container_width/2;
 var mid_height = container_height/2;
-
 var dot_radius = 40;
 var dot_space = 100;
 var col_offset = 400;
@@ -198,8 +183,8 @@ svg.selectAll("node")
         tooltip.transition()        
             .duration(200)      
             .style("opacity", .95);      
-        tooltip .html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +'<hr><span class="tag prev-tag">'+ d.keywords.split(", ").join('</span><span class="tag prev-tag">')+"</span>")  
-            .style("left", (d3.select(this).attr("cx") - $(tooltip[0][0]).width()/2) + "px")     
+        tooltip.html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +'<hr><span class="tag prev">'+ d.keywords.split(", ").join('</span><span class="tag prev">')+"</span>")  
+            .style("left", (d3.select(this).attr("cx") - $(tooltip[0][0]).width()/2 + SIDEBAR_OFFSET) + "px")     
             .style("top", (d3.select(this).attr("cy") - $(tooltip[0][0]).height()) + "px");    
     },
     "mouseout": function(d) {    
@@ -231,8 +216,8 @@ svg.selectAll("node")
         tooltip.transition()        
             .duration(200)      
             .style("opacity", .95);      
-        tooltip .html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +'<hr><span class="tag curr-tag">'+ d.keywords.split(", ").join('</span><span class="tag curr-tag">')+"</span>")  
-            .style("left", (d3.select(this).attr("cx") - $(tooltip[0][0]).width()/2) + "px")     
+        tooltip .html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +'<hr><span class="tag curr">'+ d.keywords.split(", ").join('</span><span class="tag curr">')+"</span>")  
+            .style("left", (d3.select(this).attr("cx") - $(tooltip[0][0]).width()/2) + SIDEBAR_OFFSET + "px")     
             .style("top", (d3.select(this).attr("cy") - $(tooltip[0][0]).height()) + "px");    
     },
     "mouseout": function(d) {
@@ -264,8 +249,8 @@ svg.selectAll("node")
         tooltip.transition()        
             .duration(200)      
             .style("opacity", .95);      
-        tooltip .html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +'<hr><span class="tag next-tag">'+ d.keywords.split(", ").join('</span><span class="tag next-tag">')+"</span>")
-            .style("left", (d3.select(this).attr("cx") - $(tooltip[0][0]).width()/2) + "px")     
+        tooltip .html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +'<hr><span class="tag next">'+ d.keywords.split(", ").join('</span><span class="tag next">')+"</span>")
+            .style("left", (d3.select(this).attr("cx") - $(tooltip[0][0]).width()/2) + SIDEBAR_OFFSET + "px")     
             .style("top", (d3.select(this).attr("cy") - $(tooltip[0][0]).height()) + "px");    
     },
     "mouseout": function(d) {    
@@ -334,7 +319,7 @@ svg.append("circle")
             .style("opacity", .95);  
         d3.select(this).style("cursor", "pointer");   
         nav_text.html("Currently displayed article.")
-        .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")     
+        .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + SIDEBAR_OFFSET + "px")     
         .style("top", (container_height-15) + "px"); 
     },
     "mouseout": function(d) {
@@ -360,7 +345,7 @@ for (var i=1; i<NAV_HISTORY_SIZE+1; ++i) {
             .style("opacity", .95);   
             d3.select(this).style("cursor", "pointer");
             nav_text.html("Navigate to the th node on the path to a founding article.")
-            .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")  
+            .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + SIDEBAR_OFFSET + "px")  
             .style("top", (container_height-15) + "px");
         },
         "mouseout": function(d) {
@@ -386,7 +371,7 @@ svg.append("circle")
         .style("opacity", .95);
         d3.select(this).style("cursor", "pointer");
         nav_text.html("Navigate randomly to an article that reference the selected article.")
-        .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")  
+        .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + SIDEBAR_OFFSET + "px")  
         .style("top", (container_height-15) + "px");
     },
     "mouseout": function(d) {
@@ -411,7 +396,7 @@ svg.append("circle")
         .style("opacity", .95);
         d3.select(this).style("cursor", "pointer");
         nav_text.html("Navigate to a founding article.")
-        .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + "px")  
+        .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + SIDEBAR_OFFSET + "px")  
         .style("top", (container_height-15) + "px");
     },
     "mouseout": function(d) {
@@ -460,13 +445,13 @@ svg.append("text")
 var map = L.map('map-container').setView([51.505, -0.09], 2);
 var displayed_markers = { prev: true, curr: true, next: true };
 var clust_markers_icon = {
-    "001" : function(p,c,n) { return { html: "<div class='marker next-tag'><span>"+n+"</span></div>", iconSize:L.point(30,30) } },
-    "010" : function(p,c,n) { return { html: "<div class='marker curr-tag'><span>"+c+"</span></div>", iconSize:L.point(30,30) } },
-    "011" : function(p,c,n) { return { html: "<div class='cluster-container'><div class='marker curr-tag'><span>"+c+"</span></div><div class='marker next-tag'><span>"+n+"</span></div></div>", iconSize:L.point(60,30) } },
-    "100" : function(p,c,n) { return { html: "<div class='marker prev-tag'><span>"+p+"</span></div>", iconSize:L.point(30,30) } },
-    "101" : function(p,c,n) { return { html: "<div class='cluster-container'><div class='marker prev-tag'><span>"+p+"</span></div><div class='marker next-tag'><span>"+n+"</span></div></div>", iconSize:L.point(60,30) } },
-    "110" : function(p,c,n) { return { html: "<div class='cluster-container'><div class='marker prev-tag'><span>"+p+"</span></div><div class='marker curr-tag'><span>"+c+"</span></div></div>", iconSize:L.point(60,30) } },
-    "111" : function(p,c,n) { return { html: "<div class='cluster-container top-clust'><div class='marker prev-tag'><span>"+p+"</span></div></div><div class='cluster-container'><div class='marker curr-tag'><span>"+c+"</span></div><div class='marker next-tag'><span>"+n+"</span></div></div>", iconSize:L.point(60,60) } },
+    "001" : function(p,c,n) { return { html: "<div class='marker next'><span>"+n+"</span></div>", iconSize:L.point(30,30) } },
+    "010" : function(p,c,n) { return { html: "<div class='marker curr'><span>"+c+"</span></div>", iconSize:L.point(30,30) } },
+    "011" : function(p,c,n) { return { html: "<div class='cluster-container'><div class='marker curr'><span>"+c+"</span></div><div class='marker next'><span>"+n+"</span></div></div>", iconSize:L.point(60,30) } },
+    "100" : function(p,c,n) { return { html: "<div class='marker prev'><span>"+p+"</span></div>", iconSize:L.point(30,30) } },
+    "101" : function(p,c,n) { return { html: "<div class='cluster-container'><div class='marker prev'><span>"+p+"</span></div><div class='marker next'><span>"+n+"</span></div></div>", iconSize:L.point(60,30) } },
+    "110" : function(p,c,n) { return { html: "<div class='cluster-container'><div class='marker prev'><span>"+p+"</span></div><div class='marker curr'><span>"+c+"</span></div></div>", iconSize:L.point(60,30) } },
+    "111" : function(p,c,n) { return { html: "<div class='cluster-container top-clust'><div class='marker prev'><span>"+p+"</span></div></div><div class='cluster-container'><div class='marker curr'><span>"+c+"</span></div><div class='marker next'><span>"+n+"</span></div></div>", iconSize:L.point(60,60) } },
 };
 
 var markers = L.markerClusterGroup({
@@ -526,8 +511,7 @@ function toggle_filter(self, marker_grp) {
 }
 
 function go_back() {
-    var speed = 750;
-    $('html, body').animate( { scrollTop: $("#graph-container").offset().top }, speed ); 
+    $('html, body').animate( { scrollTop: $("#graph-container").offset().top }, 750); 
 }
 
 draw_markers();
