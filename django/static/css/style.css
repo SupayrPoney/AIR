@@ -67,7 +67,7 @@ div .marker{
     height: calc(100vh - 65px);
 }
 
-.filter-box {
+#filter-box {
     position: absolute;
     background-color: #1A537F;
     bottom: 4%;
@@ -79,9 +79,10 @@ div .marker{
     box-shadow: none;
     color: white;
     padding: 5px 3px;
+    cursor: initial;
 }
 
-.filter-box:hover {
+#filter-box:hover {
     opacity: 1.0;
     width: 180px;
     transition: opacity .5s ease-in-out, box-shadow .5s ease-in-out, width .5s linear;
@@ -107,7 +108,7 @@ div .marker{
     cursor: pointer;
 }
 
-.filter-box:hover .map-legend {
+#filter-box:hover .map-legend {
     width: 83%;
     padding-left: 5px;
     transition: padding-left 0s, width .5s linear;

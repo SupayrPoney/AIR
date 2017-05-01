@@ -526,3 +526,4 @@ function toggle_filter(self, marker_grp) {
 }
 
 draw_markers();
+L.DomEvent.disableClickPropagation(L.DomUtil.get('filter-box')); 
