@@ -26,15 +26,21 @@
 <div id="map-container">
     <div class="filter-box">
         <div class="legend-container">
-            <span class="marker prev-tag"></span>
+            <span class="marker prev-tag interactive" onclick="toggle_filter(this, 'prev')">
+                <span class="glyphicon glyphicon-ok"></span>
+            </span>
             <span class="map-legend">Cited paper's authors.</span>
         </div>
         <div class="legend-container">
-            <span class="marker curr-tag"></span>
+            <span class="marker curr-tag interactive" onclick="toggle_filter(this, 'curr')">
+                <span class="glyphicon glyphicon-ok"></span>
+            </span>
             <span class="map-legend">Current paper's authors.</span>
         </div>
         <div class="legend-container">
-            <span class="marker next-tag"></span>
+            <span class="marker next-tag interactive" onclick="toggle_filter(this, 'next')">
+                <span class="glyphicon glyphicon-ok"></span>
+            </span>
             <span class="map-legend">Citing paper's authors.</span>
         </div>      
     </div>

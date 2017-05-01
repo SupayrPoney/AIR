@@ -458,15 +458,7 @@ svg.append("text")
 //#### MAP ####
 
 var map = L.map('map-container').setView([51.505, -0.09], 2);
-
-L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-    maxZoom: 18,
-    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-        '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-        'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-    id: 'mapbox.streets'
-}).addTo(map);
-
+var displayed_markers = { prev: true, curr: true, next: true };
 var clust_markers_icon = {
     "001" : function(p,c,n) { return { html: "<div class='marker next-tag'><span>"+n+"</span></div>", iconSize:L.point(30,30) } },
     "010" : function(p,c,n) { return { html: "<div class='marker curr-tag'><span>"+c+"</span></div>", iconSize:L.point(30,30) } },
@@ -490,6 +482,22 @@ var markers = L.markerClusterGroup({
         return L.divIcon(iconOptions);
     }
 });
+
+const bounds = new L.LatLngBounds(new L.LatLng(85, -180), new L.LatLng(-85, 180));
+L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+    maxZoom: 18,
+    minZoom: 2,
+    maxBoundsViscosity: 1.0,
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+        '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+        'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    id: 'mapbox.streets'
+}).addTo(map);
+
+map.on('drag', function() {
+    map.panInsideBounds(bounds, { animate: false });
+});
+
 function populates_markers(mkers, cls) {
     for (var i=0; i<mkers.length; ++i) {
         var marker = L.marker(mkers[i].location);
@@ -497,49 +505,24 @@ function populates_markers(mkers, cls) {
         markers.addLayer(marker);
     }
 }
-populates_markers(data.prev, "prev");
-populates_markers(data.curr, "curr");
-populates_markers(data.next, "next");
-map.addLayer(markers);
 
-// var map = new Datamap({
-//     element: document.getElementById('map-container'),
-//     responsive: true,
-//     fills: {
-//         'prev': COLOR_PREV,
-//         'curr': COLOR_CURR,
-//         'next': COLOR_NEXT,
-//         defaultFill: COLOR_PRIMARY
-//     },
-// });
-// window.addEventListener('resize', function() {
-//     map.resize();
-// });
+function draw_markers() {
+    markers.clearLayers();
+    for (var key in displayed_markers) {
+        if (displayed_markers[key]) {
+            populates_markers(data[key], key);
+        }
+    }
+    map.addLayer(markers);
+};
 
-// var bombs = []
-// Object.keys(data).forEach(function (el) {
-//     data[el].map(function (obj) {
-//         bombs.push({
-//             radius: 12,
-//             location: obj.affiliation,
-//             fillKey: el,
-//             borderWidth: 1,
-//             borderColor: 'rgba(0, 0, 0, 0.4)',
-//             paper: obj.name,
-//             date: obj.year,
-//             latitude: obj.location[0], 
-//             longitude: obj.location[1],
-//             fillOpacity: 1.0
-//         })
-//     })
-    
-// })
+function toggle_filter(self, marker_grp) {
+    displayed_markers[marker_grp] = !displayed_markers[marker_grp];
+    if (displayed_markers[marker_grp])
+        $(self).children().first().show();
+    else
+        $(self).children().first().hide();
+    draw_markers();
+}
 
-
-// map.bubbles(bombs, {
-//     popupTemplate: function (geo, data) {
-//             return ['<div class="hoverinfo">' +  data.paper + '<br>',
-//             data.date + "<br>" + data.location,
-//             '</div>'].join('');
-//     }
-// });
+draw_markers();

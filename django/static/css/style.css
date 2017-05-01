@@ -103,6 +103,10 @@ div .marker{
     transition: width .5s linear, padding-left 0s linear .5s;
 }
 
+.interactive:hover {
+    cursor: pointer;
+}
+
 .filter-box:hover .map-legend {
     width: 83%;
     padding-left: 5px;
