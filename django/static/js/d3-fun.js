@@ -525,5 +525,11 @@ function toggle_filter(self, marker_grp) {
     draw_markers();
 }
 
+function go_back() {
+    var speed = 750;
+    $('html, body').animate( { scrollTop: $("#graph-container").offset().top }, speed ); 
+}
+
 draw_markers();
 L.DomEvent.disableClickPropagation(L.DomUtil.get('filter-box')); 
+L.DomEvent.disableClickPropagation(L.DomUtil.get('back')); 

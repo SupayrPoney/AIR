@@ -114,11 +114,30 @@ div .marker{
     transition: padding-left 0s, width .5s linear;
 }
 
+#back {
+    position: absolute;
+    background-color: #1A537F;
+    z-index: 1000;
+    color: white;
+    opacity: 0.7;
+    padding: 5px 3px;
+    box-shadow: none;
+    right: 2%;
+    top: 4%;
+    transition: opacity .5s ease-in-out, box-shadow .5s ease-in-out;
+}
+
+#back:hover {
+    opacity:1.0;
+    transition: opacity .5s ease-in-out, box-shadow .5s ease-in-out, width .5s linear;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 1px 5px 0 rgba(0,0,0,0.12),0 3px 1px -2px rgba(0,0,0,0.2);
+    transition: opacity .5s ease-in-out, box-shadow .5s ease-in-out;
+}
+
 #graph-container {
     margin-top: 65px;
 }
 #map-container {
-
 }
 hr {
     margin-top: 5px;
