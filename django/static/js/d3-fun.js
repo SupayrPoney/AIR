@@ -485,8 +485,6 @@ var markers = L.markerClusterGroup({
             cnt[mkers[i].cls] += 1;
         }
         var clust_key = '' + (+(cnt.prev>0)) + (+(cnt.curr>0)) + (+(cnt.next>0));
-        console.log(clust_key);
-        console.log(typeof(clust_markers_icon[clust_key]));
         var iconOptions = clust_markers_icon[clust_key](cnt.prev, cnt.curr, cnt.next);
         iconOptions.className = "cluster";
         return L.divIcon(iconOptions);
