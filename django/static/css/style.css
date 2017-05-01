@@ -30,6 +30,31 @@
     background-color: #6BF178;
 }
 
+.marker {
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+.cluster-container {
+    display: -webkit-flex;
+    flex-direction: row;
+}
+
+.top-clust {
+    justify-content: center;
+    bottom: -4px;
+    position: relative;
+} 
+
+.cluster{
+    background: none;
+    border: none;
+}
+
 #graph-container, #map-container, #graph-container svg {
     width: 100vw;
     height: calc(100vh - 65px);

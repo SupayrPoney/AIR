@@ -13,13 +13,6 @@ var data = {
     affiliation: "IRSA-INRIA",
     location: [48.116282, -1.639774]
    }, {
-    name: "Alma-O: an imperative language that supports declarative programming", 
-    author: "Krzysztof R. Apt , Jacob Brunekreef , Vincent Partington , Andrea Schaerf", 
-    year: "1998",
-    keywords: "Laguages, declarative programming, imperative programming, search", 
-    affiliation: "University of Amsterdam", 
-    location: [52.355818, 4.955726]
-   }, {
     name: "The synchronous languages 12 years later",
     author: "A., Caspi, P., Edwards, S. A., Halbwachs, N., Guernic, P. L., Robert, and Simone, D",
     year: "2003",
@@ -35,7 +28,14 @@ var data = {
      affiliation: " Vrije Universiteit Brussel", 
      location: [50.823165, 4.392326]
     }],
-   next: [ {
+   next: [{
+    name: "Alma-O: an imperative language that supports declarative programming", 
+    author: "Krzysztof R. Apt , Jacob Brunekreef , Vincent Partington , Andrea Schaerf", 
+    year: "1998",
+    keywords: "Laguages, declarative programming, imperative programming, search", 
+    affiliation: "University of Amsterdam", 
+    location: [52.355818, 4.955726]
+   }, {
      name: "Multi-Tier Functional Reactive Programming for the Web", 
      author: "Bob Reynders , Dominique Devriese , Frank Piessens",
      year: "2014",
@@ -457,7 +457,7 @@ svg.append("text")
 
 //#### MAP ####
 
-var mymap = L.map('map-container').setView([51.505, -0.09], 2);
+var map = L.map('map-container').setView([51.505, -0.09], 2);
 
 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
     maxZoom: 18,
@@ -465,7 +465,44 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
         '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
         'Imagery © <a href="http://mapbox.com">Mapbox</a>',
     id: 'mapbox.streets'
-}).addTo(mymap);
+}).addTo(map);
+
+var clust_markers_icon = {
+    "001" : function(p,c,n) { return { html: "<div class='marker next-tag'><span>"+n+"</span></div>", iconSize:L.point(30,30) } },
+    "010" : function(p,c,n) { return { html: "<div class='marker curr-tag'><span>"+c+"</span></div>", iconSize:L.point(30,30) } },
+    "011" : function(p,c,n) { return { html: "<div class='cluster-container'><div class='marker curr-tag'><span>"+c+"</span></div><div class='marker next-tag'><span>"+n+"</span></div></div>", iconSize:L.point(60,30) } },
+    "100" : function(p,c,n) { return { html: "<div class='marker prev-tag'><span>"+p+"</span></div>", iconSize:L.point(30,30) } },
+    "101" : function(p,c,n) { return { html: "<div class='cluster-container'><div class='marker prev-tag'><span>"+p+"</span></div><div class='marker next-tag'><span>"+n+"</span></div></div>", iconSize:L.point(60,30) } },
+    "110" : function(p,c,n) { return { html: "<div class='cluster-container'><div class='marker prev-tag'><span>"+p+"</span></div><div class='marker curr-tag'><span>"+c+"</span></div></div>", iconSize:L.point(60,30) } },
+    "111" : function(p,c,n) { return { html: "<div class='cluster-container top-clust'><div class='marker prev-tag'><span>"+p+"</span></div></div><div class='cluster-container'><div class='marker curr-tag'><span>"+c+"</span></div><div class='marker next-tag'><span>"+n+"</span></div></div>", iconSize:L.point(60,60) } },
+};
+
+var markers = L.markerClusterGroup({
+    iconCreateFunction: function(cluster) {
+        var mkers = cluster.getAllChildMarkers();
+        var cnt = {prev:0, curr:0, next:0};
+        for (var i=0; i<mkers.length; ++i) {
+            cnt[mkers[i].cls] += 1;
+        }
+        var clust_key = '' + (+(cnt.prev>0)) + (+(cnt.curr>0)) + (+(cnt.next>0));
+        console.log(clust_key);
+        console.log(typeof(clust_markers_icon[clust_key]));
+        var iconOptions = clust_markers_icon[clust_key](cnt.prev, cnt.curr, cnt.next);
+        iconOptions.className = "cluster";
+        return L.divIcon(iconOptions);
+    }
+});
+function populates_markers(mkers, cls) {
+    for (var i=0; i<mkers.length; ++i) {
+        var marker = L.marker(mkers[i].location);
+        marker.cls = cls;
+        markers.addLayer(marker);
+    }
+}
+populates_markers(data.prev, "prev");
+populates_markers(data.curr, "curr");
+populates_markers(data.next, "next");
+map.addLayer(markers);
 
 // var map = new Datamap({
 //     element: document.getElementById('map-container'),
