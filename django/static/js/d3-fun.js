@@ -298,7 +298,10 @@ svg.append("text")
 
 //#### MAP ####
 
-var map = L.map('map-container').setView([51.505, -0.09], 2);
+var map = L.map('map-container',{
+                                    minZoom: 3
+                                })
+           .setView([51.505, -0.09], 2);
 var displayed_markers = { prev: true, curr: true, next: true };
 var clust_markers_icon = {
     "001" : function(p,c,n) { return { html: "<div class='marker next'><span>"+n+"</span></div>", iconSize:L.point(30,30) } },
