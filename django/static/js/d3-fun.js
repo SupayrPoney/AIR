@@ -85,6 +85,10 @@ function getComputedProperty(obj, property) {
     return parseInt(window.getComputedStyle(obj, null).getPropertyValue(property));
 }
 
+function scroll_to(id) {
+    $('html, body').animate( { scrollTop: $(id).offset().top }, 750); 
+}
+
 const DOT_RADIUS = 40;
 const DOT_SPACE = 100;
 const COL_OFFSET = 400;
@@ -131,7 +135,7 @@ function draw_links(nb_links, x, y, arrow) {
 
 // NODES
 
-function draw_nodes(datas, x, y, color, type) {
+function draw_nodes(datas, x, y, color, type, onclick) {
     var circle = svg.selectAll(type)
     .data(datas)
     .enter()
@@ -147,7 +151,7 @@ function draw_nodes(datas, x, y, color, type) {
     .attr("stroke", "black")
     .attr("stroke-width", CIRCLE_STROKE)
     .on({
-        "mouseover": function(d) {  
+        mouseover: function(d) {  
             d3.select(this).style("cursor", "pointer");    
             tooltip.transition()        
                 .duration(200)      
@@ -156,12 +160,13 @@ function draw_nodes(datas, x, y, color, type) {
                 .style("left", (d3.select(this).attr("cx") - $(tooltip[0][0]).width()/2 + sidebar_offset) + "px")     
                 .style("top", (d3.select(this).attr("cy") -1.5*DOT_RADIUS - $(tooltip[0][0]).height()) + "px");    
         },
-        "mouseout": function() {    
+        mouseout: function() {    
             d3.select(this).style("cursor", "default"); 
             tooltip.transition()        
                 .duration(500)      
                 .style("opacity", 0);   
-        }
+        },
+        click: onclick
     });
 }
 
@@ -169,7 +174,7 @@ function draw_scene() {
     draw_links(data.prev.length, mid_width-COL_OFFSET, left_column_offset, "url(#mid-arrow-left)");
     draw_links(data.next.length, mid_width+COL_OFFSET, right_column_offset, "url(#mid-arrow-right)")
     draw_nodes(data.prev, mid_width-COL_OFFSET, left_column_offset, COLOR_PREV, "prev");
-    draw_nodes(data.curr, mid_width, mid_height-DOT_SPACE, COLOR_CURR, "curr");
+    draw_nodes(data.curr, mid_width, mid_height-DOT_SPACE, COLOR_CURR, "curr", function(){scroll_to("#map-container")});
     draw_nodes(data.next, mid_width+COL_OFFSET, right_column_offset, COLOR_NEXT, "next");
 }
 
@@ -359,10 +364,6 @@ function toggle_filter(self, marker_grp) {
     else
         $(self).children().first().hide();
     draw_markers();
-}
-
-function go_back() {
-    $('html, body').animate( { scrollTop: $("#graph-container").offset().top }, 750); 
 }
 
 draw_markers();
