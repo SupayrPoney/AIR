@@ -11,7 +11,7 @@ body{
 }
 
 h1 {
-    font-size: 30px;
+    font-size: 15px;
 }
 
 form {      
@@ -39,6 +39,12 @@ form {
     justify-content: space-around;
     width: 100vw;
     height: 100vh;
+}
+
+#article-name{
+    font-size: 30px;
+    padding:1px 300px;
+    color:#1A537F;
 }
 
 .tag {
@@ -101,6 +107,7 @@ div.tooltip {
     padding:8px 15px;
     background-color: #F5F5F5;
     border:0px solid #dbdbdb;
+    color: #000000;
 }
 
 .button {

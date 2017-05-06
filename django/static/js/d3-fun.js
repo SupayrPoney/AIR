@@ -184,7 +184,7 @@ draw_scene();
 
 const NAV_LENGTH = 200;
 const NAV_EXTREMITY = 50;
-const NAV_OFFSET = 50;
+const NAV_OFFSET = 120;
 const NAV_STROKE_WIDTH = 3;
 const NAV_DOT_RADIUS = 8;
 const NAV_DOT_STROKE_WIDTH = 2;
@@ -276,11 +276,17 @@ function draw_nav() {
 }
 draw_nav();
 
+
+//####### FLEX-CONTAINER #######
+var titleDiv = document.querySelector("#article-name");
+titleDiv.innerHTML= data.curr[0].name;
+
+
 //#### LEGEND ####
 
 const LEGEND_LENGTH = 66
-const LEGEND_H_OFFSET = 30
-const LEGEND_V_OFFSET = 50
+const LEGEND_H_OFFSET = 70
+const LEGEND_V_OFFSET = 120
 const LEGEND_TEXT_OFFSET = 10
 
 const legend_x = container_width-LEGEND_H_OFFSET;
