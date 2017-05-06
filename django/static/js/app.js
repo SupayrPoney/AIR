@@ -24,11 +24,10 @@ function get_by_sid(sid, onSuccess, onError) {
 
 function get_prev(metadata, onSuccess, onError) {
     function lol(res, i) {
-        console.log(i)
         if (metadata.prev[i]) {
             $.ajax({
                 url: metadata.prev[i].url,
-                success: (data) => lol(res.concat[data], i + 1),
+                success: (data) => lol(res.concat([data]), i + 1),
                 error: (error) => lol(res, i + 1)
             })
         }
@@ -41,11 +40,10 @@ function get_prev(metadata, onSuccess, onError) {
 
 function get_next(metadata, onSuccess, onError) {
     function lol(res, i) {
-        console.log(i)
         if (metadata.next[i]) {
             $.ajax({
                 url: metadata.next[i].url,
-                success: (data) => lol(res.concat[data], i + 1),
+                success: (data) => lol(res.concat([data]), i + 1),
                 error: (error) => lol(res, i + 1)
             })
         }
