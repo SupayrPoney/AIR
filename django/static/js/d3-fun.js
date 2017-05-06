@@ -1,8 +1,17 @@
+const COLORS = {
+    prev: '#4CEAFF',
+    curr: '#FFE74C',
+    next: '#6BF178',
+    primary: "#1A537F"
+}
+
 const COLOR_PREV = '#4CEAFF';
 const COLOR_CURR = '#FFE74C';
 const COLOR_NEXT = '#6BF178';
 const COLOR_PRIMARY = "#1A537F";
 const CIRCLE_STROKE = 2;
+
+L.MakiMarkers.accessToken = 'pk.eyJ1Ijoic3VwYXlycG9uZXkiLCJhIjoiY2oyZGRvYXdjMDAxYTJ4bXV5YXUzMzRocCJ9.v50KWa63j5PHSN7_HACjyg'
 
 var data = {
    prev: [{
@@ -344,7 +353,8 @@ map.on('drag', function() {
 
 function populates_markers(mkers, cls) {
     for (var i=0; i<mkers.length; ++i) {
-        var marker = L.marker(mkers[i].location);
+        var icon = L.MakiMarkers.icon({color: COLORS[cls], size: "m"});
+        var marker = L.marker(mkers[i].location, {icon: icon});
         marker.cls = cls;
         markers.addLayer(marker);
     }
