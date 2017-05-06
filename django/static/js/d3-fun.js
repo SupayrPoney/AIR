@@ -179,12 +179,16 @@ function draw_nodes(datas, x, y, color, type, onclick) {
     });
 }
 
+function click_prev_next(d) {
+    draw_by_title(d.title)
+}
+
 function draw_scene(data) {
     draw_links(data.prev.length, mid_width-COL_OFFSET, left_column_offset, "url(#mid-arrow-left)");
     draw_links(data.next.length, mid_width+COL_OFFSET, right_column_offset, "url(#mid-arrow-right)")
-    draw_nodes(data.prev, mid_width-COL_OFFSET, left_column_offset, COLOR_PREV, "prev");
+    draw_nodes(data.prev, mid_width-COL_OFFSET, left_column_offset, COLOR_PREV, "prev", click_prev_next);
     draw_nodes(data.curr, mid_width, mid_height-DOT_SPACE, COLOR_CURR, "curr", function(){scroll_to("#map-container")});
-    draw_nodes(data.next, mid_width+COL_OFFSET, right_column_offset, COLOR_NEXT, "next");
+    draw_nodes(data.next, mid_width+COL_OFFSET, right_column_offset, COLOR_NEXT, "next", click_prev_next);
 }
 
 //#### NAV ####
@@ -307,9 +311,8 @@ keywordsPaper.forEach(function(keyword){
 });
 
 //######## SEARCH-PART ########
-$('#searchButton').click((event) => {
-    let value = $('#searchInput').val()
-    search_by_title(value, (data) => {
+function draw_by_title(title) {
+    search_by_title(title, (data) => {
         data.curr = [data]
         get_prev(data, (prev) => {
             data.prev = prev
@@ -319,6 +322,10 @@ $('#searchButton').click((event) => {
             }, (error) => console.error(error))
         }, (error) => console.error(error))
     }, (error) => console.error(error))
+}
+$('#searchButton').click((event) => {
+    let value = $('#searchInput').val()
+    draw_by_title(value)
 })
 
 
