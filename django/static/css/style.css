@@ -1,0 +1,236 @@
+/* HTML */
+
+hr {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+body{
+    font-family: 'Roboto', sans-serif;   
+    overflow:hidden; 
+}
+
+h1 {
+    font-size: 15px;
+}
+
+form {      
+    margin: 50px auto;
+}
+
+/* Common */
+
+.interactive:hover { cursor: pointer; }
+.curr { background-color: #FFE74C; }
+.prev { background-color: #4CEAFF; }
+.next { background-color: #6BF178; }
+.main { background-color: #1A537F; }
+
+.unselected{
+    background-color: #F5F5F5;
+    opacity: 0.3;
+}
+
+/* Graph */
+
+#graph-container, #flex-container svg {
+    width: 80vw;
+    height: 100vh;
+}
+
+#flex-container{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-around;
+    width: 100vw;
+    height: 100vh;
+}
+
+#article-name{
+    font-size: 30px;
+    text-align: center;
+    color:#1A537F;
+}
+
+.tag {
+    padding: 1px 6px;
+    color: black !important;
+    margin-left: 3px;
+    border-radius: 2px;
+    display: inline-block;
+    margin-top: 3px;
+}
+
+div.tooltip {   
+    color: white;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 1px 5px 0 rgba(0,0,0,0.12),0 3px 1px -2px rgba(0,0,0,0.2);
+    position: absolute;         
+    text-align: center;         
+    width: 360px;                   
+    padding: 10px 5px;               
+    font: 12px sans-serif;      
+    background: #1A537F; 
+    border: 0px;        
+    border-radius: 3px;         
+    pointer-events: none;           
+}
+
+.nav_text {
+    position: absolute;         
+    text-align: center;                        
+}
+
+/* Graph > paper-info */
+
+#paper-infos {
+    position: fixed;
+    top: 0px;
+    padding: 10px;
+    text-align: center;
+    color: white;
+    width: 100%;
+    height: 65px;
+}
+
+#paper-infos > span {
+    color: white;
+    font-size: 16px;
+}
+
+/* Graph > sidebar/search */
+
+#flex-container search {
+    position: relative;
+    height: 100vh;
+    float:left;
+    padding: 20px;
+    color:white;
+    width: 20vw;
+}
+
+.search {
+    padding:8px 15px;
+    background-color: #F5F5F5;
+    border:0px solid #dbdbdb;
+    color: #000000;
+}
+
+.button {
+    position:relative;
+    padding:6px 8px;
+    border:2px solid white;
+    background-color: white;
+    color:#1A537F;
+    width: 60px;
+
+}
+.button:hover  {
+    background-color:#fafafa;
+    color:#1A537F;
+}
+
+/* Map */
+
+#map-container {
+    width: 100vw;
+    height: 100vh;
+}
+
+/* Map > marker/cluster */
+
+.marker {
+    width:30px;
+    height:30px;
+    max-width: 30px;
+    max-height: 30px;
+    min-width: 30px;
+    min-height: 30px;
+    border-radius:50%;
+}
+
+div .marker{
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+.cluster-container {
+    display: -webkit-flex;
+    flex-direction: row;
+}
+
+.cluster{
+    background: none;
+    border: none;
+}
+
+.top-clust {
+    justify-content: center;
+    bottom: -4px;
+    position: relative;
+}
+
+/* Map > filter/legend */
+
+#filter-box {
+    position: absolute;
+    bottom: 4%;
+    z-index: 1000;
+    left: 2%;
+    opacity: 0.7;
+    width: 43px;
+    transition: opacity .5s ease-in-out, box-shadow .5s ease-in-out, width .5s linear;
+    box-shadow: none;
+    color: white;
+    padding: 5px 3px;
+    cursor: initial;
+}
+
+#filter-box:hover {
+    opacity: 1.0;
+    width: 180px;
+    transition: opacity .5s ease-in-out, box-shadow .5s ease-in-out, width .5s linear;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 1px 5px 0 rgba(0,0,0,0.12),0 3px 1px -2px rgba(0,0,0,0.2);
+}
+
+.legend-container {
+    align-items: center;
+    display: flex;
+    padding: 3px;
+}
+
+.map-legend {
+    padding-left: 0px;
+    width: 0px;
+    height: auto;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: width .5s linear, padding-left 0s linear .5s;
+}
+
+#filter-box:hover .map-legend {
+    width: 83%;
+    padding-left: 5px;
+    transition: padding-left 0s, width .5s linear;
+}
+ 
+/* Map > back button */
+
+#back {
+    position: absolute;
+    z-index: 1000;
+    color: white;
+    opacity: 0.7;
+    padding: 5px 3px;
+    box-shadow: none;
+    right: 2%;
+    top: 4%;
+    transition: opacity .5s ease-in-out, box-shadow .5s ease-in-out;
+}
+
+#back:hover {
+    opacity:1.0;
+    transition: opacity .5s ease-in-out, box-shadow .5s ease-in-out, width .5s linear;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 1px 5px 0 rgba(0,0,0,0.12),0 3px 1px -2px rgba(0,0,0,0.2);
+    transition: opacity .5s ease-in-out, box-shadow .5s ease-in-out;
+}
