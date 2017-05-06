@@ -26,6 +26,8 @@ form {
 .next { background-color: #6BF178; }
 .main { background-color: #1A537F; }
 
+.unselected{background-color: #F5F5F5;}
+
 /* Graph */
 
 #graph-container, #flex-container svg {
