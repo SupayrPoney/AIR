@@ -26,7 +26,10 @@ form {
 .next { background-color: #6BF178; }
 .main { background-color: #1A537F; }
 
-.unselected{background-color: #F5F5F5;}
+.unselected{
+    background-color: #F5F5F5;
+    opacity: 0.3;
+}
 
 /* Graph */
 

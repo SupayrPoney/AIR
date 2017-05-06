@@ -293,18 +293,19 @@ draw_nav();
 var keywordsPaper =data.curr[0].keywords.split(",")
 
 keywordsPaper.forEach(function(keyword){
-    var div = document.createElement("div");
-    div.innerHTML= keyword;
-    div.className = "tag curr";
-    div.onclick= function(){
-        if (div.className.includes("curr")) {
-            div.className.replace("curr", "unselected");
+    var tag_div = document.createElement("div");
+    tag_div.innerHTML= keyword;
+    tag_div.className = "tag curr";
+    tag_div.onclick= function(){
+        console.log("test");
+        if (this.className.includes("curr")) {
+            this.className = this.className.replace("curr", "unselected");
         }else{
-            div.className.replace("unselected","curr");
+            this.className = this.className.replace("unselected","curr");
         };
 
     }
-    document.getElementById("keywords-container").appendChild(div);
+    document.getElementById("keywords-container").appendChild(tag_div);
 });
 
 
