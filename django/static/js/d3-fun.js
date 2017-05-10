@@ -389,6 +389,10 @@ function populates_markers(mkers, cls) {
     }
 }
 
+function show_all_markers() {
+    map.fitBounds(markers.getBounds());
+}
+
 function draw_markers() {
     markers.clearLayers();
     for (var key in displayed_markers) {
@@ -409,5 +413,6 @@ function toggle_filter(self, marker_grp) {
 }
 
 draw_markers();
+show_all_markers();
 L.DomEvent.disableClickPropagation(L.DomUtil.get('filter-box')); 
 L.DomEvent.disableClickPropagation(L.DomUtil.get('back')); 
