@@ -99,6 +99,8 @@ function scroll_to(id) {
 }
 
 const DOT_RADIUS = 40;
+const PAPER_HEIGHT = 80;
+const PAPER_WIDTH = 64;
 const DOT_SPACE = 100;
 const COL_OFFSET = 400;
 
@@ -144,21 +146,21 @@ function draw_links(nb_links, x, y, arrow) {
 
 // NODES
 
-function draw_nodes(datas, x, y, color, type, onclick) {
-    var circle = svg.selectAll(type)
+function draw_nodes(datas, x, y, image_url, type, onclick) {
+    
+    svg.selectAll("paper")
     .data(datas)
     .enter()
-    .append("circle")
-    .attr("class", "node "+type)
-    .attr("cx", x)
-    .attr("cy", function(d) {
+    .append("svg:image")
+    .attr("class", "paper")
+    .attr("x", x-PAPER_WIDTH/2)
+    .attr("y", function(d) {
         y += DOT_SPACE;
-        return y;
+        return y-PAPER_HEIGHT/2;
     })
-    .attr("r", DOT_RADIUS)
-    .attr("fill", color)
-    .attr("stroke", "black")
-    .attr("stroke-width", CIRCLE_STROKE)
+    .attr("width", PAPER_WIDTH)
+    .attr("height", PAPER_HEIGHT)
+    .attr("xlink:href", image_url)  
     .on({
         mouseover: function(d) {  
             d3.select(this).style("cursor", "pointer");    
@@ -179,45 +181,12 @@ function draw_nodes(datas, x, y, color, type, onclick) {
     });
 }
 
-function middle_node(datas, x, y, color, type){
-    console.log(currentDoc)
-    var circle = svg.selectAll(type)
-    .data(datas)
-    .enter()
-    .append("svg:image")
-    .attr("xlink:href", currentDoc)
-    .attr("class", "node "+type)
-    .attr("x", x)
-    .attr("y", function(d) {
-        y += DOT_SPACE;
-        return y;
-    })
-    .on({
-        mouseover: function(d) {  
-            d3.select(this).style("cursor", "pointer");    
-            tooltip.transition()        
-                .duration(200)      
-                .style("opacity", .95);      
-            tooltip.html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +'<hr><span class="tag '+type+'">'+ d.keywords.split(", ").join('</span><span class="tag '+type+'">')+"</span>")  
-                .style("left", (d3.select(this).attr("cx") - $(tooltip[0][0]).width()/2 + sidebar_offset) + "px")     
-                .style("top", (d3.select(this).attr("cy") -1.5*DOT_RADIUS - $(tooltip[0][0]).height()) + "px");    
-        },
-        mouseout: function() {    
-            d3.select(this).style("cursor", "default"); 
-            tooltip.transition()        
-                .duration(500)      
-                .style("opacity", 0);   
-        },
-        click: function(){scroll_to("#map-container")}
-    });
-}
-
 function draw_scene() {
     draw_links(data.prev.length, mid_width-COL_OFFSET, left_column_offset, "url(#mid-arrow-left)");
     draw_links(data.next.length, mid_width+COL_OFFSET, right_column_offset, "url(#mid-arrow-right)")
-    draw_nodes(data.prev, mid_width-COL_OFFSET, left_column_offset, COLOR_PREV, "prev");
-    middle_node(data.curr, mid_width, mid_height-DOT_SPACE, COLOR_CURR, "curr");
-    draw_nodes(data.next, mid_width+COL_OFFSET, right_column_offset, COLOR_NEXT, "next");
+    draw_nodes(data.prev, mid_width-COL_OFFSET, left_column_offset, PREV_DOC_IMG_URL, "prev");
+    draw_nodes(data.curr, mid_width, mid_height-DOT_SPACE, CURR_DOC_IMG_URL, "curr");
+    draw_nodes(data.next, mid_width+COL_OFFSET, right_column_offset, NEXT_DOC_IMG_URL, "next");
 }
 
 draw_scene();

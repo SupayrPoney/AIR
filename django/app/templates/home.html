@@ -68,7 +68,11 @@
     </div>
 </div>
 
-<script type="text/javascript"> var currentDoc = "{% static 'images/docCurr.png' %}"</script>
+<script type="text/javascript"> 
+    const CURR_DOC_IMG_URL = "{% static 'images/docCurr.png' %}";
+    const NEXT_DOC_IMG_URL = "{% static 'images/docNext.png' %}";
+    const PREV_DOC_IMG_URL = "{% static 'images/docPrev.png' %}";
+</script>
 <script type="text/javascript" src="{% static "js/d3-fun.js" %}"></script>
 
 {% endblock content %}
