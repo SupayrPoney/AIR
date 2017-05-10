@@ -183,7 +183,7 @@ function draw_scene() {
     draw_links(data.prev.length, mid_width-COL_OFFSET, left_column_offset, "url(#mid-arrow-left)");
     draw_links(data.next.length, mid_width+COL_OFFSET, right_column_offset, "url(#mid-arrow-right)")
     draw_nodes(data.prev, mid_width-COL_OFFSET, left_column_offset, PREV_DOC_IMG_URL, "prev");
-    draw_nodes(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr");
+    draw_nodes(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr", function(){scroll_to("#map-container")});
     draw_nodes(data.next, mid_width+COL_OFFSET, right_column_offset, NEXT_DOC_IMG_URL, "next");
 }
 
