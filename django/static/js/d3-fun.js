@@ -98,10 +98,9 @@ function scroll_to(id) {
     $('html, body').animate( { scrollTop: $(id).offset().top }, 750); 
 }
 
-const DOT_RADIUS = 40;
 const PAPER_HEIGHT = 80;
 const PAPER_WIDTH = 64;
-const DOT_SPACE = 100;
+const ICON_SPACE = 100;
 const COL_OFFSET = 400;
 
 var container_width = getComputedProperty($("svg")[0], "width");
@@ -111,8 +110,8 @@ var mid_width = container_width/2;
 var mid_height = container_height/2;
 var mid = {x: mid_width, y: mid_height};
 
-var left_column_offset = ((container_height-((data.prev.length-1)*DOT_SPACE)-DOT_RADIUS*2)/2)-(DOT_RADIUS*1.5);
-var right_column_offset = ((container_height-((data.next.length-1)*DOT_SPACE)-DOT_RADIUS*2)/2)-(DOT_RADIUS*1.5);
+var left_column_offset = ((container_height-((data.prev.length-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.75);
+var right_column_offset = ((container_height-((data.next.length-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.75);
 
 
 function draw_link(frm, to, arrow) {
@@ -139,7 +138,7 @@ function draw_link(frm, to, arrow) {
 
 function draw_links(nb_links, x, y, arrow) {
     for (var i=0; i<nb_links; ++i) {
-        y += DOT_SPACE;
+        y += ICON_SPACE;
         draw_link({x:x,y:y}, mid, arrow)
     }
 }
@@ -147,7 +146,6 @@ function draw_links(nb_links, x, y, arrow) {
 // NODES
 
 function draw_nodes(datas, x, y, image_url, type, onclick) {
-    
     svg.selectAll("paper")
     .data(datas)
     .enter()
@@ -155,7 +153,7 @@ function draw_nodes(datas, x, y, image_url, type, onclick) {
     .attr("class", "paper")
     .attr("x", x-PAPER_WIDTH/2)
     .attr("y", function(d) {
-        y += DOT_SPACE;
+        y += ICON_SPACE;
         return y-PAPER_HEIGHT/2;
     })
     .attr("width", PAPER_WIDTH)
@@ -168,8 +166,8 @@ function draw_nodes(datas, x, y, image_url, type, onclick) {
                 .duration(200)      
                 .style("opacity", .95);      
             tooltip.html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +'<hr><span class="tag '+type+'">'+ d.keywords.split(", ").join('</span><span class="tag '+type+'">')+"</span>")  
-                .style("left", (d3.select(this).attr("cx") - $(tooltip[0][0]).width()/2 + sidebar_offset) + "px")     
-                .style("top", (d3.select(this).attr("cy") -1.5*DOT_RADIUS - $(tooltip[0][0]).height()) + "px");    
+                .style("left", (d3.select(this).attr("x") - $(tooltip[0][0]).width()/2 + PAPER_WIDTH/2 + sidebar_offset) + "px")     
+                .style("top", (d3.select(this).attr("y") -PAPER_HEIGHT/3 - $(tooltip[0][0]).height()) + "px");    
         },
         mouseout: function() {    
             d3.select(this).style("cursor", "default"); 
@@ -185,7 +183,7 @@ function draw_scene() {
     draw_links(data.prev.length, mid_width-COL_OFFSET, left_column_offset, "url(#mid-arrow-left)");
     draw_links(data.next.length, mid_width+COL_OFFSET, right_column_offset, "url(#mid-arrow-right)")
     draw_nodes(data.prev, mid_width-COL_OFFSET, left_column_offset, PREV_DOC_IMG_URL, "prev");
-    draw_nodes(data.curr, mid_width, mid_height-DOT_SPACE, CURR_DOC_IMG_URL, "curr");
+    draw_nodes(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr");
     draw_nodes(data.next, mid_width+COL_OFFSET, right_column_offset, NEXT_DOC_IMG_URL, "next");
 }
 
