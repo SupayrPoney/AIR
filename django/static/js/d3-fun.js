@@ -291,6 +291,8 @@ function draw_scene() {
     draw_papers(data.prev, mid_width-COL_OFFSET, left_column_offset, PREV_DOC_IMG_URL, "prev", click_prev_next);
     draw_papers(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr", function(){scroll_to("#map-container")});
     draw_papers(data.next, mid_width+COL_OFFSET, right_column_offset, NEXT_DOC_IMG_URL, "next", click_prev_next);
+    refresh_article_name();
+    refresh_keywords();
 }
 
 //#### NAV ####
@@ -393,23 +395,25 @@ draw_nav();
 //####### FLEX-CONTAINER #######
 
 //####### KEYWORDS-PART #########
+function refresh_keywords(){
+    console.log("try");
+    var keywordsPaper =data.curr[0].keywords
 
-var keywordsPaper =data.curr[0].keywords.split(",")
+    keywordsPaper.forEach(function(keyword){
+        var tag_div = document.createElement("div");
+        tag_div.innerHTML= keyword;
+        tag_div.className = "tag curr pointer";
+        tag_div.onclick= function(){
+            if (this.className.includes("curr")) {
+                this.className = this.className.replace("curr", "unselected");
+            }else{
+                this.className = this.className.replace("unselected","curr");
+            };
 
-keywordsPaper.forEach(function(keyword){
-    var tag_div = document.createElement("div");
-    tag_div.innerHTML= keyword;
-    tag_div.className = "tag curr pointer";
-    tag_div.onclick= function(){
-        if (this.className.includes("curr")) {
-            this.className = this.className.replace("curr", "unselected");
-        }else{
-            this.className = this.className.replace("unselected","curr");
-        };
-
-    }
-    document.getElementById("keywords-container").appendChild(tag_div);
-});
+        }
+        document.getElementById("keywords-container").appendChild(tag_div);
+    });
+};
 
 //######## SEARCH-PART ########
 function retrieve_data_by_title(title, callback) {
@@ -438,9 +442,12 @@ $('#searchButton').click((event) => {
 
 
 //######## GRAPH-PART #########
-var titleDiv = document.querySelector("#article-name");
-titleDiv.innerHTML= data.curr[0].name;
-
+function refresh_article_name(){
+    console.log("article name");
+    var titleDiv = document.querySelector("#article-name");
+    titleDiv.innerHTML= data.curr[0].title
+    //[0].name;
+};
 
 //#### LEGEND ####
 
