@@ -399,7 +399,7 @@ var keywordsPaper =data.curr[0].keywords.split(",")
 keywordsPaper.forEach(function(keyword){
     var tag_div = document.createElement("div");
     tag_div.innerHTML= keyword;
-    tag_div.className = "tag curr";
+    tag_div.className = "tag curr pointer";
     tag_div.onclick= function(){
         if (this.className.includes("curr")) {
             this.className = this.className.replace("curr", "unselected");
