@@ -4,6 +4,7 @@ from functools import wraps
 import os
 import hashlib
 import string
+import time
 
 DEBUG = 0
 
@@ -61,7 +62,15 @@ def fd(x):
 def requests_get(*args, params={}, **kwargs):
     params['apiKey'] = API_KEY
     params['httpAccept'] = 'application/json'
-    return requests.get(*args, proxies=proxies, params=params, **kwargs).json()
+    i = 1
+    while i < 6:
+        try:
+            return requests.get(*args, proxies=proxies, params=params, timeout=20, **kwargs).json()
+        except requests.Timeout:
+            wait = 2 ** i
+            print("Timeout, retry in %is" % wait)
+            time.sleep(wait)
+        i += 1
 
 
 # search/find on scopus
