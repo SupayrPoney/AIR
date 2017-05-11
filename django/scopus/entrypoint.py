@@ -27,7 +27,7 @@ def sid(doi):
 
 @pre_process
 def title(title):
-    return get_metadata_by_title(title)
+    return get_metadata_by_title(title.lower())
 
 
 def prev_of(paper):

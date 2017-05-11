@@ -194,8 +194,18 @@ def scopus_parse_reference(full_metadata):
                     # TODO : check proportion
                 except KeyError:
                     title = ''
-        sid = ref_info['refd-itemidlist']['itemid']['$']
-        results.append({'title': title, 'sid': sid})
+
+        sid = None
+        if isinstance(ref_info['refd-itemidlist']['itemid'], list):
+            for item in ref_info['refd-itemidlist']['itemid']:
+                if item["@idtype"] == "DOI":
+                    sid = item['$']
+                    break
+        else:
+            sid = ref_info['refd-itemidlist']['itemid']['$']
+
+        if sid:
+            results.append({'title': title, 'sid': sid})
     return results
 
 
