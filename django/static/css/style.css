@@ -151,12 +151,15 @@ div.tooltip {
     min-width: 30px;
     min-height: 30px;
     border-radius:50%;
+    box-shadow: 
+    0 0 0 1px hsl(0, 100%, 0%);
 }
 
 div .marker{
     align-items: center;
     justify-content: center;
     display: flex;
+    margin:1px; 
 }
 
 .cluster-container {
@@ -171,7 +174,8 @@ div .marker{
 
 .top-clust {
     justify-content: center;
-    bottom: -4px;
+    left: 2px;
+    bottom: -3px;
     position: relative;
 }
 
