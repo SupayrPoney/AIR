@@ -380,12 +380,17 @@ keywordsPaper.forEach(function(keyword){
 
 //######## SEARCH-PART ########
 function retrieve_data_by_title(title, callback) {
+    data = {}
     search_by_title(title, (new_data) => {
-        data.curr = [new_data]
-        get_prev(new_data, (prev) => {
-            data.prev = prev
-            get_next(new_data, (next) => {
-                data.next = next
+        data['curr'] = [new_data]
+        data['prev'] = []
+        data['next'] = []
+        callback()
+        get_prev_one_by_one(new_data, (prev) => {
+            data.prev.push(prev)
+            callback()
+            get_next_one_by_one(new_data, (next) => {
+                data.next.push(next)
                 callback()
             }, (error) => console.error(error))
         }, (error) => console.error(error))
