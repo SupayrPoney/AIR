@@ -72,6 +72,8 @@ def requests_get(*args, params={}, **kwargs):
             time.sleep(wait)
         i += 1
 
+    assert False, "Max retry exceeded"
+
 
 # search/find on scopus
 def scopus_search_by_title(title):
