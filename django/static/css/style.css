@@ -31,6 +31,10 @@ form {
     opacity: 0.3;
 }
 
+.control.glyphicon {
+  position: static;
+}
+
 /* Graph */
 
 #graph-container, #flex-container svg {

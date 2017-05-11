@@ -62,6 +62,12 @@ var data = {
    }]
  };
 
+d3.selection.prototype.moveToFront = function() {
+  return this.each(function(){
+    this.parentNode.appendChild(this);
+  });
+};
+
 var svg = d3.select("#graph-container svg");
 
 svg.append('svg:defs').append('svg:marker')
@@ -100,11 +106,13 @@ function scroll_to(id) {
     $('html, body').animate( { scrollTop: $(id).offset().top }, 750); 
 }
 
-const PAPER_HEIGHT = 80;
-const PAPER_WIDTH = 64;
+const PAPER_HEIGHT = 70;
+const PAPER_WIDTH = PAPER_HEIGHT/1.25;
 const ICON_SPACE = 100;
 const COL_OFFSET = 400;
 const TRANSITION_UNIT = 750;
+const PAGINATOR_H_OFFSET = 20;
+const PAGINATOR_V_OFFSET = 10;
 
 var container_width = getComputedProperty($("svg")[0], "width");
 var container_height = getComputedProperty($("svg")[0], "height");
@@ -112,9 +120,12 @@ var sidebar_offset = getComputedProperty($("search")[0], "width");
 var mid_width = container_width/2;
 var mid_height = container_height/2;
 var mid = {x: mid_width, y: mid_height};
+var papers_per_page = ~~((container_height-50)/ICON_SPACE);
 
 var left_column_offset;
 var right_column_offset;
+
+var pages = {next:0, prev:0};
 
 function draw_link(frm, to, arrow, cls, fade_in) {
     const mid_x = frm.x + (to.x-frm.x)/2;
@@ -198,6 +209,11 @@ function select_paper() {
     .delay(3*TRANSITION_UNIT)
     .style("opacity", 0.0)
     .remove();
+    d3.selectAll(".paginator")
+    .transition()
+    .duration(TRANSITION_UNIT)
+    .style("opacity", 0.0)
+    .remove();
 }
 
 function setupCallback(sel) {
@@ -207,13 +223,13 @@ function setupCallback(sel) {
 function onMove() {
     --counter;
     if (counter==0) {
-        draw_scene(true);
+        draw_scene();
     }
 }
 
 // NODES
 
-function draw_papers(datas, x, y, image_url, type, onclick) {
+function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
     const l = PAPER_WIDTH/2;
     var papers = svg.selectAll("paper")
     .data(datas)
@@ -221,7 +237,7 @@ function draw_papers(datas, x, y, image_url, type, onclick) {
     .append("svg:image")
     .attr("class", "paper paper-"+type)
     .attr("x", function(d) {
-        if (type=="curr") {
+        if ((type=="curr") || pagin) {
             return x-l;
         } else {
             if (type=="prev") {
@@ -237,7 +253,8 @@ function draw_papers(datas, x, y, image_url, type, onclick) {
         if (type=="curr") {
             return y-h;
         } else {
-            d.finalPos = y-h;
+            d.finalPos = y-h; 
+            if (pagin) return pagin>1 ? container_height+PAPER_HEIGHT : -PAPER_HEIGHT;
             var proj = (h*(PAPER_WIDTH+mid_width)/(COL_OFFSET))-h;
             return y<mid_height ? y-h-proj : y-h+proj;
         }
@@ -264,7 +281,7 @@ function draw_papers(datas, x, y, image_url, type, onclick) {
         click: onclick
     })
 
-    if (type=="curr") {
+    if ((type=="curr") && (!pagin)) {
         papers.style("opacity", 0.0)
         .transition()
         .duration(TRANSITION_UNIT)
@@ -279,18 +296,125 @@ function draw_papers(datas, x, y, image_url, type, onclick) {
     }
 }
 
+function paginator_transition(type, isUp) {
+    function onEnd() {
+        --counter;
+        if (counter==0) {
+            type=="prev" ? draw_prev(+isUp+1) : draw_next(+isUp+1);
+            d3.selectAll(".paper-curr").moveToFront();
+        }
+    }
+    d3.selectAll(".link-"+type)
+    .call(setupCallback)
+    .transition()
+    .duration(TRANSITION_UNIT)
+    .style("opacity", 0.0)
+    .each("end", onEnd)
+    .remove();
+    d3.selectAll(".paper-"+type)
+    .transition()
+    .delay(TRANSITION_UNIT)
+    .duration(TRANSITION_UNIT)
+    .attr("y", isUp ? -PAPER_HEIGHT : container_height+PAPER_HEIGHT)
+    .remove();
+}
+
+function page_up(type) {
+    const isNotMax = (pages[type]+1<(~~(data[type].length/papers_per_page)));
+    if (isNotMax) {
+        ++pages[type];
+        paginator_transition(type, true);
+    }
+    return isNotMax;
+}
+
+function page_down(type) {
+    const isNotMin = (pages[type]>0);
+    if (isNotMin) {
+        --pages[type];
+        paginator_transition(type, false);
+    }
+    return isNotMin;
+}
+
+function draw_paginator(x, y, type) {
+    var up = svg.append("rect")
+    .attr("class", "paginator interactive")
+    .attr("x", x+5)
+    .attr("y", 20+y)
+    .attr("width", PAPER_WIDTH-10)
+    .attr("height", 20)
+    .attr("fill", "lightgrey");
+
+    var text = svg.append("text")
+    .text(Math.max(pages[type]*papers_per_page, 1)+" - "+((pages[type]+1)*papers_per_page)+" of "+data[type].length)
+    .attr("class", "paginator")
+    .attr("x", x+PAPER_WIDTH/2)
+    .attr("y", y+55)
+    .style("text-anchor", "middle");
+
+    var up_text = svg.append("svg:foreignObject")
+    .attr("class", "paginator interactive")
+    .attr("width", 20)
+    .attr("height", 20)
+    .attr("y", y+22)
+    .attr("x", x+PAPER_WIDTH/2-7)
+    .append("xhtml:span")
+    .attr("class", "control glyphicon glyphicon-menu-up");
+
+    var down = svg.append("rect")
+    .attr("class", "paginator interactive")
+    .attr("x", x+5)
+    .attr("y", 60+y)
+    .attr("width", PAPER_WIDTH-10)
+    .attr("height", 20)
+    .attr("fill", "lightgrey");
+
+    var down_text = svg.append("svg:foreignObject")
+    .attr("class", "paginator interactive")
+    .attr("width", 20)
+    .attr("height", 20)
+    .attr("y", y+62)
+    .attr("x", x+PAPER_WIDTH/2-7)
+    .on({click: page_down})
+    .append("xhtml:span")
+    .attr("class", "control glyphicon glyphicon-menu-down");
+
+    function reload() {
+        text.text(Math.max(pages[type]*papers_per_page, 1)+" - "+Math.min((pages[type]+1)*papers_per_page, data[type].length)+" of "+data[type].length)
+    }
+    function up_click() { if (page_up(type)) reload() }
+    function down_click() { if (page_down(type)) reload() }
+    up.on({click:up_click});
+    down.on({click:down_click});
+    down_text.on({click:down_click});
+    up_text.on({click:up_click});
+}
+
 function click_prev_next(d) {
     retrieve_data_by_title(d.title, select_paper.bind(this))
 }
 
+function draw_next(pagin) {
+    right_column_offset = ((container_height-((Math.min(data.next.length, papers_per_page)-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.95);
+    draw_links(Math.min(data.next.length, papers_per_page), mid_width+COL_OFFSET, right_column_offset, "url(#mid-arrow-right)", "paper-link link-next", true)
+    var next_slice = data.next.slice(pages.next*papers_per_page, Math.min((pages.next+1)*papers_per_page, data.next.length));
+    draw_papers(next_slice, mid_width+COL_OFFSET, right_column_offset, NEXT_DOC_IMG_URL, "next", click_prev_next, pagin);
+}
+
+function draw_prev(pagin) {
+    left_column_offset = ((container_height-((Math.min(data.prev.length, papers_per_page)-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.95);
+    draw_links(Math.min(data.prev.length, papers_per_page), mid_width-COL_OFFSET, left_column_offset, "url(#mid-arrow-left)", "paper-link link-prev", true);
+    var prev_slice = data.prev.slice(pages.prev*papers_per_page, Math.min((pages.prev+1)*papers_per_page, data.prev.length));
+    draw_papers(prev_slice, mid_width-COL_OFFSET, left_column_offset, PREV_DOC_IMG_URL, "prev", click_prev_next, pagin);
+}
+
 function draw_scene() {
-    left_column_offset = ((container_height-((data.prev.length-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.75);
-    right_column_offset = ((container_height-((data.next.length-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.75);
-    draw_links(data.prev.length, mid_width-COL_OFFSET, left_column_offset, "url(#mid-arrow-left)", "paper-link", true);
-    draw_links(data.next.length, mid_width+COL_OFFSET, right_column_offset, "url(#mid-arrow-right)", "paper-link", true)
-    draw_papers(data.prev, mid_width-COL_OFFSET, left_column_offset, PREV_DOC_IMG_URL, "prev", click_prev_next);
-    draw_papers(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr", function(){scroll_to("#map-container")});
-    draw_papers(data.next, mid_width+COL_OFFSET, right_column_offset, NEXT_DOC_IMG_URL, "next", click_prev_next);
+    draw_prev(0);
+    draw_next(0);
+    draw_papers(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr", function(){scroll_to("#map-container")}, 0);
+    if (data.prev.length>papers_per_page) draw_paginator(PAGINATOR_H_OFFSET, container_height-PAGINATOR_V_OFFSET-80, "prev");
+    if (data.next.length>papers_per_page) draw_paginator(container_width-PAGINATOR_H_OFFSET-60, container_height-PAGINATOR_V_OFFSET-80, "next");
 }
 
 //#### NAV ####
