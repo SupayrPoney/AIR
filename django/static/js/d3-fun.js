@@ -315,7 +315,7 @@ function paginator_transition(type, isUp) {
 }
 
 function page_up(type) {
-    const isNotMax = (pages[type]+1<(~~(data[type].length/papers_per_page)));
+    const isNotMax = (pages[type]<(~~(data[type].length/papers_per_page)));
     if (isNotMax) {
         ++pages[type];
         paginator_transition(type, true);
@@ -390,17 +390,17 @@ function click_prev_next(d) {
     retrieve_data_by_title(d.title, select_paper.bind(this))
 }
 
-function draw_next(pagin) {
-    right_column_offset = ((container_height-((Math.min(data.next.length, papers_per_page)-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.95);
-    draw_links(Math.min(data.next.length, papers_per_page), mid_width+COL_OFFSET, right_column_offset, "url(#mid-arrow-right)", "paper-link link-next", true)
+function draw_next(pagin) {    
     var next_slice = data.next.slice(pages.next*papers_per_page, Math.min((pages.next+1)*papers_per_page, data.next.length));
+    right_column_offset = ((container_height-((next_slice.length-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.95);
+    draw_links(next_slice.length, mid_width+COL_OFFSET, right_column_offset, "url(#mid-arrow-right)", "paper-link link-next", true)
     draw_papers(next_slice, mid_width+COL_OFFSET, right_column_offset, NEXT_DOC_IMG_URL, "next", click_prev_next, pagin);
 }
 
 function draw_prev(pagin) {
-    left_column_offset = ((container_height-((Math.min(data.prev.length, papers_per_page)-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.95);
-    draw_links(Math.min(data.prev.length, papers_per_page), mid_width-COL_OFFSET, left_column_offset, "url(#mid-arrow-left)", "paper-link link-prev", true);
     var prev_slice = data.prev.slice(pages.prev*papers_per_page, Math.min((pages.prev+1)*papers_per_page, data.prev.length));
+    left_column_offset = ((container_height-((prev_slice.length-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.95);
+    draw_links(prev_slice.length, mid_width-COL_OFFSET, left_column_offset, "url(#mid-arrow-left)", "paper-link link-prev", true);
     draw_papers(prev_slice, mid_width-COL_OFFSET, left_column_offset, PREV_DOC_IMG_URL, "prev", click_prev_next, pagin);
 }
 
