@@ -15,50 +15,31 @@ L.MakiMarkers.accessToken = 'pk.eyJ1Ijoic3VwYXlycG9uZXkiLCJhIjoiY2oyZGRvYXdjMDAx
 
 var data = {
    prev: [{
-    name: "Implementation of the data-flow synchronous language SIGNAL", 
-    author: "Pascalin Amagbégnon , Loïc Besnard , Paul Le Guernic",
+    title: "Paper your paper references", 
+    authors:["author1"],
     year: "1995",
-    keywords: "", 
-    affiliation: "IRSA-INRIA",
-    location: [48.116282, -1.639774]
-   }, {
-    name: "The synchronous languages 12 years later",
-    author: "A., Caspi, P., Edwards, S. A., Halbwachs, N., Guernic, P. L., Robert, and Simone, D",
-    year: "2003",
-    keywords: "Embedded systems, Esterel, formal methods, Lustre, real-time systems, Signal, synchronous languages", 
+    keywords: ["keyword1", "keyword2"], 
+    publication: {cover_date : 2016-12-08},
     affiliation: "IRSA-INRIA",
     location: [48.116282, -1.639774]
    }],
    curr: [{
-     name: "A Survey on Reactive Programming",
-     author: "Engineer Bainomugisha , Andoni Lombide Carreton,Tom van Cutsem, Stijn Mostinckx, Wolfgang de Meuter", 
+     title: "Start by looking up a title",
+     authors: ["hoover over me for more information"], 
      year: "2013",
-     keywords: "Design, Languages, Reactive programming, interactive applications, event-driven applications, dataflow programming, functional reactive programming, reactive systems", 
+     publication: {cover_date : 2016-12-08},
+     keywords: ["Keyword1", "Keyword2", "keyword3"],
      affiliation: " Vrije Universiteit Brussel", 
      location: [50.823165, 4.392326]
     }],
    next: [{
-    name: "Alma-O: an imperative language that supports declarative programming", 
-    author: "Krzysztof R. Apt , Jacob Brunekreef , Vincent Partington , Andrea Schaerf", 
+    title: "A paper that references your paper", 
+    authors: ["author"], 
     year: "1998",
-    keywords: "Laguages, declarative programming, imperative programming, search", 
+    publication: {cover_date : 2016-12-08},
+    keywords: ["keyword1", "keyword2", "keyword3"], 
     affiliation: "University of Amsterdam", 
     location: [52.355818, 4.955726]
-   }, {
-     name: "Multi-Tier Functional Reactive Programming for the Web", 
-     author: "Bob Reynders , Dominique Devriese , Frank Piessens",
-     year: "2014",
-     keywords: "Functional Reactive Programming, FRP, Multitier Web Framework", 
-     affiliation: "University of Singapore", 
-     location: [1.296643, 103.776394]
-   }, {
-    name:"Reactive programming with reactive variables",
-    author: "Christopher Schuster , Cormac Flanagan", 
-    year: "2016", 
-    keywords: "Reactive Programming, Syntax Extension, JavaScript", 
-    affiliation: "University of California", 
-    location: [32.880060, -117.234014]
-   
    }]
  };
 
@@ -228,6 +209,20 @@ function onMove() {
 }
 
 // NODES
+
+function present_authors(data){
+    var authors = data.authors; 
+    if (authors.length == 1) {
+        return author[0];
+    }else{
+        if(authors.length ==2){
+            return author[0].concat(" & ").concat(author[1]);
+        }else{
+            return author[0].concat(" et al.");
+        };
+
+    };
+};
 
 function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
     const l = PAPER_WIDTH/2;
@@ -415,6 +410,8 @@ function draw_scene() {
     draw_papers(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr", function(){scroll_to("#map-container")}, 0);
     if (data.prev.length>papers_per_page) draw_paginator(PAGINATOR_H_OFFSET, container_height-PAGINATOR_V_OFFSET-80, "prev");
     if (data.next.length>papers_per_page) draw_paginator(container_width-PAGINATOR_H_OFFSET-60, container_height-PAGINATOR_V_OFFSET-80, "next");
+    refresh_article_name();
+    refresh_keywords();
 }
 
 //#### NAV ####
@@ -517,23 +514,28 @@ draw_nav();
 //####### FLEX-CONTAINER #######
 
 //####### KEYWORDS-PART #########
-
-var keywordsPaper =data.curr[0].keywords.split(",")
-
-keywordsPaper.forEach(function(keyword){
-    var tag_div = document.createElement("div");
-    tag_div.innerHTML= keyword;
-    tag_div.className = "tag curr";
-    tag_div.onclick= function(){
-        if (this.className.includes("curr")) {
-            this.className = this.className.replace("curr", "unselected");
-        }else{
-            this.className = this.className.replace("unselected","curr");
-        };
-
+function refresh_keywords(){
+    var keywordsPaper =data.curr[0].keywords
+    var div = document.getElementById("keywords-container");
+    while(div.firstChild){
+        div.removeChild(div.firstChild);
     }
-    document.getElementById("keywords-container").appendChild(tag_div);
-});
+
+    keywordsPaper.forEach(function(keyword){
+        var tag_div = document.createElement("div");
+        tag_div.innerHTML= keyword;
+        tag_div.className = "tag curr pointer";
+        tag_div.onclick= function(){
+            if (this.className.includes("curr")) {
+                this.className = this.className.replace("curr", "unselected");
+            }else{
+                this.className = this.className.replace("unselected","curr");
+            };
+
+        }
+        document.getElementById("keywords-container").appendChild(tag_div);
+    });
+};
 
 //######## SEARCH-PART ########
 function retrieve_data_by_title(title, callback) {
@@ -562,9 +564,11 @@ $('#searchButton').click((event) => {
 
 
 //######## GRAPH-PART #########
-var titleDiv = document.querySelector("#article-name");
-titleDiv.innerHTML= data.curr[0].name;
-
+function refresh_article_name(){
+    var titleDiv = document.querySelector("#article-name");
+    titleDiv.innerHTML= data.curr[0].title
+    //[0].name;
+};
 
 //#### LEGEND ####
 
@@ -617,7 +621,7 @@ var markers = L.markerClusterGroup({
 });
 
 const bounds = new L.LatLngBounds(new L.LatLng(85, -180), new L.LatLng(-85, 180));
-L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+L.tileLayer('https://api.tiles.mapbox.com/v4/mapbox.light/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
     maxZoom: 18,
     minZoom: 2,
     maxBoundsViscosity: 1.0,
@@ -667,3 +671,4 @@ draw_markers();
 show_all_markers();
 L.DomEvent.disableClickPropagation(L.DomUtil.get('filter-box')); 
 L.DomEvent.disableClickPropagation(L.DomUtil.get('back')); 
+draw_scene();
