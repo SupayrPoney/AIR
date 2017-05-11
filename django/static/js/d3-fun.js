@@ -104,6 +104,7 @@ const PAPER_HEIGHT = 80;
 const PAPER_WIDTH = 64;
 const ICON_SPACE = 100;
 const COL_OFFSET = 400;
+const TRANSITION_UNIT = 750;
 
 var container_width = getComputedProperty($("svg")[0], "width");
 var container_height = getComputedProperty($("svg")[0], "height");
@@ -139,13 +140,13 @@ function draw_link(frm, to, arrow, cls, fade_in) {
     if (fade_in) {
         l1.style("opacity", 0.0)
         .transition()
-        .delay(1000)
-        .duration(1000)
+        .delay(TRANSITION_UNIT)
+        .duration(TRANSITION_UNIT)
         .style("opacity", 1.0);
         l2.style("opacity", 0.0)
         .transition()
-        .delay(1000)
-        .duration(1000)
+        .delay(TRANSITION_UNIT)
+        .duration(TRANSITION_UNIT)
         .style("opacity", 1.0);
     }
 }
@@ -160,31 +161,38 @@ function draw_links(nb_links, x, y, arrow, cls, fade_in) {
 // var counter;
 function select_paper() {
     d3.selectAll(".paper-link").transition()
-    .duration(1000)
+    .duration(TRANSITION_UNIT)
     .style("opacity", 0.0)
     .remove();
     d3.select(this).transition()
-    .duration(1000)
-    .delay(1000)
+    .duration(TRANSITION_UNIT)
+    .delay(2*TRANSITION_UNIT)
     .attr("x", mid_width-PAPER_WIDTH/2)
     .attr("y", mid_height-PAPER_HEIGHT/2);
     const isPrev = (d3.select(this).attr("class")=="paper paper-prev");
-    d3.selectAll( isPrev ? ".paper-next" : ".paper-prev")
+    d3.selectAll(isPrev ? ".paper-next" : ".paper-prev")
     .transition()
-    .duration(1000)
-    .delay(1000)
-    .attr("x", isPrev ? container_width+PAPER_WIDTH : -PAPER_WIDTH)
+    .duration(TRANSITION_UNIT)
+    .delay(2*TRANSITION_UNIT)
+    .attr("x", isPrev ? container_width+PAPER_WIDTH : -PAPER_WIDTH);
+    var self = this;
+    d3.selectAll(!isPrev ? ".paper-next" : ".paper-prev")
+    .filter(function(n,i){return (this!==self)})
+    .transition()
+    .duration(TRANSITION_UNIT)
+    .delay(TRANSITION_UNIT)
+    .style("opacity", 0.0)
     d3.selectAll(".paper-curr")
     .call(setupCallback)
     .transition()
-    .duration(1000)
-    .delay(1000)
+    .duration(TRANSITION_UNIT)
+    .delay(2*TRANSITION_UNIT)
     .attr("x", (isPrev ? mid_width+COL_OFFSET : mid_width-COL_OFFSET)-PAPER_WIDTH/2)
     .each("end", onMove);
     d3.selectAll(".paper")
     .transition()
-    .duration(1000)
-    .delay(2000)
+    .duration(TRANSITION_UNIT)
+    .delay(3*TRANSITION_UNIT)
     .style("opacity", 0.0)
     .remove();
 }
@@ -235,7 +243,7 @@ function draw_papers(datas, x, y, image_url, type, onclick) {
         },
         click: onclick
     }).transition()
-    .duration(1000)
+    .duration(TRANSITION_UNIT)
     .style("opacity", 1.0);
 }
 
