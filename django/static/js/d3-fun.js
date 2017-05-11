@@ -113,9 +113,8 @@ var mid_width = container_width/2;
 var mid_height = container_height/2;
 var mid = {x: mid_width, y: mid_height};
 
-var left_column_offset = ((container_height-((data.prev.length-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.75);
-var right_column_offset = ((container_height-((data.next.length-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.75);
-
+var left_column_offset;
+var right_column_offset;
 
 function draw_link(frm, to, arrow, cls, fade_in) {
     const mid_x = frm.x + (to.x-frm.x)/2;
@@ -285,6 +284,8 @@ function click_prev_next(d) {
 }
 
 function draw_scene() {
+    left_column_offset = ((container_height-((data.prev.length-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.75);
+    right_column_offset = ((container_height-((data.next.length-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.75);
     draw_links(data.prev.length, mid_width-COL_OFFSET, left_column_offset, "url(#mid-arrow-left)", "paper-link", true);
     draw_links(data.next.length, mid_width+COL_OFFSET, right_column_offset, "url(#mid-arrow-right)", "paper-link", true)
     draw_papers(data.prev, mid_width-COL_OFFSET, left_column_offset, PREV_DOC_IMG_URL, "prev", click_prev_next);
