@@ -226,12 +226,12 @@ function draw_papers(datas, x, y, image_url, type, onclick) {
     .attr("xlink:href", image_url)
     .style("opacity", 0.0)
     .on({
-        mouseover: function(d) {  
+        mouseover: function(d) {
             d3.select(this).style("cursor", "pointer");    
             tooltip.transition()        
                 .duration(200)      
-                .style("opacity", .95);      
-            tooltip.html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +'<hr><span class="tag '+type+'">'+ d.keywords.split(", ").join('</span><span class="tag '+type+'">')+"</span>")  
+                .style("opacity", .95);
+            tooltip.html("<b>"+d.title+"</b><hr>"+d.authors + "<br>"+d.publication.cover_date +'<hr><span class="tag '+type+'">'+ d.keywords.join('</span><span class="tag '+type+'">')+"</span>")  
                 .style("left", (d3.select(this).attr("x") - $(tooltip[0][0]).width()/2 + PAPER_WIDTH/2 + sidebar_offset) + "px")     
                 .style("top", (d3.select(this).attr("y") -PAPER_HEIGHT/3 - $(tooltip[0][0]).height()) + "px");    
         },
@@ -247,16 +247,18 @@ function draw_papers(datas, x, y, image_url, type, onclick) {
     .style("opacity", 1.0);
 }
 
-function draw_scene() {
-    console.log("draw_scene");
-    draw_links(data.prev.length, mid_width-COL_OFFSET, left_column_offset, "url(#mid-arrow-left)", "paper-link", true);
-    draw_links(data.next.length, mid_width+COL_OFFSET, right_column_offset, "url(#mid-arrow-right)", "paper-link", true)
-    draw_papers(data.prev, mid_width-COL_OFFSET, left_column_offset, PREV_DOC_IMG_URL, "prev", select_paper);
-    draw_papers(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr", function(){scroll_to("#map-container")});
-    draw_papers(data.next, mid_width+COL_OFFSET, right_column_offset, NEXT_DOC_IMG_URL, "next", select_paper);
+function click_prev_next(d) {
+    retrieve_data_by_title(d.title, select_paper.bind(this))
 }
 
-draw_scene();
+function draw_scene() {
+    draw_links(data.prev.length, mid_width-COL_OFFSET, left_column_offset, "url(#mid-arrow-left)", "paper-link", true);
+    draw_links(data.next.length, mid_width+COL_OFFSET, right_column_offset, "url(#mid-arrow-right)", "paper-link", true)
+    draw_papers(data.prev, mid_width-COL_OFFSET, left_column_offset, PREV_DOC_IMG_URL, "prev", click_prev_next);
+    draw_papers(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr", function(){scroll_to("#map-container")});
+    draw_papers(data.next, mid_width+COL_OFFSET, right_column_offset, NEXT_DOC_IMG_URL, "next", click_prev_next);
+}
+
 
 //#### NAV ####
 
@@ -357,7 +359,7 @@ draw_nav();
 
 //####### FLEX-CONTAINER #######
 
-//####### SEARCH-PART #########
+//####### KEYWORDS-PART #########
 
 var keywordsPaper =data.curr[0].keywords.split(",")
 
@@ -366,7 +368,6 @@ keywordsPaper.forEach(function(keyword){
     tag_div.innerHTML= keyword;
     tag_div.className = "tag curr";
     tag_div.onclick= function(){
-        console.log("test");
         if (this.className.includes("curr")) {
             this.className = this.className.replace("curr", "unselected");
         }else{
@@ -376,6 +377,24 @@ keywordsPaper.forEach(function(keyword){
     }
     document.getElementById("keywords-container").appendChild(tag_div);
 });
+
+//######## SEARCH-PART ########
+function retrieve_data_by_title(title, callback) {
+    search_by_title(title, (new_data) => {
+        data.curr = [new_data]
+        get_prev(new_data, (prev) => {
+            data.prev = prev
+            get_next(new_data, (next) => {
+                data.next = next
+                callback()
+            }, (error) => console.error(error))
+        }, (error) => console.error(error))
+    }, (error) => console.error(error))
+}
+$('#searchButton').click((event) => {
+    let value = $('#searchInput').val()
+    retrieve_data_by_title(value, draw_scene)
+})
 
 
 //######## GRAPH-PART #########
