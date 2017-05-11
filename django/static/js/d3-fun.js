@@ -65,6 +65,7 @@ var data = {
 var svg = d3.select("#graph-container svg");
 
 svg.append('svg:defs').append('svg:marker')
+.attr('class', 'arrow')
 .attr('id', 'mid-arrow-left')
 .attr('viewBox', '0 -5 10 10')
 .attr('refX', 4)
@@ -76,6 +77,7 @@ svg.append('svg:defs').append('svg:marker')
 .attr('fill', '#000');
 
 svg.append('svg:defs').append('svg:marker')
+.attr('class', 'arrow')
 .attr('id', 'mid-arrow-right')
 .attr('viewBox', '0 -5 10 10')
 .attr('refX', 4)
@@ -114,11 +116,11 @@ var left_column_offset = ((container_height-((data.prev.length-1)*ICON_SPACE)-PA
 var right_column_offset = ((container_height-((data.next.length-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.75);
 
 
-function draw_link(frm, to, arrow) {
+function draw_link(frm, to, arrow, cls) {
     const mid_x = frm.x + (to.x-frm.x)/2;
     const mid_y = frm.y + (to.y-frm.y)/2;
     svg.append("line")
-    .attr("class", "link")
+    .attr("class", "link "+cls)
     .attr("x1", frm.x)
     .attr("y1", frm.y)
     .attr("x2", mid_x)
@@ -127,7 +129,7 @@ function draw_link(frm, to, arrow) {
     .attr("stroke", "black")
     .attr("marker-end", arrow);
     svg.append("line")
-    .attr("class", "link")
+    .attr("class", "link "+cls)
     .attr("x1", mid_x)
     .attr("y1", mid_y)
     .attr("x2", to.x)
@@ -136,21 +138,67 @@ function draw_link(frm, to, arrow) {
     .attr("stroke", "black");
 }
 
-function draw_links(nb_links, x, y, arrow) {
+function draw_links(nb_links, x, y, arrow, cls) {
     for (var i=0; i<nb_links; ++i) {
         y += ICON_SPACE;
-        draw_link({x:x,y:y}, mid, arrow)
+        draw_link({x:x,y:y}, mid, arrow, cls)
+    }
+}
+
+var counter;
+function select_paper() {
+    d3.selectAll(".paper-link").transition()
+    .duration(1000)
+    .style("opacity", 0.0)
+    .remove();
+    // d3.selectAll(".arrow").transition()
+    // .duration(1000)
+    // .style("opacity", 0.0);
+    d3.select(this).transition()
+    .duration(1000)
+    .delay(1000)
+    .attr("x", mid_width-PAPER_WIDTH/2)
+    .attr("y", mid_height-PAPER_HEIGHT/2);
+    const isPrev = (d3.select(this).attr("class")=="paper paper-prev");
+    d3.selectAll( isPrev ? ".paper-next" : ".paper-prev")
+    .transition()
+    .duration(1000)
+    .delay(1000)
+    .attr("x", isPrev ? container_width+PAPER_WIDTH : -PAPER_WIDTH)
+    d3.selectAll(".paper-curr")
+    .transition()
+    .duration(1000)
+    .delay(1000)
+    .attr("x", (isPrev ? mid_width+COL_OFFSET : mid_width-COL_OFFSET)-PAPER_WIDTH/2);
+    d3.selectAll(".paper")
+    .call(setupCallback)
+    .transition()
+    .duration(1000)
+    .delay(2000)
+    .style("opacity", 0.0)
+    .remove()
+    .each("end", onRemove);
+}
+
+function setupCallback(sel) {
+    counter = sel.size();
+}
+
+function onRemove() {
+    --counter;
+    if (counter==0) {
+        draw_scene();
     }
 }
 
 // NODES
 
-function draw_nodes(datas, x, y, image_url, type, onclick) {
+function draw_papers(datas, x, y, image_url, type, onclick) {
     svg.selectAll("paper")
     .data(datas)
     .enter()
     .append("svg:image")
-    .attr("class", "paper")
+    .attr("class", "paper paper-"+type)
     .attr("x", x-PAPER_WIDTH/2)
     .attr("y", function(d) {
         y += ICON_SPACE;
@@ -180,11 +228,12 @@ function draw_nodes(datas, x, y, image_url, type, onclick) {
 }
 
 function draw_scene() {
-    draw_links(data.prev.length, mid_width-COL_OFFSET, left_column_offset, "url(#mid-arrow-left)");
-    draw_links(data.next.length, mid_width+COL_OFFSET, right_column_offset, "url(#mid-arrow-right)")
-    draw_nodes(data.prev, mid_width-COL_OFFSET, left_column_offset, PREV_DOC_IMG_URL, "prev");
-    draw_nodes(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr", function(){scroll_to("#map-container")});
-    draw_nodes(data.next, mid_width+COL_OFFSET, right_column_offset, NEXT_DOC_IMG_URL, "next");
+    console.log("draw_scene");
+    draw_links(data.prev.length, mid_width-COL_OFFSET, left_column_offset, "url(#mid-arrow-left)", "paper-link");
+    draw_links(data.next.length, mid_width+COL_OFFSET, right_column_offset, "url(#mid-arrow-right)", "paper-link")
+    draw_papers(data.prev, mid_width-COL_OFFSET, left_column_offset, PREV_DOC_IMG_URL, "prev", select_paper);
+    draw_papers(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr", function(){scroll_to("#map-container")});
+    draw_papers(data.next, mid_width+COL_OFFSET, right_column_offset, NEXT_DOC_IMG_URL, "next", select_paper);
 }
 
 draw_scene();
@@ -326,7 +375,8 @@ const legend_y = container_height-LEGEND_V_OFFSET;
 draw_link(
     { x: legend_x-LEGEND_LENGTH, y: legend_y }, 
     { x: legend_x, y: legend_y }, 
-    'url(#mid-arrow-left)'
+    'url(#mid-arrow-left)',
+    "legend-link"
 )
 
 svg.append("text")
