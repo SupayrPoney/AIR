@@ -1,6 +1,8 @@
 import requests
+from scopus.scraper import cache
 
 
+@cache
 def geocode(city, country):
     resp = requests.get(
         "http://nominatim.openstreetmap.org/search",

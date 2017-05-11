@@ -214,16 +214,15 @@ function onMove() {
 
 // NODES
 
-function draw_papers(datas, x, y, image_url, type, move_in, onclick) {
+function draw_papers(datas, x, y, image_url, type, onclick) {
     const l = PAPER_WIDTH/2;
-    const static = !move_in || type=="curr";
     var papers = svg.selectAll("paper")
     .data(datas)
     .enter()
     .append("svg:image")
     .attr("class", "paper paper-"+type)
     .attr("x", function(d) {
-        if (static) {
+        if (type=="curr") {
             return x-l;
         } else {
             if (type=="prev") {
@@ -236,7 +235,7 @@ function draw_papers(datas, x, y, image_url, type, move_in, onclick) {
     .attr("y", function(d) {
         y += ICON_SPACE;
         var h = PAPER_HEIGHT/2;
-        if (static) {
+        if (type=="curr") {
             return y-h;
         } else {
             d.finalPos = y-h;
@@ -248,12 +247,12 @@ function draw_papers(datas, x, y, image_url, type, move_in, onclick) {
     .attr("height", PAPER_HEIGHT)
     .attr("xlink:href", image_url)
     .on({
-        mouseover: function(d) {  
+        mouseover: function(d) {
             d3.select(this).style("cursor", "pointer");    
             tooltip.transition()        
                 .duration(200)      
-                .style("opacity", .95);      
-            tooltip.html("<b>"+d.name+"</b><hr>"+d.author + "<br>"+d.year +'<hr><span class="tag '+type+'">'+ d.keywords.split(", ").join('</span><span class="tag '+type+'">')+"</span>")  
+                .style("opacity", .95);
+            tooltip.html("<b>"+d.title+"</b><hr>"+d.authors + "<br>"+d.publication.cover_date +'<hr><span class="tag '+type+'">'+ d.keywords.join('</span><span class="tag '+type+'">')+"</span>")  
                 .style("left", (d3.select(this).attr("x") - $(tooltip[0][0]).width()/2 + PAPER_WIDTH/2 + sidebar_offset) + "px")     
                 .style("top", (d3.select(this).attr("y") -PAPER_HEIGHT/3 - $(tooltip[0][0]).height()) + "px");    
         },
@@ -266,7 +265,7 @@ function draw_papers(datas, x, y, image_url, type, move_in, onclick) {
         click: onclick
     })
 
-    if (static) {
+    if (type=="curr") {
         papers.style("opacity", 0.0)
         .transition()
         .duration(TRANSITION_UNIT)
@@ -276,22 +275,22 @@ function draw_papers(datas, x, y, image_url, type, move_in, onclick) {
         .duration(TRANSITION_UNIT)
         .attr("x", x-l)
         .attr("y", function(d) {
-            console.log(d.finalPos);
             return d.finalPos;
         });
     }
 }
 
-function draw_scene(initial) {
-    console.log("draw_scene");
-    draw_links(data.prev.length, mid_width-COL_OFFSET, left_column_offset, "url(#mid-arrow-left)", "paper-link", true);
-    draw_links(data.next.length, mid_width+COL_OFFSET, right_column_offset, "url(#mid-arrow-right)", "paper-link", true)
-    draw_papers(data.prev, mid_width-COL_OFFSET, left_column_offset, PREV_DOC_IMG_URL, "prev", initial, select_paper);
-    draw_papers(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr", initial, function(){scroll_to("#map-container")});
-    draw_papers(data.next, mid_width+COL_OFFSET, right_column_offset, NEXT_DOC_IMG_URL, "next", initial, select_paper);
+function click_prev_next(d) {
+    retrieve_data_by_title(d.title, select_paper.bind(this))
 }
 
-draw_scene(false);
+function draw_scene() {
+    draw_links(data.prev.length, mid_width-COL_OFFSET, left_column_offset, "url(#mid-arrow-left)", "paper-link", true);
+    draw_links(data.next.length, mid_width+COL_OFFSET, right_column_offset, "url(#mid-arrow-right)", "paper-link", true)
+    draw_papers(data.prev, mid_width-COL_OFFSET, left_column_offset, PREV_DOC_IMG_URL, "prev", click_prev_next);
+    draw_papers(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr", function(){scroll_to("#map-container")});
+    draw_papers(data.next, mid_width+COL_OFFSET, right_column_offset, NEXT_DOC_IMG_URL, "next", click_prev_next);
+}
 
 //#### NAV ####
 
@@ -392,7 +391,7 @@ draw_nav();
 
 //####### FLEX-CONTAINER #######
 
-//####### SEARCH-PART #########
+//####### KEYWORDS-PART #########
 
 var keywordsPaper =data.curr[0].keywords.split(",")
 
@@ -401,7 +400,6 @@ keywordsPaper.forEach(function(keyword){
     tag_div.innerHTML= keyword;
     tag_div.className = "tag curr";
     tag_div.onclick= function(){
-        console.log("test");
         if (this.className.includes("curr")) {
             this.className = this.className.replace("curr", "unselected");
         }else{
@@ -411,6 +409,31 @@ keywordsPaper.forEach(function(keyword){
     }
     document.getElementById("keywords-container").appendChild(tag_div);
 });
+
+//######## SEARCH-PART ########
+function retrieve_data_by_title(title, callback) {
+    search_by_title(title, (new_data) => {
+        data.curr = [new_data]
+        get_prev(new_data, (prev) => {
+            data.prev = prev
+            get_next(new_data, (next) => {
+                data.next = next
+                callback()
+            }, (error) => console.error(error))
+        }, (error) => console.error(error))
+    }, (error) => console.error(error))
+}
+$('#searchButton').click((event) => {
+    let value = $('#searchInput').val()
+    retrieve_data_by_title(value, draw_scene);
+    d3.selectAll(".paper-link")
+    .transition()
+    .style("opacity", 0.0)
+    .remove();
+    d3.selectAll(".paper").transition()
+    .style("opacity", 0.0)
+    .remove();
+})
 
 
 //######## GRAPH-PART #########
@@ -441,10 +464,8 @@ svg.append("text")
 
 //#### MAP ####
 
-var map = L.map('map-container',{
-                                    minZoom: 3
-                                })
-           .setView([51.505, -0.09], 2);
+var map = L.map('map-container',{minZoom: 3})
+.setView([51.505, -0.09], 2);
 var displayed_markers = { prev: true, curr: true, next: true };
 var clust_markers_icon = {
     "001" : function(p,c,n) { return { html: "<div class='marker next'><span>"+n+"</span></div>", iconSize:L.point(30,30) } },

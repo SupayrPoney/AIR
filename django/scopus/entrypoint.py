@@ -6,11 +6,12 @@ from scopus import geo
 def pre_process(fn):
     def inner(*args, **kwargs):
         paper = fn(*args, **kwargs)
-        paper["next"] = next_of(paper)
-        paper["prev"] = prev_of(paper)
-        for aff in paper["affiliation"]:
-            aff["geo"] = geo.geocode(aff["city"], aff["country"])
-        return paper
+        if paper:
+            paper["next"] = next_of(paper)
+            paper["prev"] = prev_of(paper)
+            for aff in paper["affiliation"]:
+                aff["geo"] = geo.geocode(aff["city"], aff["country"])
+            return paper
     return inner
 
 
