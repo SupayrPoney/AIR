@@ -90,9 +90,8 @@ function scroll_to(id) {
 const PAPER_HEIGHT = 70;
 const PAPER_WIDTH = PAPER_HEIGHT/1.25;
 const ICON_SPACE = 100;
-const COL_OFFSET = 400;
 const TRANSITION_UNIT = 750;
-const PAGINATOR_H_OFFSET = 20;
+const PAGINATOR_H_OFFSET = 30;
 const PAGINATOR_V_OFFSET = 10;
 
 var container_width = getComputedProperty($("svg")[0], "width");
@@ -102,6 +101,7 @@ var mid_width = container_width/2;
 var mid_height = container_height/2;
 var mid = {x: mid_width, y: mid_height};
 var papers_per_page = ~~((container_height-50)/ICON_SPACE);
+const col_offset = 3*container_width/8;
 
 var left_column_offset;
 var right_column_offset;
@@ -182,7 +182,7 @@ function select_paper() {
     .transition()
     .duration(TRANSITION_UNIT)
     .delay(2*TRANSITION_UNIT)
-    .attr("x", (isPrev ? mid_width+COL_OFFSET : mid_width-COL_OFFSET)-PAPER_WIDTH/2)
+    .attr("x", (isPrev ? mid_width+col_offset : mid_width-col_offset)-PAPER_WIDTH/2)
     .each("end", onMove);
     d3.selectAll(".paper")
     .transition()
@@ -250,7 +250,7 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
         } else {
             d.finalPos = y-h; 
             if (pagin) return pagin>1 ? container_height+PAPER_HEIGHT : -PAPER_HEIGHT;
-            var proj = (h*(PAPER_WIDTH+mid_width)/(COL_OFFSET))-h;
+            var proj = (h*(PAPER_WIDTH+mid_width)/(col_offset))-h;
             return y<mid_height ? y-h-proj : y-h+proj;
         }
     })
@@ -393,15 +393,15 @@ function click_prev_next(d) {
 function draw_next(pagin) {    
     var next_slice = data.next.slice(pages.next*papers_per_page, Math.min((pages.next+1)*papers_per_page, data.next.length));
     right_column_offset = ((container_height-((next_slice.length-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.95);
-    draw_links(next_slice.length, mid_width+COL_OFFSET, right_column_offset, "url(#mid-arrow-right)", "paper-link link-next", true)
-    draw_papers(next_slice, mid_width+COL_OFFSET, right_column_offset, NEXT_DOC_IMG_URL, "next", click_prev_next, pagin);
+    draw_links(next_slice.length, mid_width+col_offset, right_column_offset, "url(#mid-arrow-right)", "paper-link link-next", true)
+    draw_papers(next_slice, mid_width+col_offset, right_column_offset, NEXT_DOC_IMG_URL, "next", click_prev_next, pagin);
 }
 
 function draw_prev(pagin) {
     var prev_slice = data.prev.slice(pages.prev*papers_per_page, Math.min((pages.prev+1)*papers_per_page, data.prev.length));
     left_column_offset = ((container_height-((prev_slice.length-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.95);
-    draw_links(prev_slice.length, mid_width-COL_OFFSET, left_column_offset, "url(#mid-arrow-left)", "paper-link link-prev", true);
-    draw_papers(prev_slice, mid_width-COL_OFFSET, left_column_offset, PREV_DOC_IMG_URL, "prev", click_prev_next, pagin);
+    draw_links(prev_slice.length, mid_width-col_offset, left_column_offset, "url(#mid-arrow-left)", "paper-link link-prev", true);
+    draw_papers(prev_slice, mid_width-col_offset, left_column_offset, PREV_DOC_IMG_URL, "prev", click_prev_next, pagin);
 }
 
 function draw_scene() {
@@ -573,12 +573,12 @@ function refresh_article_name(){
 //#### LEGEND ####
 
 const LEGEND_LENGTH = 66
-const LEGEND_H_OFFSET = 70
+const LEGEND_H_OFFSET = 30
 const LEGEND_V_OFFSET = 50
 const LEGEND_TEXT_OFFSET = 10
 
 const legend_x = container_width-LEGEND_H_OFFSET;
-const legend_y = container_height-LEGEND_V_OFFSET;
+const legend_y = LEGEND_V_OFFSET;
 draw_link(
     { x: legend_x-LEGEND_LENGTH, y: legend_y }, 
     { x: legend_x, y: legend_y }, 
@@ -588,7 +588,7 @@ draw_link(
 
 svg.append("text")
 .attr("x", container_width-LEGEND_LENGTH-LEGEND_H_OFFSET)
-.attr("y", container_height-LEGEND_V_OFFSET-LEGEND_TEXT_OFFSET)
+.attr("y", LEGEND_V_OFFSET-LEGEND_TEXT_OFFSET)
 .text("references")
 
 //#### MAP ####
