@@ -182,6 +182,10 @@ function select_paper() {
     .duration(TRANSITION_UNIT)
     .delay(TRANSITION_UNIT)
     .style("opacity", 0.0)
+    d3.select(".tooltip")
+    .transition()
+    .duration(TRANSITION_UNIT)
+    .style("opacity",0.0);
     d3.selectAll(".paper-curr")
     .call(setupCallback)
     .transition()
@@ -204,27 +208,45 @@ function setupCallback(sel) {
 function onMove() {
     --counter;
     if (counter==0) {
-        draw_scene();
+        draw_scene(true);
     }
 }
 
 // NODES
 
-function draw_papers(datas, x, y, image_url, type, onclick) {
-    svg.selectAll("paper")
+function draw_papers(datas, x, y, image_url, type, move_in, onclick) {
+    const l = PAPER_WIDTH/2;
+    const static = !move_in || type=="curr";
+    var papers = svg.selectAll("paper")
     .data(datas)
     .enter()
     .append("svg:image")
     .attr("class", "paper paper-"+type)
-    .attr("x", x-PAPER_WIDTH/2)
+    .attr("x", function(d) {
+        if (static) {
+            return x-l;
+        } else {
+            if (type=="prev") {
+                return -PAPER_WIDTH;
+            } else {
+                return container_width+PAPER_WIDTH;
+            }
+        }
+    })
     .attr("y", function(d) {
         y += ICON_SPACE;
-        return y-PAPER_HEIGHT/2;
+        var h = PAPER_HEIGHT/2;
+        if (static) {
+            return y-h;
+        } else {
+            d.finalPos = y-h;
+            var proj = (h*(PAPER_WIDTH+mid_width)/(COL_OFFSET))-h;
+            return y<mid_height ? y-h-proj : y-h+proj;
+        }
     })
     .attr("width", PAPER_WIDTH)
     .attr("height", PAPER_HEIGHT)
     .attr("xlink:href", image_url)
-    .style("opacity", 0.0)
     .on({
         mouseover: function(d) {  
             d3.select(this).style("cursor", "pointer");    
@@ -242,21 +264,34 @@ function draw_papers(datas, x, y, image_url, type, onclick) {
                 .style("opacity", 0);   
         },
         click: onclick
-    }).transition()
-    .duration(TRANSITION_UNIT)
-    .style("opacity", 1.0);
+    })
+
+    if (static) {
+        papers.style("opacity", 0.0)
+        .transition()
+        .duration(TRANSITION_UNIT)
+        .style("opacity", 1.0);
+    } else {
+        papers.transition()
+        .duration(TRANSITION_UNIT)
+        .attr("x", x-l)
+        .attr("y", function(d) {
+            console.log(d.finalPos);
+            return d.finalPos;
+        });
+    }
 }
 
-function draw_scene() {
+function draw_scene(initial) {
     console.log("draw_scene");
     draw_links(data.prev.length, mid_width-COL_OFFSET, left_column_offset, "url(#mid-arrow-left)", "paper-link", true);
     draw_links(data.next.length, mid_width+COL_OFFSET, right_column_offset, "url(#mid-arrow-right)", "paper-link", true)
-    draw_papers(data.prev, mid_width-COL_OFFSET, left_column_offset, PREV_DOC_IMG_URL, "prev", select_paper);
-    draw_papers(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr", function(){scroll_to("#map-container")});
-    draw_papers(data.next, mid_width+COL_OFFSET, right_column_offset, NEXT_DOC_IMG_URL, "next", select_paper);
+    draw_papers(data.prev, mid_width-COL_OFFSET, left_column_offset, PREV_DOC_IMG_URL, "prev", initial, select_paper);
+    draw_papers(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr", initial, function(){scroll_to("#map-container")});
+    draw_papers(data.next, mid_width+COL_OFFSET, right_column_offset, NEXT_DOC_IMG_URL, "next", initial, select_paper);
 }
 
-draw_scene();
+draw_scene(false);
 
 //#### NAV ####
 
