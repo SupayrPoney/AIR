@@ -396,7 +396,6 @@ draw_nav();
 
 //####### KEYWORDS-PART #########
 function refresh_keywords(){
-    console.log("try");
     var keywordsPaper =data.curr[0].keywords
 
     keywordsPaper.forEach(function(keyword){
@@ -443,7 +442,6 @@ $('#searchButton').click((event) => {
 
 //######## GRAPH-PART #########
 function refresh_article_name(){
-    console.log("article name");
     var titleDiv = document.querySelector("#article-name");
     titleDiv.innerHTML= data.curr[0].title
     //[0].name;
