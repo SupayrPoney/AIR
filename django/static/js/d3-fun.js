@@ -15,50 +15,31 @@ L.MakiMarkers.accessToken = 'pk.eyJ1Ijoic3VwYXlycG9uZXkiLCJhIjoiY2oyZGRvYXdjMDAx
 
 var data = {
    prev: [{
-    name: "Implementation of the data-flow synchronous language SIGNAL", 
-    author: "Pascalin Amagbégnon , Loïc Besnard , Paul Le Guernic",
+    title: "Paper your paper references", 
+    authors:["author1"],
     year: "1995",
-    keywords: "", 
-    affiliation: "IRSA-INRIA",
-    location: [48.116282, -1.639774]
-   }, {
-    name: "The synchronous languages 12 years later",
-    author: "A., Caspi, P., Edwards, S. A., Halbwachs, N., Guernic, P. L., Robert, and Simone, D",
-    year: "2003",
-    keywords: "Embedded systems, Esterel, formal methods, Lustre, real-time systems, Signal, synchronous languages", 
+    keywords: ["keyword1", "keyword2"], 
+    publication: {cover_date : 2016-12-08},
     affiliation: "IRSA-INRIA",
     location: [48.116282, -1.639774]
    }],
    curr: [{
-     name: "A Survey on Reactive Programming",
-     author: "Engineer Bainomugisha , Andoni Lombide Carreton,Tom van Cutsem, Stijn Mostinckx, Wolfgang de Meuter", 
+     title: "Start by looking up a title",
+     authors: ["hoover over me for more information"], 
      year: "2013",
-     keywords: "Design, Languages, Reactive programming, interactive applications, event-driven applications, dataflow programming, functional reactive programming, reactive systems", 
+     publication: {cover_date : 2016-12-08},
+     keywords: ["Keyword1", "Keyword2", "keyword3"],
      affiliation: " Vrije Universiteit Brussel", 
      location: [50.823165, 4.392326]
     }],
    next: [{
-    name: "Alma-O: an imperative language that supports declarative programming", 
-    author: "Krzysztof R. Apt , Jacob Brunekreef , Vincent Partington , Andrea Schaerf", 
+    title: "A paper that references your paper", 
+    authors: ["author"], 
     year: "1998",
-    keywords: "Laguages, declarative programming, imperative programming, search", 
+    publication: {cover_date : 2016-12-08},
+    keywords: ["keyword1", "keyword2", "keyword3"], 
     affiliation: "University of Amsterdam", 
     location: [52.355818, 4.955726]
-   }, {
-     name: "Multi-Tier Functional Reactive Programming for the Web", 
-     author: "Bob Reynders , Dominique Devriese , Frank Piessens",
-     year: "2014",
-     keywords: "Functional Reactive Programming, FRP, Multitier Web Framework", 
-     affiliation: "University of Singapore", 
-     location: [1.296643, 103.776394]
-   }, {
-    name:"Reactive programming with reactive variables",
-    author: "Christopher Schuster , Cormac Flanagan", 
-    year: "2016", 
-    keywords: "Reactive Programming, Syntax Extension, JavaScript", 
-    affiliation: "University of California", 
-    location: [32.880060, -117.234014]
-   
    }]
  };
 
@@ -212,6 +193,20 @@ function onMove() {
 }
 
 // NODES
+
+function present_authors(data){
+    var authors = data.authors; 
+    if (authors.length == 1) {
+        return author[0];
+    }else{
+        if(authors.length ==2){
+            return author[0].concat(" & ").concat(author[1]);
+        }else{
+            return author[0].concat(" et al.");
+        };
+
+    };
+};
 
 function draw_papers(datas, x, y, image_url, type, onclick) {
     const l = PAPER_WIDTH/2;
@@ -397,6 +392,10 @@ draw_nav();
 //####### KEYWORDS-PART #########
 function refresh_keywords(){
     var keywordsPaper =data.curr[0].keywords
+    var div = document.getElementById("keywords-container");
+    while(div.firstChild){
+        div.removeChild(div.firstChild);
+    }
 
     keywordsPaper.forEach(function(keyword){
         var tag_div = document.createElement("div");
@@ -548,3 +547,4 @@ draw_markers();
 show_all_markers();
 L.DomEvent.disableClickPropagation(L.DomUtil.get('filter-box')); 
 L.DomEvent.disableClickPropagation(L.DomUtil.get('back')); 
+draw_scene();
