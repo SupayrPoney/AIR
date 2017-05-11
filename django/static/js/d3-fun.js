@@ -116,10 +116,10 @@ var left_column_offset = ((container_height-((data.prev.length-1)*ICON_SPACE)-PA
 var right_column_offset = ((container_height-((data.next.length-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.75);
 
 
-function draw_link(frm, to, arrow, cls) {
+function draw_link(frm, to, arrow, cls, fade_in) {
     const mid_x = frm.x + (to.x-frm.x)/2;
     const mid_y = frm.y + (to.y-frm.y)/2;
-    svg.append("line")
+    var l1 = svg.append("line")
     .attr("class", "link "+cls)
     .attr("x1", frm.x)
     .attr("y1", frm.y)
@@ -128,7 +128,7 @@ function draw_link(frm, to, arrow, cls) {
     .attr("fill", "none")
     .attr("stroke", "black")
     .attr("marker-end", arrow);
-    svg.append("line")
+    var l2 = svg.append("line")
     .attr("class", "link "+cls)
     .attr("x1", mid_x)
     .attr("y1", mid_y)
@@ -136,24 +136,33 @@ function draw_link(frm, to, arrow, cls) {
     .attr("y2", to.y)
     .attr("fill", "none")
     .attr("stroke", "black");
-}
-
-function draw_links(nb_links, x, y, arrow, cls) {
-    for (var i=0; i<nb_links; ++i) {
-        y += ICON_SPACE;
-        draw_link({x:x,y:y}, mid, arrow, cls)
+    if (fade_in) {
+        l1.style("opacity", 0.0)
+        .transition()
+        .delay(1000)
+        .duration(1000)
+        .style("opacity", 1.0);
+        l2.style("opacity", 0.0)
+        .transition()
+        .delay(1000)
+        .duration(1000)
+        .style("opacity", 1.0);
     }
 }
 
-var counter;
+function draw_links(nb_links, x, y, arrow, cls, fade_in) {
+    for (var i=0; i<nb_links; ++i) {
+        y += ICON_SPACE;
+        draw_link({x:x,y:y}, mid, arrow, cls, fade_in)
+    }
+}
+
+// var counter;
 function select_paper() {
     d3.selectAll(".paper-link").transition()
     .duration(1000)
     .style("opacity", 0.0)
     .remove();
-    // d3.selectAll(".arrow").transition()
-    // .duration(1000)
-    // .style("opacity", 0.0);
     d3.select(this).transition()
     .duration(1000)
     .delay(1000)
@@ -166,25 +175,25 @@ function select_paper() {
     .delay(1000)
     .attr("x", isPrev ? container_width+PAPER_WIDTH : -PAPER_WIDTH)
     d3.selectAll(".paper-curr")
+    .call(setupCallback)
     .transition()
     .duration(1000)
     .delay(1000)
-    .attr("x", (isPrev ? mid_width+COL_OFFSET : mid_width-COL_OFFSET)-PAPER_WIDTH/2);
+    .attr("x", (isPrev ? mid_width+COL_OFFSET : mid_width-COL_OFFSET)-PAPER_WIDTH/2)
+    .each("end", onMove);
     d3.selectAll(".paper")
-    .call(setupCallback)
     .transition()
     .duration(1000)
     .delay(2000)
     .style("opacity", 0.0)
-    .remove()
-    .each("end", onRemove);
+    .remove();
 }
 
 function setupCallback(sel) {
     counter = sel.size();
 }
 
-function onRemove() {
+function onMove() {
     --counter;
     if (counter==0) {
         draw_scene();
@@ -206,7 +215,8 @@ function draw_papers(datas, x, y, image_url, type, onclick) {
     })
     .attr("width", PAPER_WIDTH)
     .attr("height", PAPER_HEIGHT)
-    .attr("xlink:href", image_url)  
+    .attr("xlink:href", image_url)
+    .style("opacity", 0.0)
     .on({
         mouseover: function(d) {  
             d3.select(this).style("cursor", "pointer");    
@@ -224,13 +234,15 @@ function draw_papers(datas, x, y, image_url, type, onclick) {
                 .style("opacity", 0);   
         },
         click: onclick
-    });
+    }).transition()
+    .duration(1000)
+    .style("opacity", 1.0);
 }
 
 function draw_scene() {
     console.log("draw_scene");
-    draw_links(data.prev.length, mid_width-COL_OFFSET, left_column_offset, "url(#mid-arrow-left)", "paper-link");
-    draw_links(data.next.length, mid_width+COL_OFFSET, right_column_offset, "url(#mid-arrow-right)", "paper-link")
+    draw_links(data.prev.length, mid_width-COL_OFFSET, left_column_offset, "url(#mid-arrow-left)", "paper-link", true);
+    draw_links(data.next.length, mid_width+COL_OFFSET, right_column_offset, "url(#mid-arrow-right)", "paper-link", true)
     draw_papers(data.prev, mid_width-COL_OFFSET, left_column_offset, PREV_DOC_IMG_URL, "prev", select_paper);
     draw_papers(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr", function(){scroll_to("#map-container")});
     draw_papers(data.next, mid_width+COL_OFFSET, right_column_offset, NEXT_DOC_IMG_URL, "next", select_paper);
