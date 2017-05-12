@@ -556,18 +556,32 @@ function retrieve_data_by_title(title, callback) {
             callback()
         }
     }
+    function draw_marker(node, cls) {
+        if (node.affiliation) {
+            node.affiliation.forEach((aff) => {
+                if (aff.geo) {
+                    let location = [aff.geo.lat, aff.geo.lon]
+                    add_one_marker(location, cls)   
+                }
+            })
+        }
+    }
+    markers.clearLayers();
     search_by_title(title, (new_data) => {
         data.curr = [new_data]
         data.prev = new_data.prev
         data.next = new_data.next
+        draw_marker(new_data, 'curr')
         batman()
         get_prev_one_by_one(new_data, (prev) => {
             data.prev[counter_prev] = prev
+            draw_marker(prev, 'prev')
             counter_prev++
             batman()
         }, (error) => console.error(error))
         get_next_one_by_one(new_data, (next) => {
             data.next[counter_next] = next
+            draw_marker(next, 'next')
             counter_next++
             batman()
         }, (error) => console.error(error))
@@ -658,18 +672,22 @@ map.on('drag', function() {
     map.panInsideBounds(bounds, { animate: false });
 });
 
+function add_one_marker(location, cls) {
+    var icon = L.icon({
+        iconUrl: ICONS[cls],
+
+        iconSize:     [52*0.7, 68*0.7], // size of the icon
+        iconAnchor:   [26*0.7, 34*0.7], // point of the icon which will correspond to marker's location
+        // popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+    var marker = L.marker(location, {icon: icon});
+    marker.cls = cls;
+    markers.addLayer(marker);
+}
+
 function populates_markers(mkers, cls) {
     for (var i=0; i<mkers.length; ++i) {
-        var icon = L.icon({
-            iconUrl: ICONS[cls],
-
-            iconSize:     [52*0.7, 68*0.7], // size of the icon
-            iconAnchor:   [26*0.7, 34*0.7], // point of the icon which will correspond to marker's location
-            // popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-        });
-        var marker = L.marker(mkers[i].location, {icon: icon});
-        marker.cls = cls;
-        markers.addLayer(marker);
+        add_one_marker(mkers[i].location, cls)
     }
 }
 
