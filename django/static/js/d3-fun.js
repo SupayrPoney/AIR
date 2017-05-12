@@ -23,9 +23,8 @@ var data = {
      prev: [{
         title: "Paper your paper references",
         authors:["Author1"],
-        year: "1995",
         keywords: ["keyword1", "keyword2"],
-        publication: {cover_date : 2016-12-08},
+        publication: {cover_date : "2006-12-08"},
         affiliation: [{
             name: "IRSA-INRIA",
             geo: {  lat: 48.116282, 
@@ -36,8 +35,7 @@ var data = {
     curr: [{
        title: "Start by looking up a title",
        authors: ["Hover over me for more information"],
-       year: "2013",
-       publication: {cover_date : 2016-12-08},
+       publication: {cover_date : "2015-12-08"},
        keywords: ["Keyword1", "Keyword2", "keyword3"],
        affiliation: [{
             name: "Vrije Universiteit Brussel",
@@ -49,8 +47,7 @@ var data = {
     next: [{
         title: "A paper that references your paper",
         authors: ["Author2"],
-        year: "1998",
-        publication: {cover_date : 2016-12-08},
+        publication: {cover_date : "2016-12-08"},
         keywords: ["keyword1", "keyword2", "keyword3"],
         affiliation: [{
             name: "University of Amsterdam",
@@ -230,12 +227,19 @@ function onMove() {
 
 function present_authors(data){
     var authors = data.authors;
-    if (authors.length == 0) { return ""; }
-    else if (authors.length == 1) { return authors[0]; }
-    else if(authors.length ==2){ return authors[0].concat(" & ").concat(authors[1]); }
+    var text = "";
+    if (authors.length == 0) { text = "-"; }
+    else if (authors.length == 1) { text = authors[0]; }
+    else if(authors.length ==2){ text = authors[0].concat(" & ").concat(authors[1]); }
     else{
-            return authors[0].concat(" et al.");
+            text = authors[0].concat(" et al.");
         }
+    if (data.publication) {
+        if (data.publication.cover_date) {
+            text += ` , ${data.publication.cover_date.split(/-/)[0]}`;
+        }
+    }
+    return text;
 };
     
 
