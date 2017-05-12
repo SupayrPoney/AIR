@@ -465,6 +465,7 @@ function draw_prev(pagin) {
 
 function draw_scene() {
     delete_authors();
+    draw_legend();
     draw_prev(0);
     draw_next(0);
     draw_papers(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr", function(){scroll_to("#map-container")}, 0);
@@ -648,10 +649,12 @@ draw_link(
     "legend-link"
     )
 
+function draw_legend(){
 svg.append("text")
 .attr("x", container_width-LEGEND_LENGTH-LEGEND_H_OFFSET)
 .attr("y", LEGEND_V_OFFSET-LEGEND_TEXT_OFFSET)
 .text("references")
+}
 
 //#### MAP ####
 
