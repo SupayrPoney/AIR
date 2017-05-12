@@ -332,7 +332,7 @@ function paginator_transition(type, isUp) {
     .remove();
 }
 
-function page_up(type) {
+function page_down(type) {
     const isNotMax = (pages[type]<(~~(data[type].length/papers_per_page)));
     if (isNotMax) {
         ++pages[type];
@@ -341,7 +341,7 @@ function page_up(type) {
     return isNotMax;
 }
 
-function page_down(type) {
+function page_up(type) {
     const isNotMin = (pages[type]>0);
     if (isNotMin) {
         --pages[type];
