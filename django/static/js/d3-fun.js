@@ -100,14 +100,33 @@ const TRANSITION_UNIT = 750;
 const PAGINATOR_H_OFFSET = 30;
 const PAGINATOR_V_OFFSET = 10;
 
-var container_width = getComputedProperty($("svg")[0], "width");
-var container_height = getComputedProperty($("svg")[0], "height");
-var sidebar_offset = getComputedProperty($("search")[0], "width");
-var mid_width = container_width/2;
-var mid_height = container_height/2;
-var mid = {x: mid_width, y: mid_height};
-var papers_per_page = ~~((container_height-50)/ICON_SPACE);
-const col_offset = 3*container_width/8;
+var container_width;
+var container_height;
+var sidebar_offset;
+var mid_width;
+var mid_height;
+var mid;
+var papers_per_page;
+var col_offset;
+
+function init() {
+    d3.selectAll('svg > *').remove()
+    container_width = getComputedProperty($("svg")[0], "width");
+    container_height = getComputedProperty($("svg")[0], "height");
+    sidebar_offset = getComputedProperty($("search")[0], "width");
+    mid_width = container_width/2;
+    mid_height = container_height/2;
+    mid = {x: mid_width, y: mid_height};
+    papers_per_page = ~~((container_height-50)/ICON_SPACE);
+    col_offset = 3*container_width/8;
+}
+
+init()
+
+window.onresize = () => {
+    init()
+    draw_scene()
+}
 
 var left_column_offset;
 var right_column_offset;
