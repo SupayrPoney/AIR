@@ -57,30 +57,6 @@ d3.selection.prototype.moveToFront = function() {
 
 var svg = d3.select("#graph-container svg");
 
-svg.append('svg:defs').append('svg:marker')
-.attr('class', 'arrow')
-.attr('id', 'mid-arrow-left')
-.attr('viewBox', '0 -5 10 10')
-.attr('refX', 4)
-.attr('markerWidth', 10)
-.attr('markerHeight', 10)
-.attr('orient', 'auto')
-.append('svg:path')
-.attr('d', 'M10,-5L0,0L10,5L6,0')
-.attr('fill', '#000');
-
-svg.append('svg:defs').append('svg:marker')
-.attr('class', 'arrow')
-.attr('id', 'mid-arrow-right')
-.attr('viewBox', '0 -5 10 10')
-.attr('refX', 4)
-.attr('markerWidth', 10)
-.attr('markerHeight', 10)
-.attr('orient', 'auto')
-.append('svg:path')
-.attr('d', 'M0,-5L10,0L0,5L5,0')
-.attr('fill', '#000');
-
 var tooltip = d3.select("body").append("div")
 .attr("class", "tooltip")
 .style("opacity", 0);
@@ -108,6 +84,7 @@ var mid_height;
 var mid;
 var papers_per_page;
 var col_offset;
+var pages;
 
 function init() {
     d3.selectAll('svg > *').remove()
@@ -119,6 +96,31 @@ function init() {
     mid = {x: mid_width, y: mid_height};
     papers_per_page = ~~((container_height-50)/ICON_SPACE);
     col_offset = 3*container_width/8;
+    pages = {next:0, prev:0};
+    
+    svg.append('svg:defs').append('svg:marker')
+    .attr('class', 'arrow')
+    .attr('id', 'mid-arrow-left')
+    .attr('viewBox', '0 -5 10 10')
+    .attr('refX', 4)
+    .attr('markerWidth', 10)
+    .attr('markerHeight', 10)
+    .attr('orient', 'auto')
+    .append('svg:path')
+    .attr('d', 'M10,-5L0,0L10,5L6,0')
+    .attr('fill', '#000');
+
+    svg.append('svg:defs').append('svg:marker')
+    .attr('class', 'arrow')
+    .attr('id', 'mid-arrow-right')
+    .attr('viewBox', '0 -5 10 10')
+    .attr('refX', 4)
+    .attr('markerWidth', 10)
+    .attr('markerHeight', 10)
+    .attr('orient', 'auto')
+    .append('svg:path')
+    .attr('d', 'M0,-5L10,0L0,5L5,0')
+    .attr('fill', '#000');
 }
 
 init()
@@ -131,7 +133,6 @@ window.onresize = () => {
 var left_column_offset;
 var right_column_offset;
 
-var pages = {next:0, prev:0};
 
 function draw_link(frm, to, arrow, cls, fade_in) {
     const mid_x = frm.x + (to.x-frm.x)/2;
