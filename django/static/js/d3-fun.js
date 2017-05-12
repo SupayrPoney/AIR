@@ -412,6 +412,7 @@ function draw_scene() {
     if (data.next.length>papers_per_page) draw_paginator(container_width-PAGINATOR_H_OFFSET-60, container_height-PAGINATOR_V_OFFSET-80, "next");
     refresh_article_name();
     refresh_keywords();
+    draw_map();
 }
 
 //#### NAV ####
@@ -637,10 +638,25 @@ map.on('drag', function() {
 
 function populates_markers(mkers, cls) {
     for (var i=0; i<mkers.length; ++i) {
-        var icon = L.MakiMarkers.icon({color: COLORS[cls], size: "m"});
-        var marker = L.marker(mkers[i].location, {icon: icon});
-        marker.cls = cls;
-        markers.addLayer(marker);
+
+        var affiliation = mkers[i].affiliation[0];
+        if (affiliation){
+            var geo = null;
+            for (var j = 0; (j < mkers.length) && (geo == null); j++) {
+                if (affiliation.geo){
+                    geo = affiliation.geo;
+
+                }
+
+            }
+            if (geo) {
+                var icon = L.MakiMarkers.icon({color: COLORS[cls], size: "m"});
+                var marker = L.marker([geo.lat,geo.lon], {icon: icon});
+                marker.cls = cls;
+                markers.addLayer(marker);
+
+            }
+        }
     }
 }
 
@@ -667,8 +683,12 @@ function toggle_filter(self, marker_grp) {
     draw_markers();
 }
 
-draw_markers();
-show_all_markers();
+function draw_map() {
+    draw_markers();
+    show_all_markers();
+}
+
+draw_map();
 L.DomEvent.disableClickPropagation(L.DomUtil.get('filter-box')); 
 L.DomEvent.disableClickPropagation(L.DomUtil.get('back')); 
 draw_scene();
