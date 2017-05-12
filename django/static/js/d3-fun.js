@@ -336,7 +336,7 @@ function display_authors(datas, x, y, type, pagin){
         } else {
             if (pagin) return pagin>1 ? container_height+PAPER_HEIGHT : -PAPER_HEIGHT;
             var proj = (h*(PAPER_WIDTH+mid_width)/(col_offset))-h;
-            return y<mid_height ? y+2*h-proj : y+2*h+proj;
+            return y+2*h-proj;
         }
     })
     .style("text-anchor", "middle");
