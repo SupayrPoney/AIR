@@ -34,7 +34,7 @@ var data = {
     }],
     curr: [{
        title: "Start by looking up a title",
-       authors: ["Hover over me for more information"],
+       authors: ["Author"],
        publication: {cover_date : "2015-12-08"},
        keywords: ["Keyword1", "Keyword2", "keyword3"],
        affiliation: [{
@@ -660,6 +660,12 @@ svg.append("text")
 .text("references")
 }
 
+function draw_hover_line(){
+    svg.append("text")
+    .attr("x", container_width/2- 130)
+    .attr("y", 200)
+    .text("Hover over the papers for more information")
+}
 //#### MAP ####
 
 var map = L.map('map-container',{minZoom: 3})
@@ -768,3 +774,4 @@ show_all_markers();
 L.DomEvent.disableClickPropagation(L.DomUtil.get('filter-box'));
 L.DomEvent.disableClickPropagation(L.DomUtil.get('back'));
 draw_scene();
+draw_hover_line();
