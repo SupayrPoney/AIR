@@ -37,3 +37,41 @@ function get_next(metadata, onSuccess, onError) {
         error: onError
     })
 }
+
+function get_prev_one_by_one(metadata, onSuccess, onError) {
+    function lol(index) {
+        if (metadata.prev[index]) {
+            $.ajax({
+                url: metadata.prev[index].url,
+                success: (data) => {
+                    onSuccess(data) 
+                    lol(index + 1)
+                },
+                error: (error) => {
+                    //console.log(error)
+                    lol(index + 1)
+                }
+            })
+        }
+    }
+    lol(0)
+}
+
+function get_next_one_by_one(metadata, onSuccess, onError) {
+    function lol(index) {
+        if (metadata.next[index]) {
+            $.ajax({
+                url: metadata.next[index].url,
+                success: (data) => {
+                    onSuccess(data) 
+                    lol(index + 1)
+                },
+                error: (error) => {
+                    //console.log(error)
+                    lol(index + 1)
+                }
+            })
+        }
+    }
+    lol(0)
+}
