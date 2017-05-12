@@ -237,11 +237,6 @@ function present_authors(data){
             return authors[0].concat(" et al.");
         }
 };
-
-   
-
-
-
     
 
 function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
@@ -346,8 +341,11 @@ function display_authors(datas, x, y, type, pagin){
     })
     .style("text-anchor", "middle");
 
+}
 
-
+function delete_authors(){
+    d3.selectAll("text")
+    .remove()
 }
 
 function paginator_transition(type, isUp) {
@@ -466,6 +464,7 @@ function draw_prev(pagin) {
 }
 
 function draw_scene() {
+    delete_authors();
     draw_prev(0);
     draw_next(0);
     draw_papers(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr", function(){scroll_to("#map-container")}, 0);
