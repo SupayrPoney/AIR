@@ -218,17 +218,19 @@ function onMove() {
 
 function present_authors(data){
     var authors = data.authors;
-    if (authors.length == 1) {
-        return author[0];
-    }else{
-        if(authors.length ==2){
-            return author[0].concat(" & ").concat(author[1]);
-        }else{
-            return author[0].concat(" et al.");
-        };
-
-    };
+    if (authors.length == 0) { return ""; }
+    else if (authors.length == 1) { return authors[0]; }
+    else if(authors.length ==2){ return authors[0].concat(" & ").concat(authors[1]); }
+    else{
+            return authors[0].concat(" et al.");
+        }
 };
+
+   
+
+
+
+    
 
 function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
     const l = PAPER_WIDTH/2;
@@ -282,6 +284,7 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
         click: onclick
     })
 
+
     if ((type=="curr") && (!pagin)) {
         papers.style("opacity", 0.0)
         .transition()
@@ -295,6 +298,44 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
             return d.finalPos;
         });
     }
+
+  
+}
+
+
+function display_authors(datas, x, y, type, pagin){
+    const l = PAPER_WIDTH/2;
+    var papers = svg.selectAll("paper")
+    .data(datas)
+    .enter()
+    .append("text")
+    .text( (d) => {return present_authors(d);})
+    .attr("x",function(d) {
+        if ((type=="curr") || pagin) {
+            return x;
+        } else {
+            if (type=="prev") {
+                return PAPER_WIDTH + PAPER_WIDTH;
+            } else {
+                return container_width - 2*PAPER_WIDTH - 5;
+            }
+        }
+    })
+    .attr("y",function(d) {
+        y += ICON_SPACE;
+        var h = PAPER_HEIGHT/2;
+        if (type=="curr") {
+            return y-h +90 ;
+        } else {
+            if (pagin) return pagin>1 ? container_height+PAPER_HEIGHT : -PAPER_HEIGHT;
+            var proj = (h*(PAPER_WIDTH+mid_width)/(col_offset))-h;
+            return y<mid_height ? y+2*h-proj : y+2*h+proj;
+        }
+    })
+    .style("text-anchor", "middle");
+
+
+
 }
 
 function paginator_transition(type, isUp) {
@@ -401,6 +442,7 @@ function draw_next(pagin) {
     right_column_offset = ((container_height-((next_slice.length-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.95);
     draw_links(next_slice.length, mid_width+col_offset, right_column_offset, "url(#mid-arrow-right)", "paper-link link-next", true)
     draw_papers(next_slice, mid_width+col_offset, right_column_offset, NEXT_DOC_IMG_URL, "next", click_prev_next, pagin);
+    display_authors(next_slice, mid_width+col_offset, right_column_offset,"next", pagin)
 }
 
 function draw_prev(pagin) {
@@ -408,12 +450,14 @@ function draw_prev(pagin) {
     left_column_offset = ((container_height-((prev_slice.length-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.95);
     draw_links(prev_slice.length, mid_width-col_offset, left_column_offset, "url(#mid-arrow-left)", "paper-link link-prev", true);
     draw_papers(prev_slice, mid_width-col_offset, left_column_offset, PREV_DOC_IMG_URL, "prev", click_prev_next, pagin);
+    display_authors(prev_slice, mid_width-col_offset, left_column_offset, "prev", pagin)
 }
 
 function draw_scene() {
     draw_prev(0);
     draw_next(0);
     draw_papers(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr", function(){scroll_to("#map-container")}, 0);
+    display_authors(data.curr, mid_width, mid_height-ICON_SPACE, "curr", 0)
     if (data.prev.length>papers_per_page) draw_paginator(PAGINATOR_H_OFFSET, container_height-PAGINATOR_V_OFFSET-80, "prev");
     if (data.next.length>papers_per_page) draw_paginator(container_width-PAGINATOR_H_OFFSET-60, container_height-PAGINATOR_V_OFFSET-80, "next");
     refresh_article_name();
