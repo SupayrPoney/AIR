@@ -665,9 +665,10 @@ function populates_markers(mkers, cls) {
 
             iconSize:     [52*0.7, 68*0.7], // size of the icon
             iconAnchor:   [26*0.7, 34*0.7], // point of the icon which will correspond to marker's location
-            // popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+            popupAnchor:  [0, -22] // point from which the popup should open relative to the iconAnchor
         });
         var marker = L.marker(mkers[i].location, {icon: icon});
+        marker.bindPopup(`<b>${mkers[i].title}</b><br>${mkers[i].authors} - ${mkers[i].year}`);
         marker.cls = cls;
         markers.addLayer(marker);
     }
