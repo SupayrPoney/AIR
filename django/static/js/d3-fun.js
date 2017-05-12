@@ -107,7 +107,7 @@ var mid_width = container_width/2;
 var mid_height = container_height/2;
 var mid = {x: mid_width, y: mid_height};
 var papers_per_page = ~~((container_height-50)/ICON_SPACE);
-const col_offset = 3*container_width/8;
+const col_offset = 2.5*container_width/8;
 
 var left_column_offset;
 var right_column_offset;
