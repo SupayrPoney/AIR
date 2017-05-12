@@ -542,7 +542,7 @@ function retrieve_data_by_title(title, callback) {
     let counter_prev = 0
     let counter_next = 0
     let drawn = false
-    function lol() {
+    function batman() {
         if (counter_prev >= Math.min(papers_per_page, data.prev.length) &&
             counter_next >= Math.min(papers_per_page, data.next.length) &&
             !drawn) {
@@ -554,15 +554,16 @@ function retrieve_data_by_title(title, callback) {
         data.curr = [new_data]
         data.prev = new_data.prev
         data.next = new_data.next
+        batman()
         get_prev_one_by_one(new_data, (prev) => {
             data.prev[counter_prev] = prev
             counter_prev++
-            lol()
+            batman()
         }, (error) => console.error(error))
         get_next_one_by_one(new_data, (next) => {
             data.next[counter_next] = next
             counter_next++
-            lol()
+            batman()
         }, (error) => console.error(error))
     }, (error) => console.error(error))
 }
