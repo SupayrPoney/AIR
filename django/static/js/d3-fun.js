@@ -94,10 +94,10 @@ function init() {
     mid_width = container_width/2;
     mid_height = container_height/2;
     mid = {x: mid_width, y: mid_height};
-    papers_per_page = ~~((container_height-50)/ICON_SPACE);
+    papers_per_page = Math.min(~~((container_height-250)/ICON_SPACE), 7);
     col_offset = 3*container_width/8;
     pages = {next:0, prev:0};
-    
+
     svg.append('svg:defs').append('svg:marker')
     .attr('class', 'arrow')
     .attr('id', 'mid-arrow-left')
@@ -581,7 +581,7 @@ function retrieve_data_by_title(title, callback) {
             node.affiliation.forEach((aff) => {
                 if (aff.geo) {
                     let location = [aff.geo.lat, aff.geo.lon]
-                    add_one_marker(location, cls)   
+                    add_one_marker(location, cls)
                 }
             })
         }
