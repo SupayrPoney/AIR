@@ -26,8 +26,13 @@ var data = {
     year: "1995",
     keywords: ["keyword1", "keyword2"],
     publication: {cover_date : 2016-12-08},
-    affiliation: "IRSA-INRIA",
-    location: [48.116282, -1.639774]
+    affiliation: [{
+        name: "IRSA-INRIA",
+        geo: {
+            lat: 48.116282,
+            lon: -1.639774,
+        }
+    }],
    }],
    curr: [{
      title: "Start by looking up a title",
@@ -35,8 +40,14 @@ var data = {
      year: "2013",
      publication: {cover_date : 2016-12-08},
      keywords: ["Keyword1", "Keyword2", "keyword3"],
-     affiliation: " Vrije Universiteit Brussel",
-     location: [50.823165, 4.392326]
+     affiliation: "",
+     affiliation: [{
+        name: "Vrije Universiteit Brussel",
+        geo: {
+            lat: 50.823165,
+            lon: 4.392326,
+        }
+     }],
     }],
    next: [{
     title: "A paper that references your paper",
@@ -44,8 +55,13 @@ var data = {
     year: "1998",
     publication: {cover_date : 2016-12-08},
     keywords: ["keyword1", "keyword2", "keyword3"],
-    affiliation: "University of Amsterdam",
-    location: [52.355818, 4.955726]
+    affiliation: [{
+        name: "University of Amsterdam",
+        geo: {
+            lat: 52.355818,
+            lon: 4.955726,
+        }
+     }],
    }]
  };
 
@@ -95,7 +111,7 @@ function init() {
     mid_height = container_height/2;
     mid = {x: mid_width, y: mid_height};
     papers_per_page = Math.min(~~((container_height-250)/ICON_SPACE), 7);
-    col_offset = 3*container_width/8;
+    col_offset = 2.5*container_width/8;
     pages = {next:0, prev:0};
 
     svg.append('svg:defs').append('svg:marker')
@@ -578,12 +594,7 @@ function retrieve_data_by_title(title, callback) {
     }
     function draw_marker(node, cls) {
         if (node.affiliation) {
-            node.affiliation.forEach((aff) => {
-                if (aff.geo) {
-                    let location = [aff.geo.lat, aff.geo.lon]
-                    add_one_marker(location, cls)
-                }
-            })
+            add_one_marker(node, cls)
         }
     }
     markers.clearLayers();
@@ -692,7 +703,7 @@ map.on('drag', function() {
     map.panInsideBounds(bounds, { animate: false });
 });
 
-function add_one_marker(location, cls) {
+function add_one_marker(node, cls) {
     var icon = L.icon({
         iconUrl: ICONS[cls],
 
@@ -700,14 +711,23 @@ function add_one_marker(location, cls) {
         iconAnchor:   [26*0.7, 34*0.7], // point of the icon which will correspond to marker's location
         // popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
     });
-    var marker = L.marker(location, {icon: icon});
-    marker.cls = cls;
-    markers.addLayer(marker);
+    if(node.affiliation) {
+        node.affiliation.forEach((aff) => {
+            if (aff.geo) {
+                let location = [aff.geo.lat, aff.geo.lon]
+                var marker = L.marker(location, {icon: icon});
+                marker.bindPopup(`<b>${node.title}</b><br>${node.authors} - ${node.year}`);
+                marker.cls = cls;
+                markers.addLayer(marker);
+            }
+        })
+    }
+
 }
 
 function populates_markers(mkers, cls) {
     for (var i=0; i<mkers.length; ++i) {
-        add_one_marker(mkers[i].location, cls)
+        add_one_marker(mkers[i], cls)
     }
 }
 
