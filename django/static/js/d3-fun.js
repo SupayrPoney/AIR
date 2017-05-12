@@ -20,39 +20,51 @@ const CIRCLE_STROKE = 2;
 L.MakiMarkers.accessToken = 'pk.eyJ1Ijoic3VwYXlycG9uZXkiLCJhIjoiY2oyZGRvYXdjMDAxYTJ4bXV5YXUzMzRocCJ9.v50KWa63j5PHSN7_HACjyg'
 
 var data = {
-   prev: [{
-    title: "Paper your paper references",
-    authors:["author1"],
-    year: "1995",
-    keywords: ["keyword1", "keyword2"],
-    publication: {cover_date : 2016-12-08},
-    affiliation: "IRSA-INRIA",
-    location: [48.116282, -1.639774]
-   }],
-   curr: [{
-     title: "Start by looking up a title",
-     authors: ["hoover over me for more information"],
-     year: "2013",
-     publication: {cover_date : 2016-12-08},
-     keywords: ["Keyword1", "Keyword2", "keyword3"],
-     affiliation: " Vrije Universiteit Brussel",
-     location: [50.823165, 4.392326]
+     prev: [{
+        title: "Paper your paper references",
+        authors:["author1"],
+        year: "1995",
+        keywords: ["keyword1", "keyword2"],
+        publication: {cover_date : 2016-12-08},
+        affiliation: [{
+            name: "IRSA-INRIA",
+            geo: {  lat: 48.116282, 
+                    lon: -1.639774
+            }
+        }]
     }],
-   next: [{
-    title: "A paper that references your paper",
-    authors: ["author"],
-    year: "1998",
-    publication: {cover_date : 2016-12-08},
-    keywords: ["keyword1", "keyword2", "keyword3"],
-    affiliation: "University of Amsterdam",
-    location: [52.355818, 4.955726]
-   }]
- };
+    curr: [{
+       title: "Start by looking up a title",
+       authors: ["hoover over me for more information"],
+       year: "2013",
+       publication: {cover_date : 2016-12-08},
+       keywords: ["Keyword1", "Keyword2", "keyword3"],
+       affiliation: [{
+            name: "Vrije Universiteit Brussel",
+            geo: {  lat: 50.823165, 
+                    lon: 4.392326
+            }
+       }]
+    }],
+    next: [{
+        title: "A paper that references your paper",
+        authors: ["author"],
+        year: "1998",
+        publication: {cover_date : 2016-12-08},
+        keywords: ["keyword1", "keyword2", "keyword3"],
+        affiliation: [{
+            name: "University of Amsterdam",
+            geo: {  lat: 52.355818, 
+                    lon: 4.955726
+            }
+        }]
+    }]
+};
 
 d3.selection.prototype.moveToFront = function() {
   return this.each(function(){
     this.parentNode.appendChild(this);
-  });
+});
 };
 
 var svg = d3.select("#graph-container svg");
@@ -267,17 +279,17 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
         mouseover: function(d) {
             d3.select(this).style("cursor", "pointer");
             tooltip.transition()
-                .duration(200)
-                .style("opacity", .95);
+            .duration(200)
+            .style("opacity", .95);
             tooltip.html("<b>"+d.title+"</b><hr>"+d.authors + "<br>"+d.publication.cover_date +'<hr><span class="tag '+type+'">'+ d.keywords.join('</span><span class="tag '+type+'">')+"</span>")
-                .style("left", (d3.select(this).attr("x") - $(tooltip[0][0]).width()/2 + PAPER_WIDTH/2 + sidebar_offset) + "px")
-                .style("top", (d3.select(this).attr("y") -PAPER_HEIGHT/3 - $(tooltip[0][0]).height()) + "px");
+            .style("left", (d3.select(this).attr("x") - $(tooltip[0][0]).width()/2 + PAPER_WIDTH/2 + sidebar_offset) + "px")
+            .style("top", (d3.select(this).attr("y") -PAPER_HEIGHT/3 - $(tooltip[0][0]).height()) + "px");
         },
         mouseout: function() {
             d3.select(this).style("cursor", "default");
             tooltip.transition()
-                .duration(500)
-                .style("opacity", 0);
+            .duration(500)
+            .style("opacity", 0);
         },
         click: onclick
     })
@@ -464,8 +476,8 @@ function draw_nav_nodes(datas) {
     .on({
         "mouseover": function(d) {
             nav_text.transition()
-                .duration(200)
-                .style("opacity", .95);
+            .duration(200)
+            .style("opacity", .95);
             d3.select(this).style("cursor", "pointer");
             nav_text.html(d.text)
             .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + sidebar_offset + "px")
@@ -488,22 +500,22 @@ function draw_nav() {
     draw_line(mid1_x, y, mid2_x, y);
     draw_line(mid2_x, y, mid2_x+NAV_EXTREMITY, y, "dotted");
     const nav_datas = [
-        {
-            text: "Currently displayed article.",
-            x: mid_width,
-            y: y,
-            color: COLOR_CURR
-        }, {
-            text: "Navigate randomly to an article that reference the selected article.",
-            x: mid_width+NAV_DOT_SPACE,
-            y: y,
-            color: COLOR_NEXT
-        }, {
-            text: "Navigate to a founding article.",
-            x: mid1_x-NAV_EXTREMITY+5,
-            y: y,
-            color: COLOR_PRIMARY,
-        }
+    {
+        text: "Currently displayed article.",
+        x: mid_width,
+        y: y,
+        color: COLOR_CURR
+    }, {
+        text: "Navigate randomly to an article that reference the selected article.",
+        x: mid_width+NAV_DOT_SPACE,
+        y: y,
+        color: COLOR_NEXT
+    }, {
+        text: "Navigate to a founding article.",
+        x: mid1_x-NAV_EXTREMITY+5,
+        y: y,
+        color: COLOR_PRIMARY,
+    }
     ];
     for (var i=1; i<NAV_HISTORY_SIZE+1; ++i) {
         nav_datas.push({
@@ -591,7 +603,7 @@ draw_link(
     { x: legend_x, y: legend_y },
     'url(#mid-arrow-left)',
     "legend-link"
-)
+    )
 
 svg.append("text")
 .attr("x", container_width-LEGEND_LENGTH-LEGEND_H_OFFSET)
@@ -633,8 +645,8 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/mapbox.light/{z}/{x}/{y}.png?access
     minZoom: 2,
     maxBoundsViscosity: 1.0,
     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-        '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-        'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+    'Imagery © <a href="http://mapbox.com">Mapbox</a>',
     id: 'mapbox.streets'
 }).addTo(map);
 
