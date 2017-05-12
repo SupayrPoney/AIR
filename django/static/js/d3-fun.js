@@ -662,9 +662,10 @@ svg.append("text")
 
 function draw_hover_line(){
     svg.append("text")
-    .attr("x", container_width/2- 130)
+    .attr("x", container_width/2- 240)
     .attr("y", 200)
     .text("Hover over the papers for more information")
+    .style("font-size",25)
 }
 //#### MAP ####
 
