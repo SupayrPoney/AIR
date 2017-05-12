@@ -22,7 +22,7 @@ L.MakiMarkers.accessToken = 'pk.eyJ1Ijoic3VwYXlycG9uZXkiLCJhIjoiY2oyZGRvYXdjMDAx
 var data = {
      prev: [{
         title: "Paper your paper references",
-        authors:["author1"],
+        authors:["Author1"],
         year: "1995",
         keywords: ["keyword1", "keyword2"],
         publication: {cover_date : 2016-12-08},
@@ -35,7 +35,7 @@ var data = {
     }],
     curr: [{
        title: "Start by looking up a title",
-       authors: ["hoover over me for more information"],
+       authors: ["Hover over me for more information"],
        year: "2013",
        publication: {cover_date : 2016-12-08},
        keywords: ["Keyword1", "Keyword2", "keyword3"],
@@ -48,7 +48,7 @@ var data = {
     }],
     next: [{
         title: "A paper that references your paper",
-        authors: ["author"],
+        authors: ["Author2"],
         year: "1998",
         publication: {cover_date : 2016-12-08},
         keywords: ["keyword1", "keyword2", "keyword3"],
