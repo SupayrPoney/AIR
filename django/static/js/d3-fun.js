@@ -110,7 +110,7 @@ function init() {
     mid_width = container_width/2;
     mid_height = container_height/2;
     mid = {x: mid_width, y: mid_height};
-    papers_per_page = Math.min(~~((container_height-250)/ICON_SPACE), 7);
+    papers_per_page = Math.max(Math.min(~~((container_height-250)/ICON_SPACE), 7), 3);
     col_offset = 2.5*container_width/8;
     pages = {next:0, prev:0};
 
