@@ -5,6 +5,12 @@ const COLORS = {
     primary: "#1A537F"
 }
 
+const ICONS = {
+    prev: "static/images/docPrev.png",
+    curr: "static/images/docCurr.png",
+    next: "static/images/docNext.png",
+}
+
 const COLOR_PREV = '#4CEAFF';
 const COLOR_CURR = '#FFE74C';
 const COLOR_NEXT = '#6BF178';
@@ -15,30 +21,30 @@ L.MakiMarkers.accessToken = 'pk.eyJ1Ijoic3VwYXlycG9uZXkiLCJhIjoiY2oyZGRvYXdjMDAx
 
 var data = {
    prev: [{
-    title: "Paper your paper references", 
+    title: "Paper your paper references",
     authors:["author1"],
     year: "1995",
-    keywords: ["keyword1", "keyword2"], 
+    keywords: ["keyword1", "keyword2"],
     publication: {cover_date : 2016-12-08},
     affiliation: "IRSA-INRIA",
     location: [48.116282, -1.639774]
    }],
    curr: [{
      title: "Start by looking up a title",
-     authors: ["hoover over me for more information"], 
+     authors: ["hoover over me for more information"],
      year: "2013",
      publication: {cover_date : 2016-12-08},
      keywords: ["Keyword1", "Keyword2", "keyword3"],
-     affiliation: " Vrije Universiteit Brussel", 
+     affiliation: " Vrije Universiteit Brussel",
      location: [50.823165, 4.392326]
     }],
    next: [{
-    title: "A paper that references your paper", 
-    authors: ["author"], 
+    title: "A paper that references your paper",
+    authors: ["author"],
     year: "1998",
     publication: {cover_date : 2016-12-08},
-    keywords: ["keyword1", "keyword2", "keyword3"], 
-    affiliation: "University of Amsterdam", 
+    keywords: ["keyword1", "keyword2", "keyword3"],
+    affiliation: "University of Amsterdam",
     location: [52.355818, 4.955726]
    }]
  };
@@ -75,8 +81,8 @@ svg.append('svg:defs').append('svg:marker')
 .attr('d', 'M0,-5L10,0L0,5L5,0')
 .attr('fill', '#000');
 
-var tooltip = d3.select("body").append("div")   
-.attr("class", "tooltip")               
+var tooltip = d3.select("body").append("div")
+.attr("class", "tooltip")
 .style("opacity", 0);
 
 function getComputedProperty(obj, property) {
@@ -84,7 +90,7 @@ function getComputedProperty(obj, property) {
 }
 
 function scroll_to(id) {
-    $('html, body').animate( { scrollTop: $(id).offset().top }, 750); 
+    $('html, body').animate( { scrollTop: $(id).offset().top }, 750);
 }
 
 const PAPER_HEIGHT = 70;
@@ -211,7 +217,7 @@ function onMove() {
 // NODES
 
 function present_authors(data){
-    var authors = data.authors; 
+    var authors = data.authors;
     if (authors.length == 1) {
         return author[0];
     }else{
@@ -248,7 +254,7 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
         if (type=="curr") {
             return y-h;
         } else {
-            d.finalPos = y-h; 
+            d.finalPos = y-h;
             if (pagin) return pagin>1 ? container_height+PAPER_HEIGHT : -PAPER_HEIGHT;
             var proj = (h*(PAPER_WIDTH+mid_width)/(col_offset))-h;
             return y<mid_height ? y-h-proj : y-h+proj;
@@ -259,19 +265,19 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
     .attr("xlink:href", image_url)
     .on({
         mouseover: function(d) {
-            d3.select(this).style("cursor", "pointer");    
-            tooltip.transition()        
-                .duration(200)      
+            d3.select(this).style("cursor", "pointer");
+            tooltip.transition()
+                .duration(200)
                 .style("opacity", .95);
-            tooltip.html("<b>"+d.title+"</b><hr>"+d.authors + "<br>"+d.publication.cover_date +'<hr><span class="tag '+type+'">'+ d.keywords.join('</span><span class="tag '+type+'">')+"</span>")  
-                .style("left", (d3.select(this).attr("x") - $(tooltip[0][0]).width()/2 + PAPER_WIDTH/2 + sidebar_offset) + "px")     
-                .style("top", (d3.select(this).attr("y") -PAPER_HEIGHT/3 - $(tooltip[0][0]).height()) + "px");    
+            tooltip.html("<b>"+d.title+"</b><hr>"+d.authors + "<br>"+d.publication.cover_date +'<hr><span class="tag '+type+'">'+ d.keywords.join('</span><span class="tag '+type+'">')+"</span>")
+                .style("left", (d3.select(this).attr("x") - $(tooltip[0][0]).width()/2 + PAPER_WIDTH/2 + sidebar_offset) + "px")
+                .style("top", (d3.select(this).attr("y") -PAPER_HEIGHT/3 - $(tooltip[0][0]).height()) + "px");
         },
-        mouseout: function() {    
-            d3.select(this).style("cursor", "default"); 
-            tooltip.transition()        
-                .duration(500)      
-                .style("opacity", 0);   
+        mouseout: function() {
+            d3.select(this).style("cursor", "default");
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
         },
         click: onclick
     })
@@ -390,7 +396,7 @@ function click_prev_next(d) {
     retrieve_data_by_title(d.title, select_paper.bind(this))
 }
 
-function draw_next(pagin) {    
+function draw_next(pagin) {
     var next_slice = data.next.slice(pages.next*papers_per_page, Math.min((pages.next+1)*papers_per_page, data.next.length));
     right_column_offset = ((container_height-((next_slice.length-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.95);
     draw_links(next_slice.length, mid_width+col_offset, right_column_offset, "url(#mid-arrow-right)", "paper-link link-next", true)
@@ -426,7 +432,7 @@ const NAV_DOT_STROKE_WIDTH = 2;
 const NAV_DOT_SPACE = 25;
 const NAV_HISTORY_SIZE = 3;
 
-var nav_text = d3.select("body").append("div")   
+var nav_text = d3.select("body").append("div")
 .attr("class", "nav_text")
 .style("opacity", 0);
 
@@ -457,19 +463,19 @@ function draw_nav_nodes(datas) {
     .attr("stroke-width", NAV_DOT_STROKE_WIDTH)
     .on({
         "mouseover": function(d) {
-            nav_text.transition()        
-                .duration(200)      
-                .style("opacity", .95);  
-            d3.select(this).style("cursor", "pointer");   
+            nav_text.transition()
+                .duration(200)
+                .style("opacity", .95);
+            d3.select(this).style("cursor", "pointer");
             nav_text.html(d.text)
-            .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + sidebar_offset + "px")     
-            .style("top", (container_height-NAV_OFFSET-30) + "px"); 
+            .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + sidebar_offset + "px")
+            .style("top", (container_height-NAV_OFFSET-30) + "px");
         },
         "mouseout": function(d) {
-            d3.select(this).style("cursor", "default"); 
-            nav_text.transition()        
-            .duration(500)      
-            .style("opacity", 0);  
+            d3.select(this).style("cursor", "default");
+            nav_text.transition()
+            .duration(500)
+            .style("opacity", 0);
         }
     })
 }
@@ -482,7 +488,7 @@ function draw_nav() {
     draw_line(mid1_x, y, mid2_x, y);
     draw_line(mid2_x, y, mid2_x+NAV_EXTREMITY, y, "dotted");
     const nav_datas = [
-        { 
+        {
             text: "Currently displayed article.",
             x: mid_width,
             y: y,
@@ -581,8 +587,8 @@ const LEGEND_TEXT_OFFSET = 10
 const legend_x = container_width-LEGEND_H_OFFSET;
 const legend_y = LEGEND_V_OFFSET;
 draw_link(
-    { x: legend_x-LEGEND_LENGTH, y: legend_y }, 
-    { x: legend_x, y: legend_y }, 
+    { x: legend_x-LEGEND_LENGTH, y: legend_y },
+    { x: legend_x, y: legend_y },
     'url(#mid-arrow-left)',
     "legend-link"
 )
@@ -650,7 +656,13 @@ function populates_markers(mkers, cls) {
 
             }
             if (geo) {
-                var icon = L.MakiMarkers.icon({color: COLORS[cls], size: "m"});
+                var icon = L.icon({
+                    iconUrl: ICONS[cls],
+
+                    iconSize:     [52*0.7, 68*0.7], // size of the icon
+                    iconAnchor:   [26*0.7, 34*0.7], // point of the icon which will correspond to marker's location
+                    // popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+                });
                 var marker = L.marker([geo.lat,geo.lon], {icon: icon});
                 marker.cls = cls;
                 markers.addLayer(marker);
@@ -689,6 +701,8 @@ function draw_map() {
 }
 
 draw_map();
-L.DomEvent.disableClickPropagation(L.DomUtil.get('filter-box')); 
-L.DomEvent.disableClickPropagation(L.DomUtil.get('back')); 
+draw_markers();
+show_all_markers();
+L.DomEvent.disableClickPropagation(L.DomUtil.get('filter-box'));
+L.DomEvent.disableClickPropagation(L.DomUtil.get('back'));
 draw_scene();
