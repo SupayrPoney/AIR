@@ -326,9 +326,9 @@ function display_authors(datas, x, y, type, pagin){
             return x;
         } else {
             if (type=="prev") {
-                return PAPER_WIDTH + PAPER_WIDTH;
+                return PAPER_WIDTH + PAPER_WIDTH + present_authors(d).length*3;
             } else {
-                return container_width - 2*PAPER_WIDTH - 5;
+                return container_width - 2*PAPER_WIDTH - 5 -present_authors(d).length*3;
             }
         }
     })
