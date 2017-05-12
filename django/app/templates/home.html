@@ -40,11 +40,14 @@
         <svg xmlns="http://www.w3.org/2000/svg">
         </svg>
     </div>
-</div>    
+    <div id="forward" class="interactive main" onclick="scroll_to('#map-container')">
+        <span class="glyphicon glyphicon-menu-down"></span> Show the papers on a map
+    </div>
+</div>
 
 <div id="map-container">
-    <div id="back" class="interactive main" onclick="scroll_to('#flex-container')"> 
-        <span class="glyphicon glyphicon-menu-up"></span> Back
+    <div id="back" class="interactive main" onclick="scroll_to('#flex-container')">
+        <span class="glyphicon glyphicon-menu-up"></span> Back to the paper network
     </div>
     <div id="filter-box" class="main">
         <div class="legend-container">
@@ -64,11 +67,11 @@
                 <span class="glyphicon glyphicon-ok"></span>
             </span>
             <span class="map-legend">Citing paper's authors.</span>
-        </div>      
+        </div>
     </div>
 </div>
 
-<script type="text/javascript"> 
+<script type="text/javascript">
     const CURR_DOC_IMG_URL = "{% static 'images/docCurr.png' %}";
     const NEXT_DOC_IMG_URL = "{% static 'images/docNext.png' %}";
     const PREV_DOC_IMG_URL = "{% static 'images/docPrev.png' %}";
