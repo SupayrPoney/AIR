@@ -695,20 +695,20 @@ const LEGEND_TEXT_OFFSET = 10
 
 
 function draw_legend(){
-const legend_x = container_width-LEGEND_H_OFFSET;
-const legend_y = LEGEND_V_OFFSET;
-draw_link(
-    { x: legend_x-LEGEND_LENGTH, y: legend_y },
-    { x: legend_x, y: legend_y },
-    'url(#mid-arrow-left)',
-    "legend-link"
-    )
+    const legend_x = container_width-LEGEND_H_OFFSET;
+    const legend_y = LEGEND_V_OFFSET;
+    draw_link(
+        { x: legend_x-LEGEND_LENGTH, y: legend_y },
+        { x: legend_x, y: legend_y },
+        'url(#mid-arrow-left)',
+        "legend-link"
+        )
 
 
-svg.append("text")
-.attr("x", container_width-LEGEND_LENGTH-LEGEND_H_OFFSET)
-.attr("y", LEGEND_V_OFFSET-LEGEND_TEXT_OFFSET)
-.text("references")
+    svg.append("text")
+    .attr("x", container_width-LEGEND_LENGTH-LEGEND_H_OFFSET)
+    .attr("y", LEGEND_V_OFFSET-LEGEND_TEXT_OFFSET)
+    .text("references")
 }
 
 function draw_hover_line(){
