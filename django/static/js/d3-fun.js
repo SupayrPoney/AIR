@@ -346,9 +346,9 @@ function display_authors(datas, x, y, type, pagin){
             return x;
         } else {
             if (type=="prev") {
-                return PAPER_WIDTH + PAPER_WIDTH + present_authors(d).length*3;
+                return 9/40* container_width - present_authors(d).length*3;
             } else {
-                return container_width - 2*PAPER_WIDTH - 5 -present_authors(d).length*3;
+                return 31/40*container_width  + present_authors(d).length*3;
             }
         }
     })
@@ -360,7 +360,7 @@ function display_authors(datas, x, y, type, pagin){
         } else {
             if (pagin) return pagin>1 ? container_height+PAPER_HEIGHT : -PAPER_HEIGHT;
             var proj = (h*(PAPER_WIDTH+mid_width)/(col_offset))-h;
-            return y+2*h-proj;
+            return y+2*h-proj + 10;
         }
     })
     .style("text-anchor", "middle");
