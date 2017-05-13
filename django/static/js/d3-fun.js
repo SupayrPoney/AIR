@@ -66,30 +66,6 @@ d3.selection.prototype.moveToFront = function() {
 
 var svg = d3.select("#graph-container svg");
 
-svg.append('svg:defs').append('svg:marker')
-.attr('class', 'arrow')
-.attr('id', 'mid-arrow-left')
-.attr('viewBox', '0 -5 10 10')
-.attr('refX', 4)
-.attr('markerWidth', 10)
-.attr('markerHeight', 10)
-.attr('orient', 'auto')
-.append('svg:path')
-.attr('d', 'M10,-5L0,0L10,5L6,0')
-.attr('fill', '#000');
-
-svg.append('svg:defs').append('svg:marker')
-.attr('class', 'arrow')
-.attr('id', 'mid-arrow-right')
-.attr('viewBox', '0 -5 10 10')
-.attr('refX', 4)
-.attr('markerWidth', 10)
-.attr('markerHeight', 10)
-.attr('orient', 'auto')
-.append('svg:path')
-.attr('d', 'M0,-5L10,0L0,5L5,0')
-.attr('fill', '#000');
-
 var tooltip = d3.select("body").append("div")
 .attr("class", "tooltip")
 .style("opacity", 0);
@@ -109,19 +85,63 @@ const TRANSITION_UNIT = 750;
 const PAGINATOR_H_OFFSET = 30;
 const PAGINATOR_V_OFFSET = 10;
 
-var container_width = getComputedProperty($("svg")[0], "width");
-var container_height = getComputedProperty($("svg")[0], "height");
-var sidebar_offset = getComputedProperty($("search")[0], "width");
-var mid_width = container_width/2;
-var mid_height = container_height/2;
-var mid = {x: mid_width, y: mid_height};
-var papers_per_page = ~~((container_height-50)/ICON_SPACE);
-const col_offset = 3*container_width/8;
+var container_width;
+var container_height;
+var sidebar_offset;
+var mid_width;
+var mid_height;
+var mid;
+var papers_per_page;
+var col_offset;
+var pages;
+
+function init() {
+    d3.selectAll('svg > *').remove()
+    container_width = getComputedProperty($("svg")[0], "width");
+    container_height = getComputedProperty($("svg")[0], "height");
+    sidebar_offset = getComputedProperty($("search")[0], "width");
+    mid_width = container_width/2;
+    mid_height = container_height/2;
+    mid = {x: mid_width, y: mid_height};
+    papers_per_page = Math.max(Math.min(~~((container_height-250)/ICON_SPACE), 7), 3);
+    col_offset = 2.5*container_width/8;
+    pages = {next:0, prev:0};
+
+    svg.append('svg:defs').append('svg:marker')
+    .attr('class', 'arrow')
+    .attr('id', 'mid-arrow-left')
+    .attr('viewBox', '0 -5 10 10')
+    .attr('refX', 4)
+    .attr('markerWidth', 10)
+    .attr('markerHeight', 10)
+    .attr('orient', 'auto')
+    .append('svg:path')
+    .attr('d', 'M10,-5L0,0L10,5L6,0')
+    .attr('fill', '#000');
+
+    svg.append('svg:defs').append('svg:marker')
+    .attr('class', 'arrow')
+    .attr('id', 'mid-arrow-right')
+    .attr('viewBox', '0 -5 10 10')
+    .attr('refX', 4)
+    .attr('markerWidth', 10)
+    .attr('markerHeight', 10)
+    .attr('orient', 'auto')
+    .append('svg:path')
+    .attr('d', 'M0,-5L10,0L0,5L5,0')
+    .attr('fill', '#000');
+}
+
+init()
+
+window.onresize = () => {
+    init()
+    draw_scene()
+}
 
 var left_column_offset;
 var right_column_offset;
 
-var pages = {next:0, prev:0};
 
 function draw_link(frm, to, arrow, cls, fade_in) {
     const mid_x = frm.x + (to.x-frm.x)/2;
@@ -606,14 +626,40 @@ function refresh_keywords(){
 
 //######## SEARCH-PART ########
 function retrieve_data_by_title(title, callback) {
+    let counter_prev = 0
+    let counter_next = 0
+    let drawn = false
+    function batman() {
+        if (counter_prev >= Math.min(papers_per_page, data.prev.length) &&
+            counter_next >= Math.min(papers_per_page, data.next.length) &&
+            !drawn) {
+            drawn = true
+            callback()
+        }
+    }
+    function draw_marker(node, cls) {
+        if (node.affiliation) {
+            add_one_marker(node, cls)
+        }
+    }
+    markers.clearLayers();
     search_by_title(title, (new_data) => {
         data.curr = [new_data]
-        get_prev(new_data, (prev) => {
-            data.prev = prev
-            get_next(new_data, (next) => {
-                data.next = next
-                callback()
-            }, (error) => console.error(error))
+        data.prev = new_data.prev
+        data.next = new_data.next
+        draw_marker(new_data, 'curr')
+        batman()
+        get_prev_one_by_one(new_data, (prev) => {
+            data.prev[counter_prev] = prev
+            draw_marker(prev, 'prev')
+            counter_prev++
+            batman()
+        }, (error) => console.error(error))
+        get_next_one_by_one(new_data, (next) => {
+            data.next[counter_next] = next
+            draw_marker(next, 'next')
+            counter_next++
+            batman()
         }, (error) => console.error(error))
     }, (error) => console.error(error))
 }
@@ -711,33 +757,31 @@ map.on('drag', function() {
     map.panInsideBounds(bounds, { animate: false });
 });
 
-function populates_markers(mkers, cls) {
-    for (var i=0; i<mkers.length; ++i) {
+function add_one_marker(node, cls) {
+    var icon = L.icon({
+        iconUrl: ICONS[cls],
 
-        var affiliation = mkers[i].affiliation[0];
-        if (affiliation){
-            var geo = null;
-            for (var j = 0; (j < mkers.length) && (geo == null); j++) {
-                if (affiliation.geo){
-                    geo = affiliation.geo;
-
-                }
-
-            }
-            if (geo) {
-                var icon = L.icon({
-                    iconUrl: ICONS[cls],
-
-                    iconSize:     [52*0.7, 68*0.7], // size of the icon
-                    iconAnchor:   [26*0.7, 34*0.7], // point of the icon which will correspond to marker's location
-                    // popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-                });
-                var marker = L.marker([geo.lat,geo.lon], {icon: icon});
+        iconSize:     [52*0.7, 68*0.7], // size of the icon
+        iconAnchor:   [26*0.7, 34*0.7], // point of the icon which will correspond to marker's location
+        // popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+    if(node.affiliation) {
+        node.affiliation.forEach((aff) => {
+            if (aff.geo) {
+                let location = [aff.geo.lat, aff.geo.lon]
+                var marker = L.marker(location, {icon: icon});
+                marker.bindPopup(`<b>${node.title}</b><br>${node.authors} - ${node.year}`);
                 marker.cls = cls;
                 markers.addLayer(marker);
-
             }
-        }
+        })
+    }
+
+}
+
+function populates_markers(mkers, cls) {
+    for (var i=0; i<mkers.length; ++i) {
+        add_one_marker(mkers[i], cls)
     }
 }
 
