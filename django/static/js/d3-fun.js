@@ -458,6 +458,8 @@ function draw_paginator(x, y, type) {
 
     function reload() {
         text.text(Math.max(pages[type]*papers_per_page, 1)+" - "+Math.min((pages[type]+1)*papers_per_page, data[type].length)+" of "+data[type].length)
+        delete_authors();
+        displayed_authors();
     }
     function up_click() { if (page_up(type)) reload() }
     function down_click() { if (page_down(type)) reload() }
@@ -490,6 +492,7 @@ function draw_prev(pagin) {
 function draw_scene() {
     delete_authors();
     draw_legend();
+    draw_nav();
     draw_prev(0);
     draw_next(0);
     draw_papers(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr", function(){scroll_to("#map-container")}, 0);
@@ -690,6 +693,8 @@ const LEGEND_H_OFFSET = 30
 const LEGEND_V_OFFSET = 50
 const LEGEND_TEXT_OFFSET = 10
 
+
+function draw_legend(){
 const legend_x = container_width-LEGEND_H_OFFSET;
 const legend_y = LEGEND_V_OFFSET;
 draw_link(
@@ -699,7 +704,7 @@ draw_link(
     "legend-link"
     )
 
-function draw_legend(){
+
 svg.append("text")
 .attr("x", container_width-LEGEND_LENGTH-LEGEND_H_OFFSET)
 .attr("y", LEGEND_V_OFFSET-LEGEND_TEXT_OFFSET)
