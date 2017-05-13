@@ -341,6 +341,7 @@ function display_authors(datas, x, y, type, pagin){
     .enter()
     .append("text")
     .text( (d) => {return present_authors(d);})
+    .attr("class", "paper author-"+type)
     .attr("x",function(d) {
         if ((type=="curr") || pagin) {
             return x;
@@ -364,7 +365,7 @@ function display_authors(datas, x, y, type, pagin){
         }
     })
     .style("text-anchor", "middle");
-
+  
 
       if ((type=="curr") && (!pagin)) {
         papers.style("opacity", 0.0)
@@ -406,6 +407,8 @@ function paginator_transition(type, isUp) {
     .delay(TRANSITION_UNIT)
     .duration(TRANSITION_UNIT)
     .attr("y", isUp ? -PAPER_HEIGHT : container_height+PAPER_HEIGHT)
+    .remove();
+    d3.selectAll(".author-"+type)
     .remove();
 }
 
