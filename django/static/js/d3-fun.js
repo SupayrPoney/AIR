@@ -360,7 +360,7 @@ function display_authors(datas, x, y, type, pagin){
         } else {
             if (pagin) return pagin>1 ? container_height+PAPER_HEIGHT : -PAPER_HEIGHT;
             var proj = (h*(PAPER_WIDTH+mid_width)/(col_offset))-h;
-            return y+2*h-proj + 10;
+            return y+2*h-proj + 200;
         }
     })
     .style("text-anchor", "middle");
@@ -374,9 +374,9 @@ function display_authors(datas, x, y, type, pagin){
     } else {
         papers.transition()
         .duration(TRANSITION_UNIT)
-        .attr("x", x-l)
+        .attr("x", x)
         .attr("y", function(d) {
-            return d.finalPos;
+            return d.finalPos + 4/3*PAPER_HEIGHT;
         });
     }
 }
