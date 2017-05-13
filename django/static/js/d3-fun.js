@@ -365,6 +365,20 @@ function display_authors(datas, x, y, type, pagin){
     })
     .style("text-anchor", "middle");
 
+
+      if ((type=="curr") && (!pagin)) {
+        papers.style("opacity", 0.0)
+        .transition()
+        .duration(TRANSITION_UNIT)
+        .style("opacity", 1.0);
+    } else {
+        papers.transition()
+        .duration(TRANSITION_UNIT)
+        .attr("x", x-l)
+        .attr("y", function(d) {
+            return d.finalPos;
+        });
+    }
 }
 
 function delete_authors(){
@@ -458,8 +472,6 @@ function draw_paginator(x, y, type) {
 
     function reload() {
         text.text(Math.max(pages[type]*papers_per_page, 1)+" - "+Math.min((pages[type]+1)*papers_per_page, data[type].length)+" of "+data[type].length)
-        delete_authors();
-        displayed_authors();
     }
     function up_click() { if (page_up(type)) reload() }
     function down_click() { if (page_down(type)) reload() }
