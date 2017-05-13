@@ -122,20 +122,25 @@ div.tooltip {
     background-color: #F5F5F5;
     border:0px solid #dbdbdb;
     color: #000000;
+    width: 100%;
 }
 
 .button {
-    position:relative;
-    padding:6px 8px;
-    border:2px solid white;
+
+    position: relative;
+    padding: 6px 8px;
+    border: 2px solid white;
     background-color: white;
-    color:#1A537F;
-    width: 60px;
+    color: #1A537F;
+    width: 100%;
+    display: table;
+    margin: 0 auto;
+    margin-top: 8px;
 
 }
 .button:hover  {
-    background-color:#fafafa;
-    color:#1A537F;
+    background-color:#1A537F;
+    color:#FFF;
 }
 
 /* Map */

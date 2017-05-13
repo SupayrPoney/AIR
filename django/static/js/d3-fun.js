@@ -20,55 +20,48 @@ const CIRCLE_STROKE = 2;
 L.MakiMarkers.accessToken = 'pk.eyJ1Ijoic3VwYXlycG9uZXkiLCJhIjoiY2oyZGRvYXdjMDAxYTJ4bXV5YXUzMzRocCJ9.v50KWa63j5PHSN7_HACjyg'
 
 var data = {
-   prev: [{
-    title: "Paper your paper references",
-    authors:["author1"],
-    year: "1995",
-    keywords: ["keyword1", "keyword2"],
-    publication: {cover_date : 2016-12-08},
-    affiliation: [{
-        name: "IRSA-INRIA",
-        geo: {
-            lat: 48.116282,
-            lon: -1.639774,
-        }
+     prev: [{
+        title: "Paper your paper references",
+        authors:["Author1"],
+        keywords: ["keyword1", "keyword2"],
+        publication: {cover_date : "2006-12-08"},
+        affiliation: [{
+            name: "IRSA-INRIA",
+            geo: {  lat: 48.116282, 
+                    lon: -1.639774
+            }
+        }]
     }],
-   }],
-   curr: [{
-     title: "Start by looking up a title",
-     authors: ["hoover over me for more information"],
-     year: "2013",
-     publication: {cover_date : 2016-12-08},
-     keywords: ["Keyword1", "Keyword2", "keyword3"],
-     affiliation: "",
-     affiliation: [{
-        name: "Vrije Universiteit Brussel",
-        geo: {
-            lat: 50.823165,
-            lon: 4.392326,
-        }
-     }],
+    curr: [{
+       title: "Start by looking up a title",
+       authors: ["Author"],
+       publication: {cover_date : "2015-12-08"},
+       keywords: ["Keyword1", "Keyword2", "keyword3"],
+       affiliation: [{
+            name: "Vrije Universiteit Brussel",
+            geo: {  lat: 50.823165, 
+                    lon: 4.392326
+            }
+       }]
     }],
-   next: [{
-    title: "A paper that references your paper",
-    authors: ["author"],
-    year: "1998",
-    publication: {cover_date : 2016-12-08},
-    keywords: ["keyword1", "keyword2", "keyword3"],
-    affiliation: [{
-        name: "University of Amsterdam",
-        geo: {
-            lat: 52.355818,
-            lon: 4.955726,
-        }
-     }],
-   }]
- };
+    next: [{
+        title: "A paper that references your paper",
+        authors: ["Author2"],
+        publication: {cover_date : "2016-12-08"},
+        keywords: ["keyword1", "keyword2", "keyword3"],
+        affiliation: [{
+            name: "University of Amsterdam",
+            geo: {  lat: 52.355818, 
+                    lon: 4.955726
+            }
+        }]
+    }]
+};
 
 d3.selection.prototype.moveToFront = function() {
   return this.each(function(){
     this.parentNode.appendChild(this);
-  });
+});
 };
 
 var svg = d3.select("#graph-container svg");
@@ -254,17 +247,21 @@ function onMove() {
 
 function present_authors(data){
     var authors = data.authors;
-    if (authors.length == 1) {
-        return author[0];
-    }else{
-        if(authors.length ==2){
-            return author[0].concat(" & ").concat(author[1]);
-        }else{
-            return author[0].concat(" et al.");
-        };
-
-    };
+    var text = "";
+    if (authors.length == 0) { text = "-"; }
+    else if (authors.length == 1) { text = authors[0]; }
+    else if(authors.length ==2){ text = authors[0].concat(" & ").concat(authors[1]); }
+    else{
+            text = authors[0].concat(" et al.");
+        }
+    if (data.publication) {
+        if (data.publication.cover_date) {
+            text += ` , ${data.publication.cover_date.split(/-/)[0]}`;
+        }
+    }
+    return text;
 };
+    
 
 function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
     const l = PAPER_WIDTH/2;
@@ -303,20 +300,21 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
         mouseover: function(d) {
             d3.select(this).style("cursor", "pointer");
             tooltip.transition()
-                .duration(200)
-                .style("opacity", .95);
+            .duration(200)
+            .style("opacity", .95);
             tooltip.html("<b>"+d.title+"</b><hr>"+d.authors + "<br>"+d.publication.cover_date +'<hr><span class="tag '+type+'">'+ d.keywords.join('</span><span class="tag '+type+'">')+"</span>")
-                .style("left", (d3.select(this).attr("x") - $(tooltip[0][0]).width()/2 + PAPER_WIDTH/2 + sidebar_offset) + "px")
-                .style("top", (d3.select(this).attr("y") -PAPER_HEIGHT/3 - $(tooltip[0][0]).height()) + "px");
+            .style("left", (d3.select(this).attr("x") - $(tooltip[0][0]).width()/2 + PAPER_WIDTH/2 + sidebar_offset) + "px")
+            .style("top", (d3.select(this).attr("y") -PAPER_HEIGHT/3 - $(tooltip[0][0]).height()) + "px");
         },
         mouseout: function() {
             d3.select(this).style("cursor", "default");
             tooltip.transition()
-                .duration(500)
-                .style("opacity", 0);
+            .duration(500)
+            .style("opacity", 0);
         },
         click: onclick
     })
+
 
     if ((type=="curr") && (!pagin)) {
         papers.style("opacity", 0.0)
@@ -331,6 +329,47 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
             return d.finalPos;
         });
     }
+
+  
+}
+
+
+function display_authors(datas, x, y, type, pagin){
+    const l = PAPER_WIDTH/2;
+    var papers = svg.selectAll("paper")
+    .data(datas)
+    .enter()
+    .append("text")
+    .text( (d) => {return present_authors(d);})
+    .attr("x",function(d) {
+        if ((type=="curr") || pagin) {
+            return x;
+        } else {
+            if (type=="prev") {
+                return 9/40* container_width - present_authors(d).length*3;
+            } else {
+                return 31/40*container_width  + present_authors(d).length*3;
+            }
+        }
+    })
+    .attr("y",function(d) {
+        y += ICON_SPACE;
+        var h = PAPER_HEIGHT/2;
+        if (type=="curr") {
+            return y-h +90 ;
+        } else {
+            if (pagin) return pagin>1 ? container_height+PAPER_HEIGHT : -PAPER_HEIGHT;
+            var proj = (h*(PAPER_WIDTH+mid_width)/(col_offset))-h;
+            return y+2*h-proj + 10;
+        }
+    })
+    .style("text-anchor", "middle");
+
+}
+
+function delete_authors(){
+    d3.selectAll("text")
+    .remove()
 }
 
 function paginator_transition(type, isUp) {
@@ -356,7 +395,7 @@ function paginator_transition(type, isUp) {
     .remove();
 }
 
-function page_up(type) {
+function page_down(type) {
     const isNotMax = (pages[type]<(~~(data[type].length/papers_per_page)));
     if (isNotMax) {
         ++pages[type];
@@ -365,7 +404,7 @@ function page_up(type) {
     return isNotMax;
 }
 
-function page_down(type) {
+function page_up(type) {
     const isNotMin = (pages[type]>0);
     if (isNotMin) {
         --pages[type];
@@ -419,6 +458,8 @@ function draw_paginator(x, y, type) {
 
     function reload() {
         text.text(Math.max(pages[type]*papers_per_page, 1)+" - "+Math.min((pages[type]+1)*papers_per_page, data[type].length)+" of "+data[type].length)
+        delete_authors();
+        displayed_authors();
     }
     function up_click() { if (page_up(type)) reload() }
     function down_click() { if (page_down(type)) reload() }
@@ -437,6 +478,7 @@ function draw_next(pagin) {
     right_column_offset = ((container_height-((next_slice.length-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.95);
     draw_links(next_slice.length, mid_width+col_offset, right_column_offset, "url(#mid-arrow-right)", "paper-link link-next", true)
     draw_papers(next_slice, mid_width+col_offset, right_column_offset, NEXT_DOC_IMG_URL, "next", click_prev_next, pagin);
+    display_authors(next_slice, mid_width+col_offset, right_column_offset,"next", pagin)
 }
 
 function draw_prev(pagin) {
@@ -444,16 +486,22 @@ function draw_prev(pagin) {
     left_column_offset = ((container_height-((prev_slice.length-1)*ICON_SPACE)-PAPER_HEIGHT)/2)-(PAPER_HEIGHT*0.95);
     draw_links(prev_slice.length, mid_width-col_offset, left_column_offset, "url(#mid-arrow-left)", "paper-link link-prev", true);
     draw_papers(prev_slice, mid_width-col_offset, left_column_offset, PREV_DOC_IMG_URL, "prev", click_prev_next, pagin);
+    display_authors(prev_slice, mid_width-col_offset, left_column_offset, "prev", pagin)
 }
 
 function draw_scene() {
+    delete_authors();
+    draw_legend();
+    draw_nav();
     draw_prev(0);
     draw_next(0);
     draw_papers(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr", function(){scroll_to("#map-container")}, 0);
+    display_authors(data.curr, mid_width, mid_height-ICON_SPACE, "curr", 0)
     if (data.prev.length>papers_per_page) draw_paginator(PAGINATOR_H_OFFSET, container_height-PAGINATOR_V_OFFSET-80, "prev");
     if (data.next.length>papers_per_page) draw_paginator(container_width-PAGINATOR_H_OFFSET-60, container_height-PAGINATOR_V_OFFSET-80, "next");
     refresh_article_name();
     refresh_keywords();
+    draw_map();
 }
 
 //#### NAV ####
@@ -499,8 +547,8 @@ function draw_nav_nodes(datas) {
     .on({
         "mouseover": function(d) {
             nav_text.transition()
-                .duration(200)
-                .style("opacity", .95);
+            .duration(200)
+            .style("opacity", .95);
             d3.select(this).style("cursor", "pointer");
             nav_text.html(d.text)
             .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + sidebar_offset + "px")
@@ -523,22 +571,22 @@ function draw_nav() {
     draw_line(mid1_x, y, mid2_x, y);
     draw_line(mid2_x, y, mid2_x+NAV_EXTREMITY, y, "dotted");
     const nav_datas = [
-        {
-            text: "Currently displayed article.",
-            x: mid_width,
-            y: y,
-            color: COLOR_CURR
-        }, {
-            text: "Navigate randomly to an article that reference the selected article.",
-            x: mid_width+NAV_DOT_SPACE,
-            y: y,
-            color: COLOR_NEXT
-        }, {
-            text: "Navigate to a founding article.",
-            x: mid1_x-NAV_EXTREMITY+5,
-            y: y,
-            color: COLOR_PRIMARY,
-        }
+    {
+        text: "Currently displayed article.",
+        x: mid_width,
+        y: y,
+        color: COLOR_CURR
+    }, {
+        text: "Navigate randomly to an article that reference the selected article.",
+        x: mid_width+NAV_DOT_SPACE,
+        y: y,
+        color: COLOR_NEXT
+    }, {
+        text: "Navigate to a founding article.",
+        x: mid1_x-NAV_EXTREMITY+5,
+        y: y,
+        color: COLOR_PRIMARY,
+    }
     ];
     for (var i=1; i<NAV_HISTORY_SIZE+1; ++i) {
         nav_datas.push({
@@ -645,6 +693,8 @@ const LEGEND_H_OFFSET = 30
 const LEGEND_V_OFFSET = 50
 const LEGEND_TEXT_OFFSET = 10
 
+
+function draw_legend(){
 const legend_x = container_width-LEGEND_H_OFFSET;
 const legend_y = LEGEND_V_OFFSET;
 draw_link(
@@ -652,13 +702,22 @@ draw_link(
     { x: legend_x, y: legend_y },
     'url(#mid-arrow-left)',
     "legend-link"
-)
+    )
+
 
 svg.append("text")
 .attr("x", container_width-LEGEND_LENGTH-LEGEND_H_OFFSET)
 .attr("y", LEGEND_V_OFFSET-LEGEND_TEXT_OFFSET)
 .text("references")
+}
 
+function draw_hover_line(){
+    svg.append("text")
+    .attr("x", container_width/2- 240)
+    .attr("y", 200)
+    .text("Hover over the papers for more information")
+    .style("font-size",25)
+}
 //#### MAP ####
 
 var map = L.map('map-container',{minZoom: 3})
@@ -694,8 +753,8 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/mapbox.light/{z}/{x}/{y}.png?access
     minZoom: 2,
     maxBoundsViscosity: 1.0,
     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-        '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-        'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+    'Imagery © <a href="http://mapbox.com">Mapbox</a>',
     id: 'mapbox.streets'
 }).addTo(map);
 
@@ -754,8 +813,15 @@ function toggle_filter(self, marker_grp) {
     draw_markers();
 }
 
+function draw_map() {
+    draw_markers();
+    show_all_markers();
+}
+
+draw_map();
 draw_markers();
 show_all_markers();
 L.DomEvent.disableClickPropagation(L.DomUtil.get('filter-box'));
 L.DomEvent.disableClickPropagation(L.DomUtil.get('back'));
 draw_scene();
+draw_hover_line();
