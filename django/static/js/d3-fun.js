@@ -377,7 +377,7 @@ function display_authors(datas, x, y, type, pagin){
         .duration(TRANSITION_UNIT)
         .attr("x", x)
         .attr("y", function(d) {
-            return d.finalPos + 4/3*PAPER_HEIGHT;
+            return d.finalPos + 5/4*PAPER_HEIGHT;
         });
     }
 }
