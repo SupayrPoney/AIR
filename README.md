@@ -3,21 +3,21 @@ Article International Representation for the course of Information Visualization
 
 ## Requirements
 ### Question 1 - Graph
-- [ ] Be able to give an article(title)/author? as input
-- [ ] See the articles a paper is referenced in / referenced by (as a graph)
-- [ ] Be able to get all the metadata (by hovering on a node)
-- [ ] Be able to click on another node of the graph and center the viz on it (aka being able to see the articles it is referenced in / referenced by). This way, by always clicking on the referenced papers, we can track down one of the founding papers.
+- [x] Be able to give an article(title)/author? as input
+- [x] See the articles a paper is referenced in / referenced by (as a graph)
+- [x] Be able to get all the metadata (by hovering on a node)
+- [x] Be able to click on another node of the graph and center the viz on it (aka being able to see the articles it is referenced in / referenced by). This way, by always clicking on the referenced papers, we can track down one of the founding papers.
 - [ ] The founding papers should be easily accessible (through a button for example). 
 - [ ] Same goes for going back to the user's paper.
 
 ### Question 2 - Map
-- [ ] Being able to see where an article's authors are/were located (at the time of release) (can be multiple places) on a map.
-- [ ] Same goes for the **referenced** papers.
-- [ ] Same goes for the **referencing** papers.
-- [ ] Easy way for the user to choose which information gets shown.
+- [x] Being able to see where an article's authors are/were located (at the time of release) (can be multiple places) on a map.
+- [x] Same goes for the **referenced** papers.
+- [x] Same goes for the **referencing** papers.
+- [x] Easy way for the user to choose which information gets shown.
 
 ### Technical
-- [ ] Visualizations in D3.js
+- [x] Visualizations in D3.js
 - [ ] Respect the course conventions
 
 ### Extras
