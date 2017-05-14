@@ -64,6 +64,32 @@ d3.selection.prototype.moveToFront = function() {
 });
 };
 
+function draw_arrow_heads() {
+    svg.append('svg:defs').append('svg:marker')
+    .attr('class', 'arrow')
+    .attr('id', 'mid-arrow-left')
+    .attr('viewBox', '0 -5 10 10')
+    .attr('refX', 4)
+    .attr('markerWidth', 10)
+    .attr('markerHeight', 10)
+    .attr('orient', 'auto')
+    .append('svg:path')
+    .attr('d', 'M10,-5L0,0L10,5L6,0')
+    .attr('fill', '#000');
+
+    svg.append('svg:defs').append('svg:marker')
+    .attr('class', 'arrow')
+    .attr('id', 'mid-arrow-right')
+    .attr('viewBox', '0 -5 10 10')
+    .attr('refX', 4)
+    .attr('markerWidth', 10)
+    .attr('markerHeight', 10)
+    .attr('orient', 'auto')
+    .append('svg:path')
+    .attr('d', 'M0,-5L10,0L0,5L5,0')
+    .attr('fill', '#000');
+}
+
 var svg = d3.select("#graph-container svg");
 
 var tooltip = d3.select("body").append("div")
@@ -94,6 +120,7 @@ var mid;
 var papers_per_page;
 var col_offset;
 var pages;
+var paper_counter;
 
 function init() {
     d3.selectAll('svg > *').remove()
@@ -106,30 +133,8 @@ function init() {
     papers_per_page = Math.max(Math.min(~~((container_height-250)/ICON_SPACE), 7), 3);
     col_offset = 2.5*container_width/8;
     pages = {next:0, prev:0};
-
-    svg.append('svg:defs').append('svg:marker')
-    .attr('class', 'arrow')
-    .attr('id', 'mid-arrow-left')
-    .attr('viewBox', '0 -5 10 10')
-    .attr('refX', 4)
-    .attr('markerWidth', 10)
-    .attr('markerHeight', 10)
-    .attr('orient', 'auto')
-    .append('svg:path')
-    .attr('d', 'M10,-5L0,0L10,5L6,0')
-    .attr('fill', '#000');
-
-    svg.append('svg:defs').append('svg:marker')
-    .attr('class', 'arrow')
-    .attr('id', 'mid-arrow-right')
-    .attr('viewBox', '0 -5 10 10')
-    .attr('refX', 4)
-    .attr('markerWidth', 10)
-    .attr('markerHeight', 10)
-    .attr('orient', 'auto')
-    .append('svg:path')
-    .attr('d', 'M0,-5L10,0L0,5L5,0')
-    .attr('fill', '#000');
+    paper_counter = {next:1, prev:1}
+    draw_arrow_heads();
 }
 
 init()
@@ -184,7 +189,6 @@ function draw_links(nb_links, x, y, arrow, cls, fade_in) {
     }
 }
 
-// var counter;
 function select_paper() {
     d3.selectAll(".paper-link")
     .transition()
@@ -192,6 +196,11 @@ function select_paper() {
     .style("opacity", 0.0)
     .remove();
     d3.selectAll(".paper-info")
+    .transition()
+    .duration(TRANSITION_UNIT)
+    .style("opacity", 0.0)
+    .remove();
+    d3.selectAll(".info-bg")
     .transition()
     .duration(TRANSITION_UNIT)
     .style("opacity", 0.0)
@@ -236,6 +245,7 @@ function select_paper() {
     .duration(TRANSITION_UNIT)
     .style("opacity", 0.0)
     .remove();
+    pages = {next:0, prev:0};
 }
 
 function setupCallback(sel) {
@@ -254,7 +264,7 @@ function onMove() {
 function present_authors(data){
     var authors = data.authors;
     var text = "";
-    if (authors.length == 0) { text = "-"; }
+    if ((typeof authors === "undefined") || (authors.length == 0)) { text = "-"; }
     else if (authors.length == 1) { text = authors[0]; }
     else if(authors.length ==2){ text = authors[0].concat(" & ").concat(authors[1]); }
     else{
@@ -293,8 +303,11 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
         if (type=="curr") {
             return y-h;
         } else {
+            console.log(d)
             d.finalPos = y-h;
+            // console.log(pagin)
             if (pagin) return pagin>1 ? container_height+PAPER_HEIGHT : -PAPER_HEIGHT;
+            // console.log("not returned")
             var proj = (h*(PAPER_WIDTH+mid_width)/(col_offset))-h;
             return y<mid_height ? y-h-proj : y-h+proj;
         }
@@ -308,8 +321,11 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
             tooltip.transition()
             .duration(200)
             .style("opacity", .95);
-            tooltip.html("<b>"+d.title+"</b><hr>"+d.authors + "<br>"+d.publication.cover_date +'<hr><span class="tag '+type+'">'+ d.keywords.join('</span><span class="tag '+type+'">')+"</span>")
-            .style("left", (d3.select(this).attr("x") - $(tooltip[0][0]).width()/2 + PAPER_WIDTH/2 + sidebar_offset) + "px")
+            tooltip.html(typeof d.publication !== "undefined" ?
+                "<b>"+d.title+"</b><hr>"+d.authors + "<br>"+d.publication.cover_date +'<hr><span class="tag '+type+'">'+ d.keywords.join('</span><span class="tag '+type+'">')+"</span>"
+            :
+                "<b>"+d.title+'</b><hr>n/a<br>n/a<hr><span class="tag '+type+'"></span>'
+            ).style("left", (d3.select(this).attr("x") - $(tooltip[0][0]).width()/2 + PAPER_WIDTH/2 + sidebar_offset) + "px")
             .style("top", (d3.select(this).attr("y") -PAPER_HEIGHT/3 - $(tooltip[0][0]).height()) + "px");
         },
         mouseout: function() {
@@ -332,13 +348,11 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
         .duration(TRANSITION_UNIT)
         .attr("x", x-l)
         .attr("y", function(d) {
+            console.log(d)
             return d.finalPos;
         });
-    }
-
-  
+    }  
 }
-
 
 function display_authors(datas, x, y, type, pagin){
     const l = PAPER_WIDTH/2;
@@ -360,11 +374,11 @@ function display_authors(datas, x, y, type, pagin){
     .style("opacity", 1.0)
     .each(function(d) {
         svg.append("rect")
-        .attr("class", "text-bg text-bg-"+type)
+        .attr("class", "info-bg info-bg-"+type)
         .attr("x", d3.select(this).attr("x")-this.getComputedTextLength()/2-2)
         .attr("y", d3.select(this).attr("y")-13)
         .attr("width", this.getComputedTextLength()+4)
-        .attr("height", 15)
+        .attr("height", 16)
         .attr("fill", "white")
         .style("opacity",0.0)
         .transition()
@@ -376,18 +390,13 @@ function display_authors(datas, x, y, type, pagin){
 
 }
 
-function delete_authors(){
-    d3.selectAll("text")
-    .remove()
-}
-
 function paginator_transition(type, isUp) {
     function onEnd() {
         --counter;
         if (counter==0) {
             type=="prev" ? draw_prev(+isUp+1) : draw_next(+isUp+1);
             d3.selectAll(".paper-curr").moveToFront();
-            d3.selectAll(".text-bg-curr").moveToFront();
+            d3.selectAll(".info-bg-curr").moveToFront();
             d3.selectAll(".paper-info-curr").moveToFront();
         }
     }
@@ -396,7 +405,7 @@ function paginator_transition(type, isUp) {
     .duration(TRANSITION_UNIT)
     .style("opacity",0.0)
     .remove()
-    d3.selectAll(".text-bg-"+type)
+    d3.selectAll(".info-bg-"+type)
     .transition()
     .duration(TRANSITION_UNIT)
     .style("opacity",0.0)
@@ -414,11 +423,12 @@ function paginator_transition(type, isUp) {
     .duration(TRANSITION_UNIT)
     .attr("y", isUp ? -PAPER_HEIGHT : container_height+PAPER_HEIGHT)
     .remove();
-    d3.selectAll(".author-"+type)
-    .remove();
 }
 
 function page_down(type) {
+    if ((typeof data[type] === "undefined") || (paper_counter[type]<pages[type]*papers_per_page+papers_per_page)) { 
+        return false
+    }
     const isNotMax = (pages[type]<(~~(data[type].length/papers_per_page)));
     if (isNotMax) {
         ++pages[type];
@@ -511,7 +521,6 @@ function draw_prev(pagin) {
 }
 
 function draw_scene() {
-    delete_authors();
     draw_legend();
     draw_nav();
     draw_prev(0);
@@ -648,55 +657,71 @@ function refresh_keywords(){
     });
 };
 
+var state = {can:false, run:{prev:false, next:false}}
 //######## SEARCH-PART ########
 function retrieve_data_by_title(title, callback) {
-    let counter_prev = 0
-    let counter_next = 0
-    let drawn = false
-    function batman() {
-        if (counter_prev >= Math.min(papers_per_page, data.prev.length) &&
-            counter_next >= Math.min(papers_per_page, data.next.length) &&
-            !drawn) {
-            drawn = true
-            callback()
+    if (state.run.prev||state.run.next) {
+        state.can = true;
+        state.continue = function(){retrieve_data_by_title(title, callback)}
+    } else {
+        state.run = {prev:true, next:true};
+        paper_counter = {prev:0, next:0}
+        let drawn = false
+        
+        function batman() {
+            if (paper_counter.prev >= Math.min(papers_per_page, data.prev.length) &&
+                paper_counter.next >= Math.min(papers_per_page, data.next.length) &&
+                !drawn) {
+                drawn = true
+                callback()
+            }
+            if (paper_counter.prev==data.prev.length) 
+                state.run.prev = false;
+            if (paper_counter.next==data.next.length)
+                state.run.next = false;
         }
-    }
-    function draw_marker(node, cls) {
-        if (node.affiliation) {
-            add_one_marker(node, cls)
+        function draw_marker(node, cls) {
+            if (node.affiliation) {
+                add_one_marker(node, cls)
+            }
         }
+        markers.clearLayers();
+
+        search_by_title(title, (new_data) => {
+            data.curr = [new_data]
+            data.prev = new_data.prev
+            data.next = new_data.next
+            draw_marker(new_data, 'curr')
+            batman()
+            get_prev_one_by_one(new_data, state, (prev) => {
+                data.prev[paper_counter.prev] = prev
+                draw_marker(prev, 'prev')
+                paper_counter.prev++
+                batman()
+            }, (error) => {
+                console.error(error)
+                paper_counter.prev++
+                batman()
+            })
+            get_next_one_by_one(new_data, state, (next) => {
+                data.next[paper_counter.next] = next
+                draw_marker(next, 'next')
+                paper_counter.next++
+                batman()
+            }, (error) => {
+                console.error(error)
+                paper_counter.next++
+                batman()
+            })
+        }, (error) => console.error(error))
     }
-    markers.clearLayers();
-    search_by_title(title, (new_data) => {
-        data.curr = [new_data]
-        data.prev = new_data.prev
-        data.next = new_data.next
-        draw_marker(new_data, 'curr')
-        batman()
-        get_prev_one_by_one(new_data, (prev) => {
-            data.prev[counter_prev] = prev
-            draw_marker(prev, 'prev')
-            counter_prev++
-            batman()
-        }, (error) => console.error(error))
-        get_next_one_by_one(new_data, (next) => {
-            data.next[counter_next] = next
-            draw_marker(next, 'next')
-            counter_next++
-            batman()
-        }, (error) => console.error(error))
-    }, (error) => console.error(error))
 }
 $('#searchButton').click((event) => {
     let value = $('#searchInput').val()
     retrieve_data_by_title(value, draw_scene);
-    d3.selectAll(".paper-link")
-    .transition()
-    .style("opacity", 0.0)
-    .remove();
-    d3.selectAll(".paper").transition()
-    .style("opacity", 0.0)
-    .remove();
+    d3.selectAll("svg > *").remove();
+    draw_arrow_heads();
+    pages = {next:0, prev:0};
 })
 
 
