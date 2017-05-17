@@ -38,9 +38,10 @@ function get_next(metadata, onSuccess, onError) {
     })
 }
 
-function get_prev_one_by_one(metadata, onSuccess, onError) {
+function get_prev_one_by_one(metadata, state, onSuccess, onError) {
     function lol(index) {
-        if (metadata.prev[index]) {
+        console.log(metadata.prev)
+        if ((!state.can) && (index<metadata.prev.length)) {
             $.ajax({
                 url: metadata.prev[index].url,
                 success: (data) => {
@@ -48,18 +49,24 @@ function get_prev_one_by_one(metadata, onSuccess, onError) {
                     lol(index + 1)
                 },
                 error: (error) => {
-                    //console.log(error)
+                    onError(error)
                     lol(index + 1)
                 }
             })
+        } else {
+            state.run.prev = false;
+            if (state.can && (!state.run.next)) {
+                state.can = false;
+                state.continue();
+            }
         }
     }
     lol(0)
 }
 
-function get_next_one_by_one(metadata, onSuccess, onError) {
+function get_next_one_by_one(metadata, state, onSuccess, onError) {
     function lol(index) {
-        if (metadata.next[index]) {
+        if ((!state.can) && (index<metadata.next.length)) {
             $.ajax({
                 url: metadata.next[index].url,
                 success: (data) => {
@@ -67,10 +74,16 @@ function get_next_one_by_one(metadata, onSuccess, onError) {
                     lol(index + 1)
                 },
                 error: (error) => {
-                    //console.log(error)
+                    onError(error)
                     lol(index + 1)
                 }
             })
+        } else {
+            state.run.next = false;
+            if (state.can && (!state.run.prev)) {
+                state.can = false;
+                state.continue();
+            }
         }
     }
     lol(0)
