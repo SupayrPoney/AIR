@@ -365,6 +365,19 @@ def get_references_metadata(metadata):
         references.append(ref_md)
     return references
 
+
+def get_founding_paper(full_metadata, keywords):
+    children = get_references_metadata(full_metadata)
+    valid_children = [c for c in children if c and set(k.lower() for k in c['keywords']).issuperset(keywords)]
+
+    if len(valid_children) > 1:
+        return "too broad", len(valid_children)
+    if len(valid_children) == 0:
+        return full_metadata
+
+    return get_founding_paper(valid_children[0], keywords)
+
+
 if __name__ == '__main__':
     import sys
     if len(sys.argv) > 2:

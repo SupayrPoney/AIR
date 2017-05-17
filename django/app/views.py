@@ -55,3 +55,14 @@ def next(request):
         return JsonResponse({"next": res})
     else:
         raise Http404("No paper for you, sorry")
+
+
+def founding(request):
+    sid = request.GET["sid"]
+    title = request.GET["title"]
+    keywords = request.GET["keywords"].split(",")
+
+    founding = entrypoint.founding_paper(sid, title, keywords)
+    if isinstance(founding, tuple):
+        raise Http404("Your query is too broad, we found %i papers with the same set of tags." % founding[1])
+    return JsonResponse(founding)

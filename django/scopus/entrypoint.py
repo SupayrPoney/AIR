@@ -1,4 +1,4 @@
-from scopus.scraper import get_metadata_by_doi, get_metadata_by_sid, get_metadata_by_title, get_citers_by_eid
+from scopus.scraper import get_metadata_by_doi, get_metadata_by_sid, get_metadata_by_title, get_citers_by_eid, get_founding_paper
 from django.utils.http import urlquote
 from scopus import geo
 
@@ -60,3 +60,14 @@ def next_of(paper):
         }
         for x in citers
     ]
+
+
+def founding_paper(sid, title, keywords):
+    paper = get_metadata_by_sid(sid)
+    if not paper:
+        paper = get_metadata_by_title(title.lower())
+    if not paper:
+        return None
+
+    founding = get_founding_paper(paper, set(k.lower() for k in keywords))
+    return founding
