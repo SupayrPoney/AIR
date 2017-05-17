@@ -127,6 +127,6 @@ STATICFILES_DIRS = (
 PROD = False
 
 try:
-    from local_settings import * # NOQA
+    from .local_settings import * # NOQA
 except ImportError:
     print("No local settings found")
