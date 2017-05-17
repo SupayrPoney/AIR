@@ -123,3 +123,10 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join('', '', 'static'),
 )
+
+PROD = False
+
+try:
+    from local_settings import * # NOQA
+except ImportError:
+    print("No local settings found")
