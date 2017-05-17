@@ -715,8 +715,19 @@ function retrieve_data_by_title(title, callback) {
                 paper_counter.next++
                 batman()
             })
-        }, (error) => console.error(error))
+        }, (error) => display_error_message(error))
     }
+}
+
+function display_error_message(error) {
+    d3.selectAll("svg > *").remove();
+    var error_message = "Could not find the searched article"
+    svg.append("text")
+    .text(error_message)
+    .attr("x",mid_width-error_message.length*2)
+    .attr("y",mid_height)
+    .attr("class", "error_message")
+    .style("fill", "red")
 }
 $('#searchButton').click((event) => {
     let value = $('#searchInput').val()

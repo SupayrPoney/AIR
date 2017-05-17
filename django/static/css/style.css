@@ -125,6 +125,10 @@ div.tooltip {
     width: 100%;
 }
 
+.error_message {
+    font-size: 25px;
+}
+
 .button {
 
     position: relative;
