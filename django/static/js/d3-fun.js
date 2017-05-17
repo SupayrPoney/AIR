@@ -280,6 +280,8 @@ function present_authors(data){
     
 
 function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
+    $(".loading").remove();
+    $("#forward").show();
     const l = PAPER_WIDTH/2;
     var papers = svg.selectAll("paper")
     .data(datas)
@@ -720,6 +722,18 @@ $('#searchButton').click((event) => {
     let value = $('#searchInput').val()
     retrieve_data_by_title(value, draw_scene);
     d3.selectAll("svg > *").remove();
+    $("#forward").hide();
+
+    var loading_width = 210;
+    var loading_height = 210
+    svg.append("svg:image")
+    .attr("xlink:href","/static/images/magnify.svg")
+    .attr("width", loading_width)
+    .attr("height", loading_height)
+    .attr("class", "loading")
+    .attr("x",mid_width - loading_width/2)
+    .attr("y",mid_height-loading_width/2)
+
     draw_arrow_heads();
     pages = {next:0, prev:0};
 })
