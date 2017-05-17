@@ -47,8 +47,9 @@ class Command(BaseCommand):
                     next = []
                     print("¨", end="")
 
-                titles.extend(prev)
-                titles.extend(next)
+                if len(titles) < 10000000:
+                    titles.extend(prev)
+                    titles.extend(next)
             except Exception as e:
                 print(e)
 
