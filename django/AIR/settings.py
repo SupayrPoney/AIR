@@ -25,7 +25,7 @@ SECRET_KEY = '_pcg4=*wf$7%3+dddu_ea8-%+1)d*0%%l_9&tf5i7gboq10j!o'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
