@@ -38,14 +38,14 @@ class Command(BaseCommand):
                     prev = [x["title"] for x in prev]
                 else:
                     prev = []
-                    print("`")
+                    print("`", end="")
 
                 next = get_citers_by_eid(paper['eid'])
                 if next:
                     next = [x["title"] for x in next]
                 else:
                     next = []
-                    print("¨")
+                    print("¨", end="")
 
                 titles.extend(prev)
                 titles.extend(next)
