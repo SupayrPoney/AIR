@@ -63,8 +63,10 @@ def requests_get(*args, params={}, **kwargs):
     params['apiKey'] = API_KEY
     params['httpAccept'] = 'application/json'
     if settings.PROD:
-        proxies = None
-    return requests.get(*args, proxies=proxies, params=params, **kwargs).json()
+        our_proxies = None
+    else:
+        our_proxies = proxies
+    return requests.get(*args, proxies=our_proxies, params=params, **kwargs).json()
 
 
 # search/find on scopus
