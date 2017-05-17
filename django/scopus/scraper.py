@@ -21,8 +21,6 @@ ABSTRACT_SID_URL = 'https://api.elsevier.com/content/abstract/scopus_id/{}'
 AFFILIATION_URL = 'https://api.elsevier.com/content/affiliation/affiliation_id/{}'
 ABSTRACT_DOI_URL = 'https://api.elsevier.com/content/abstract/doi/{}'
 # requests and cache
-if not os.path.exists(CACHE_DIR):
-    os.mkdir(CACHE_DIR)
 
 
 def tuplize(something):
@@ -34,6 +32,9 @@ def tuplize(something):
 
 
 def cache(func):
+    if not os.path.exists(CACHE_DIR):
+        os.mkdir(CACHE_DIR)
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         key = API_KEY + str(tuplize(args) + tuplize(kwargs))
@@ -367,15 +368,23 @@ def get_references_metadata(metadata):
 
 
 def get_founding_paper(full_metadata, keywords):
-    children = get_references_metadata(full_metadata)
-    valid_children = [c for c in children if c and set(k.lower() for k in c['keywords']).issuperset(keywords)]
+    threshold = 100
+    papers = [full_metadata]
+    while (True):
+        print(len(papers))
+        next_papers = []
+        for p in papers:
+            children = get_references_metadata(p)
+            valid_children = [c for c in children if c and set(k.lower() for k in c['keywords']).issuperset(keywords)]
+            next_papers.extend(valid_children)
 
-    if len(valid_children) > 1:
-        return "too broad", len(valid_children)
-    if len(valid_children) == 0:
-        return full_metadata
+        l = sum([len(x['references']) for x in next_papers])
+        if l > threshold:
+            return "too broad", l
+        if len(next_papers) == 0:
+            return papers[0]
 
-    return get_founding_paper(valid_children[0], keywords)
+        papers = next_papers
 
 
 if __name__ == '__main__':
