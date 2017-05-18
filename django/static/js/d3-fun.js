@@ -58,6 +58,8 @@ var data = {
     }]
 };
 
+let history = []
+
 d3.selection.prototype.moveToFront = function() {
   return this.each(function(){
     this.parentNode.appendChild(this);
@@ -693,6 +695,9 @@ function retrieve_data_by_title(title, callback) {
         markers.clearLayers();
 
         search_by_title(title, (new_data) => {
+            if (new_data.title !== history[history.length - 1]) {
+                history.push(new_data.title)
+            }
             data.curr = [new_data]
             data.prev = new_data.prev
             data.next = new_data.next
@@ -762,16 +767,6 @@ $('#searchButton').click((event) => {
     d3.selectAll("svg > *").remove();
     $("#forward").hide();
 
-    var loading_width = 210;
-    var loading_height = 210
-    svg.append("svg:image")
-    .attr("xlink:href","/static/images/magnify.svg")
-    .attr("width", loading_width)
-    .attr("height", loading_height)
-    .attr("class", "loading")
-    .attr("x",mid_width - loading_width/2)
-    .attr("y",mid_height-loading_width/2)
-
     draw_arrow_heads();
     pages = {next:0, prev:0};
 })
@@ -783,6 +778,16 @@ function refresh_article_name(){
     titleDiv.innerHTML= data.curr[0].title
     //[0].name;
 };
+
+//######## HISTORY ########
+$('#history-back').click((event) => {
+    let title = history[history.length - 2]
+    if (title) {
+        history.pop()
+        init()
+        retrieve_data_by_title(title, draw_scene)
+    }
+})
 
 //#### LEGEND ####
 
