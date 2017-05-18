@@ -58,6 +58,8 @@ var data = {
     }]
 };
 
+let history = []
+
 d3.selection.prototype.moveToFront = function() {
   return this.each(function(){
     this.parentNode.appendChild(this);
@@ -285,7 +287,6 @@ function present_authors_date(data){
 
 
 function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
-    $(".loading").remove();
     $("#forward").show();
     const l = PAPER_WIDTH/2;
     var papers = svg.selectAll("paper")
@@ -564,6 +565,7 @@ function refresh_keywords(){
 var state = {can:false, run:{prev:false, next:false}}
 //######## SEARCH-PART ########
 function retrieve_data_by_title(title, callback) {
+    display_loading()
     if (state.run.prev||state.run.next) {
         state.can = true;
         state.continue = function(){retrieve_data_by_title(title, callback)}
@@ -577,6 +579,7 @@ function retrieve_data_by_title(title, callback) {
                 paper_counter.next >= Math.min(papers_per_page, data.next.length) &&
                 !drawn) {
                 drawn = true
+                hide_loading()
                 callback()
             }
             if (paper_counter.prev==data.prev.length)
@@ -592,6 +595,9 @@ function retrieve_data_by_title(title, callback) {
         markers.clearLayers();
 
         search_by_title(title, (new_data) => {
+            if (new_data.title !== history[history.length - 1]) {
+                history.push(new_data.title)
+            }
             data.curr = [new_data]
             data.prev = new_data.prev
             data.next = new_data.next
@@ -621,6 +627,28 @@ function retrieve_data_by_title(title, callback) {
     }
 }
 
+function display_loading(small) {
+    if (small == undefined) {
+        small = false
+    }
+    if (small) {
+
+    }
+    var loading_width = 210;
+    var loading_height = 210
+    svg.append("svg:image")
+    .attr("xlink:href","/static/images/magnify.svg")
+    .attr("width", loading_width)
+    .attr("height", loading_height)
+    .attr("class", "loading")
+    .attr("x",mid_width - loading_width/2)
+    .attr("y",mid_height-loading_width/2)
+}
+
+function hide_loading() {
+    $(".loading").remove();
+}
+
 function display_error_message(error) {
     d3.selectAll("svg > *").remove();
     var error_message = "We could not find the searched article in the Scopus database.";
@@ -639,16 +667,6 @@ $('#searchButton').click((event) => {
     d3.selectAll("svg > *").remove();
     $("#forward").hide();
 
-    var loading_width = 210;
-    var loading_height = 210
-    svg.append("svg:image")
-    .attr("xlink:href","/static/images/magnify.svg")
-    .attr("width", loading_width)
-    .attr("height", loading_height)
-    .attr("class", "loading")
-    .attr("x",mid_width - loading_width/2)
-    .attr("y",mid_height-loading_width/2)
-
     draw_arrow_heads();
     pages = {next:0, prev:0};
 })
@@ -660,6 +678,16 @@ function refresh_article_name(){
     titleDiv.innerHTML= data.curr[0].title
     //[0].name;
 };
+
+//######## HISTORY ########
+$('#history-back').click((event) => {
+    let title = history[history.length - 2]
+    if (title) {
+        history.pop()
+        init()
+        retrieve_data_by_title(title, draw_scene)
+    }
+})
 
 //#### LEGEND ####
 
