@@ -723,7 +723,9 @@ function retrieve_data_by_title(title, callback) {
 
 function display_error_message(error) {
     d3.selectAll("svg > *").remove();
-    var error_message = "Could not find the searched article"
+    var error_message = "Could not find the searched article";
+    state.run.next = false;
+    state.run.prev = false;
     svg.append("text")
     .text(error_message)
     .attr("x",mid_width-error_message.length*2)
