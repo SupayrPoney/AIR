@@ -305,11 +305,8 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
         if (type=="curr") {
             return y-h;
         } else {
-            console.log(d)
             d.finalPos = y-h;
-            // console.log(pagin)
             if (pagin) return pagin>1 ? container_height+PAPER_HEIGHT : -PAPER_HEIGHT;
-            // console.log("not returned")
             var proj = (h*(PAPER_WIDTH+mid_width)/(col_offset))-h;
             return y<mid_height ? y-h-proj : y-h+proj;
         }
@@ -350,7 +347,6 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
         .duration(TRANSITION_UNIT)
         .attr("x", x-l)
         .attr("y", function(d) {
-            console.log(d)
             return d.finalPos;
         });
     }  
@@ -848,7 +844,8 @@ function add_one_marker(node, cls) {
             if (aff.geo) {
                 let location = [aff.geo.lat, aff.geo.lon]
                 var marker = L.marker(location, {icon: icon});
-                marker.bindPopup(`<b>${node.title}</b><br>${node.authors} - <b>${node.publication.cover_date.split(/-/)[0]}</b>`);
+                let authors = node.authors.length > 3 ? node.authors[0] + " et al." : node.authors
+                marker.bindPopup(`<b>${node.title}</b><br>${authors} - <b>${node.publication.cover_date.split(/-/)[0]}</b>`);
                 marker.cls = cls;
                 markers.addLayer(marker);
             }

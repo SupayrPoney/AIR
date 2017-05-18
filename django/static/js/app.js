@@ -40,7 +40,6 @@ function get_next(metadata, onSuccess, onError) {
 
 function get_prev_one_by_one(metadata, state, onSuccess, onError) {
     function lol(index) {
-        console.log(metadata.prev)
         if ((!state.can) && (index<metadata.prev.length)) {
             $.ajax({
                 url: metadata.prev[index].url,
