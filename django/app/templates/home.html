@@ -27,7 +27,7 @@
          <span><b>Current article:</b></span>
          <h1 id= "article-name"> </h1>
         <form>
-            <input type="text" id="searchInput" class="search" placeholder="Enter title.." required>
+            <input type="text" id="searchInput" class="search" placeholder="Enter title.." required onkeydown="if (event.keyCode == 13){$('#searchButton').click(); event.preventDefault()}">
             <input type="button" id="searchButton" class="button" value="Search">
         </form>
         <br>

@@ -27,7 +27,7 @@ var data = {
         publication: {cover_date : "2006-12-08"},
         affiliation: [{
             name: "IRSA-INRIA",
-            geo: {  lat: 48.116282, 
+            geo: {  lat: 48.116282,
                     lon: -1.639774
             }
         }]
@@ -39,7 +39,7 @@ var data = {
        keywords: ["Keyword1", "Keyword2", "keyword3"],
        affiliation: [{
             name: "Vrije Universiteit Brussel",
-            geo: {  lat: 50.823165, 
+            geo: {  lat: 50.823165,
                     lon: 4.392326
             }
        }]
@@ -51,7 +51,7 @@ var data = {
         keywords: ["keyword1", "keyword2", "keyword3"],
         affiliation: [{
             name: "University of Amsterdam",
-            geo: {  lat: 52.355818, 
+            geo: {  lat: 52.355818,
                     lon: 4.955726
             }
         }]
@@ -277,7 +277,7 @@ function present_authors(data){
     }
     return text;
 };
-    
+
 
 function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
     $(".loading").remove();
@@ -349,7 +349,7 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
         .attr("y", function(d) {
             return d.finalPos;
         });
-    }  
+    }
 }
 
 function display_authors(datas, x, y, type, pagin){
@@ -424,7 +424,7 @@ function paginator_transition(type, isUp) {
 }
 
 function page_down(type) {
-    if ((typeof data[type] === "undefined") || (paper_counter[type]<pages[type]*papers_per_page+papers_per_page)) { 
+    if ((typeof data[type] === "undefined") || (paper_counter[type]<pages[type]*papers_per_page+papers_per_page)) {
         return false
     }
     const isNotMax = (pages[type]<(~~(data[type].length/papers_per_page)));
@@ -665,7 +665,7 @@ function retrieve_data_by_title(title, callback) {
         state.run = {prev:true, next:true};
         paper_counter = {prev:0, next:0}
         let drawn = false
-        
+
         function batman() {
             if (paper_counter.prev >= Math.min(papers_per_page, data.prev.length) &&
                 paper_counter.next >= Math.min(papers_per_page, data.next.length) &&
@@ -673,7 +673,7 @@ function retrieve_data_by_title(title, callback) {
                 drawn = true
                 callback()
             }
-            if (paper_counter.prev==data.prev.length) 
+            if (paper_counter.prev==data.prev.length)
                 state.run.prev = false;
             if (paper_counter.next==data.next.length)
                 state.run.next = false;
