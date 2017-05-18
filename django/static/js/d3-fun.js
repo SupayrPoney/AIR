@@ -627,13 +627,7 @@ function retrieve_data_by_title(title, callback) {
     }
 }
 
-function display_loading(small) {
-    if (small == undefined) {
-        small = false
-    }
-    if (small) {
-
-    }
+function display_loading() {
     var loading_width = 210;
     var loading_height = 210
     svg.append("svg:image")
