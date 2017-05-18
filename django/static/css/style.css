@@ -267,8 +267,8 @@ div .marker{
     opacity: 0.7;
     padding: 10px 8px;
     box-shadow: none;
-    right: 15%;
-    bottom: 4%;
+    right: calc( 50% - 99px );
+    bottom: 3em;
     transition: opacity .5s ease-in-out, box-shadow .5s ease-in-out;
 }
 
