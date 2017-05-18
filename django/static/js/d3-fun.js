@@ -27,7 +27,7 @@ var data = {
         publication: {cover_date : "2006-12-08"},
         affiliation: [{
             name: "IRSA-INRIA",
-            geo: {  lat: 48.116282, 
+            geo: {  lat: 48.116282,
                     lon: -1.639774
             }
         }]
@@ -39,7 +39,7 @@ var data = {
        keywords: ["Keyword1", "Keyword2", "keyword3"],
        affiliation: [{
             name: "Vrije Universiteit Brussel",
-            geo: {  lat: 50.823165, 
+            geo: {  lat: 50.823165,
                     lon: 4.392326
             }
        }]
@@ -51,7 +51,7 @@ var data = {
         keywords: ["keyword1", "keyword2", "keyword3"],
         affiliation: [{
             name: "University of Amsterdam",
-            geo: {  lat: 52.355818, 
+            geo: {  lat: 52.355818,
                     lon: 4.955726
             }
         }]
@@ -260,16 +260,21 @@ function onMove() {
 }
 
 // NODES
-
-function present_authors(data){
+function present_authors(data) {
     var authors = data.authors;
     var text = "";
     if ((typeof authors === "undefined") || (authors.length == 0)) { text = "-"; }
     else if (authors.length == 1) { text = authors[0]; }
     else if(authors.length ==2){ text = authors[0].concat(" & ").concat(authors[1]); }
-    else{
-            text = authors[0].concat(" et al.");
-        }
+    else {
+        text = authors[0].concat(" et al.");
+    }
+    return text
+}
+
+
+function present_authors_date(data){
+    let text = present_authors(data)
     if (data.publication) {
         if (data.publication.cover_date) {
             text += ` , ${data.publication.cover_date.split(/-/)[0]}`;
@@ -277,9 +282,11 @@ function present_authors(data){
     }
     return text;
 };
-    
+
 
 function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
+    $(".loading").remove();
+    $("#forward").show();
     const l = PAPER_WIDTH/2;
     var papers = svg.selectAll("paper")
     .data(datas)
@@ -303,11 +310,8 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
         if (type=="curr") {
             return y-h;
         } else {
-            console.log(d)
             d.finalPos = y-h;
-            // console.log(pagin)
             if (pagin) return pagin>1 ? container_height+PAPER_HEIGHT : -PAPER_HEIGHT;
-            // console.log("not returned")
             var proj = (h*(PAPER_WIDTH+mid_width)/(col_offset))-h;
             return y<mid_height ? y-h-proj : y-h+proj;
         }
@@ -321,8 +325,9 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
             tooltip.transition()
             .duration(200)
             .style("opacity", .95);
+            let authors = present_authors(d)
             tooltip.html(typeof d.publication !== "undefined" ?
-                "<b>"+d.title+"</b><hr>"+d.authors + "<br>"+d.publication.cover_date +'<hr><span class="tag '+type+'">'+ d.keywords.join('</span><span class="tag '+type+'">')+"</span>"
+                "<b>"+d.title+"</b><hr>"+authors + "<br>"+d.publication.cover_date +'<hr><span class="tag '+type+'">'+ d.keywords.join('</span><span class="tag '+type+'">')+"</span>"
             :
                 "<b>"+d.title+'</b><hr>n/a<br>n/a<hr><span class="tag '+type+'"></span>'
             ).style("left", (d3.select(this).attr("x") - $(tooltip[0][0]).width()/2 + PAPER_WIDTH/2 + sidebar_offset) + "px")
@@ -348,10 +353,9 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
         .duration(TRANSITION_UNIT)
         .attr("x", x-l)
         .attr("y", function(d) {
-            console.log(d)
             return d.finalPos;
         });
-    }  
+    }
 }
 
 function display_authors(datas, x, y, type, pagin){
@@ -360,7 +364,7 @@ function display_authors(datas, x, y, type, pagin){
     .data(datas)
     .enter()
     .append("text")
-    .text( (d) => {return present_authors(d);})
+    .text( (d) => {return present_authors_date(d);})
     .style("text-anchor", "middle")
     .attr("class", "paper-info paper-info-"+type)
     .attr("x", x)
@@ -426,7 +430,7 @@ function paginator_transition(type, isUp) {
 }
 
 function page_down(type) {
-    if ((typeof data[type] === "undefined") || (paper_counter[type]<pages[type]*papers_per_page+papers_per_page)) { 
+    if ((typeof data[type] === "undefined") || (paper_counter[type]<pages[type]*papers_per_page+papers_per_page)) {
         return false
     }
     const isNotMax = (pages[type]<(~~(data[type].length/papers_per_page)));
@@ -667,7 +671,7 @@ function retrieve_data_by_title(title, callback) {
         state.run = {prev:true, next:true};
         paper_counter = {prev:0, next:0}
         let drawn = false
-        
+
         function batman() {
             if (paper_counter.prev >= Math.min(papers_per_page, data.prev.length) &&
                 paper_counter.next >= Math.min(papers_per_page, data.next.length) &&
@@ -675,7 +679,7 @@ function retrieve_data_by_title(title, callback) {
                 drawn = true
                 callback()
             }
-            if (paper_counter.prev==data.prev.length) 
+            if (paper_counter.prev==data.prev.length)
                 state.run.prev = false;
             if (paper_counter.next==data.next.length)
                 state.run.next = false;
@@ -713,13 +717,38 @@ function retrieve_data_by_title(title, callback) {
                 paper_counter.next++
                 batman()
             })
-        }, (error) => console.error(error))
+        }, (error) => display_error_message(error))
     }
+}
+
+function display_error_message(error) {
+    d3.selectAll("svg > *").remove();
+    var error_message = "Could not find the searched article";
+    state.run.next = false;
+    state.run.prev = false;
+    svg.append("text")
+    .text(error_message)
+    .attr("x",mid_width-error_message.length*2)
+    .attr("y",mid_height)
+    .attr("class", "error_message")
+    .style("fill", "red")
 }
 $('#searchButton').click((event) => {
     let value = $('#searchInput').val()
     retrieve_data_by_title(value, draw_scene);
     d3.selectAll("svg > *").remove();
+    $("#forward").hide();
+
+    var loading_width = 210;
+    var loading_height = 210
+    svg.append("svg:image")
+    .attr("xlink:href","/static/images/magnify.svg")
+    .attr("width", loading_width)
+    .attr("height", loading_height)
+    .attr("class", "loading")
+    .attr("x",mid_width - loading_width/2)
+    .attr("y",mid_height-loading_width/2)
+
     draw_arrow_heads();
     pages = {next:0, prev:0};
 })
@@ -821,7 +850,8 @@ function add_one_marker(node, cls) {
             if (aff.geo) {
                 let location = [aff.geo.lat, aff.geo.lon]
                 var marker = L.marker(location, {icon: icon});
-                marker.bindPopup(`<b>${node.title}</b><br>${node.authors} - <b>${node.publication.cover_date.split(/-/)[0]}</b>`);
+                let authors = present_authors(node)
+                marker.bindPopup(`<b>${node.title}</b><br>${authors} - <b>${node.publication.cover_date.split(/-/)[0]}</b>`);
                 marker.cls = cls;
                 markers.addLayer(marker);
             }
