@@ -260,16 +260,21 @@ function onMove() {
 }
 
 // NODES
-
-function present_authors(data){
+function present_authors(data) {
     var authors = data.authors;
     var text = "";
     if ((typeof authors === "undefined") || (authors.length == 0)) { text = "-"; }
     else if (authors.length == 1) { text = authors[0]; }
     else if(authors.length ==2){ text = authors[0].concat(" & ").concat(authors[1]); }
-    else{
-            text = authors[0].concat(" et al.");
-        }
+    else {
+        text = authors[0].concat(" et al.");
+    }
+    return text
+}
+
+
+function present_authors_date(data){
+    let text = present_authors(data)
     if (data.publication) {
         if (data.publication.cover_date) {
             text += ` , ${data.publication.cover_date.split(/-/)[0]}`;
@@ -320,8 +325,9 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
             tooltip.transition()
             .duration(200)
             .style("opacity", .95);
+            let authors = present_authors(d)
             tooltip.html(typeof d.publication !== "undefined" ?
-                "<b>"+d.title+"</b><hr>"+d.authors + "<br>"+d.publication.cover_date +'<hr><span class="tag '+type+'">'+ d.keywords.join('</span><span class="tag '+type+'">')+"</span>"
+                "<b>"+d.title+"</b><hr>"+authors + "<br>"+d.publication.cover_date +'<hr><span class="tag '+type+'">'+ d.keywords.join('</span><span class="tag '+type+'">')+"</span>"
             :
                 "<b>"+d.title+'</b><hr>n/a<br>n/a<hr><span class="tag '+type+'"></span>'
             ).style("left", (d3.select(this).attr("x") - $(tooltip[0][0]).width()/2 + PAPER_WIDTH/2 + sidebar_offset) + "px")
@@ -358,7 +364,7 @@ function display_authors(datas, x, y, type, pagin){
     .data(datas)
     .enter()
     .append("text")
-    .text( (d) => {return present_authors(d);})
+    .text( (d) => {return present_authors_date(d);})
     .style("text-anchor", "middle")
     .attr("class", "paper-info paper-info-"+type)
     .attr("x", x)
@@ -717,7 +723,9 @@ function retrieve_data_by_title(title, callback) {
 
 function display_error_message(error) {
     d3.selectAll("svg > *").remove();
-    var error_message = "Could not find the searched article"
+    var error_message = "Could not find the searched article";
+    state.run.next = false;
+    state.run.prev = false;
     svg.append("text")
     .text(error_message)
     .attr("x",mid_width-error_message.length*2)
@@ -842,7 +850,8 @@ function add_one_marker(node, cls) {
             if (aff.geo) {
                 let location = [aff.geo.lat, aff.geo.lon]
                 var marker = L.marker(location, {icon: icon});
-                marker.bindPopup(`<b>${node.title}</b><br>${node.authors} - <b>${node.publication.cover_date.split(/-/)[0]}</b>`);
+                let authors = present_authors(node)
+                marker.bindPopup(`<b>${node.title}</b><br>${authors} - <b>${node.publication.cover_date.split(/-/)[0]}</b>`);
                 marker.cls = cls;
                 markers.addLayer(marker);
             }
