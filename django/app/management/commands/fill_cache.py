@@ -8,12 +8,12 @@ from django.core.management.base import BaseCommand
 class Command(BaseCommand):
     def handle(self, *args, **options):
         titles = [
-            "DocTr: A unifying framework for tracking physical documents and organisational structures ",
-            "Optimal reactive power dispatch: A review, and a new stochastic voltage stability constrained multi-objective model at the presence of uncertain wind power generation",
-            "Towards task analysis tool support",
-            "ECOVAL: A framework for increasing the ecological validity in usability testing",
-            "Do i have to press the big button labelled spacebar to separate two words?",
-            "STRATUS: A questionnaire for strategic usability assessment",
+            # "DocTr: A unifying framework for tracking physical documents and organisational structures ",
+            # "Optimal reactive power dispatch: A review, and a new stochastic voltage stability constrained multi-objective model at the presence of uncertain wind power generation",
+            # "Towards task analysis tool support",
+            # "ECOVAL: A framework for increasing the ecological validity in usability testing",
+            # "Do i have to press the big button labelled spacebar to separate two words?",
+            # "STRATUS: A questionnaire for strategic usability assessment",
             "A survey on reactive programming",
         ]
 
