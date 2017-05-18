@@ -27,7 +27,7 @@ var data = {
         publication: {cover_date : "2006-12-08"},
         affiliation: [{
             name: "IRSA-INRIA",
-            geo: {  lat: 48.116282, 
+            geo: {  lat: 48.116282,
                     lon: -1.639774
             }
         }]
@@ -39,7 +39,7 @@ var data = {
        keywords: ["Keyword1", "Keyword2", "keyword3"],
        affiliation: [{
             name: "Vrije Universiteit Brussel",
-            geo: {  lat: 50.823165, 
+            geo: {  lat: 50.823165,
                     lon: 4.392326
             }
        }]
@@ -51,7 +51,7 @@ var data = {
         keywords: ["keyword1", "keyword2", "keyword3"],
         affiliation: [{
             name: "University of Amsterdam",
-            geo: {  lat: 52.355818, 
+            geo: {  lat: 52.355818,
                     lon: 4.955726
             }
         }]
@@ -260,16 +260,21 @@ function onMove() {
 }
 
 // NODES
-
-function present_authors(data){
+function present_authors(data) {
     var authors = data.authors;
     var text = "";
     if ((typeof authors === "undefined") || (authors.length == 0)) { text = "-"; }
     else if (authors.length == 1) { text = authors[0]; }
     else if(authors.length ==2){ text = authors[0].concat(" & ").concat(authors[1]); }
-    else{
-            text = authors[0].concat(" et al.");
-        }
+    else {
+        text = authors[0].concat(" et al.");
+    }
+    return text
+}
+
+
+function present_authors_date(data){
+    let text = present_authors(data)
     if (data.publication) {
         if (data.publication.cover_date) {
             text += ` , ${data.publication.cover_date.split(/-/)[0]}`;
@@ -277,7 +282,7 @@ function present_authors(data){
     }
     return text;
 };
-    
+
 
 function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
     $(".loading").remove();
@@ -320,8 +325,9 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
             tooltip.transition()
             .duration(200)
             .style("opacity", .95);
+            let authors = present_authors(d)
             tooltip.html(typeof d.publication !== "undefined" ?
-                "<b>"+d.title+"</b><hr>"+d.authors + "<br>"+d.publication.cover_date +'<hr><span class="tag '+type+'">'+ d.keywords.join('</span><span class="tag '+type+'">')+"</span>"
+                "<b>"+d.title+"</b><hr>"+authors + "<br>"+d.publication.cover_date +'<hr><span class="tag '+type+'">'+ d.keywords.join('</span><span class="tag '+type+'">')+"</span>"
             :
                 "<b>"+d.title+'</b><hr>n/a<br>n/a<hr><span class="tag '+type+'"></span>'
             ).style("left", (d3.select(this).attr("x") - $(tooltip[0][0]).width()/2 + PAPER_WIDTH/2 + sidebar_offset) + "px")
@@ -349,7 +355,7 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
         .attr("y", function(d) {
             return d.finalPos;
         });
-    }  
+    }
 }
 
 function display_authors(datas, x, y, type, pagin){
@@ -358,7 +364,7 @@ function display_authors(datas, x, y, type, pagin){
     .data(datas)
     .enter()
     .append("text")
-    .text( (d) => {return present_authors(d);})
+    .text( (d) => {return present_authors_date(d);})
     .style("text-anchor", "middle")
     .attr("class", "paper-info paper-info-"+type)
     .attr("x", x)
@@ -424,7 +430,7 @@ function paginator_transition(type, isUp) {
 }
 
 function page_down(type) {
-    if ((typeof data[type] === "undefined") || (paper_counter[type]<pages[type]*papers_per_page+papers_per_page)) { 
+    if ((typeof data[type] === "undefined") || (paper_counter[type]<pages[type]*papers_per_page+papers_per_page)) {
         return false
     }
     const isNotMax = (pages[type]<(~~(data[type].length/papers_per_page)));
@@ -520,7 +526,6 @@ function draw_prev(pagin) {
 
 function draw_scene() {
     draw_legend();
-    draw_nav();
     draw_prev(0);
     draw_next(0);
     draw_papers(data.curr, mid_width, mid_height-ICON_SPACE, CURR_DOC_IMG_URL, "curr", function(){scroll_to("#map-container")}, 0);
@@ -531,105 +536,6 @@ function draw_scene() {
     refresh_keywords();
     draw_map();
 }
-
-//#### NAV ####
-
-const NAV_LENGTH = 200;
-const NAV_EXTREMITY = 50;
-const NAV_OFFSET = 50;
-const NAV_STROKE_WIDTH = 3;
-const NAV_DOT_RADIUS = 8;
-const NAV_DOT_STROKE_WIDTH = 2;
-const NAV_DOT_SPACE = 25;
-const NAV_HISTORY_SIZE = 3;
-
-var nav_text = d3.select("body").append("div")
-.attr("class", "nav_text")
-.style("opacity", 0);
-
-function draw_line(x1, y1, x2, y2, type) {
-    var line = svg.append("line")
-    .style("stroke", "black")
-    .style("stroke-width", NAV_STROKE_WIDTH)
-    .attr("x1", x1)
-    .attr("y1", y1)
-    .attr("x2", x2)
-    .attr("y2", y2);
-    if (type=="dotted") {
-        line.style("stroke-dasharray", ("3, 3"));
-    }
-};
-
-function draw_nav_nodes(datas) {
-    svg.selectAll("nav-node")
-    .data(datas)
-    .enter()
-    .append("circle")
-    .attr("class", "nav-node")
-    .attr("cx", function(d) { return d.x })
-    .attr("cy", function(d) { return d.y })
-    .attr("r", NAV_DOT_RADIUS)
-    .attr("fill", function(d) { return d.color })
-    .attr("stroke", "black")
-    .attr("stroke-width", NAV_DOT_STROKE_WIDTH)
-    .on({
-        "mouseover": function(d) {
-            nav_text.transition()
-            .duration(200)
-            .style("opacity", .95);
-            d3.select(this).style("cursor", "pointer");
-            nav_text.html(d.text)
-            .style("left", (d3.select(this).attr("cx") - $(nav_text[0][0]).width()/2) + sidebar_offset + "px")
-            .style("top", (container_height-NAV_OFFSET-30) + "px");
-        },
-        "mouseout": function(d) {
-            d3.select(this).style("cursor", "default");
-            nav_text.transition()
-            .duration(500)
-            .style("opacity", 0);
-        }
-    })
-}
-
-function draw_nav() {
-    const mid1_x = mid_width-(NAV_LENGTH/2);
-    const mid2_x = mid_width+(NAV_LENGTH/2);
-    const y = container_height-NAV_OFFSET;
-    draw_line(mid1_x-NAV_EXTREMITY, y, mid1_x, y, "dotted");
-    draw_line(mid1_x, y, mid2_x, y);
-    draw_line(mid2_x, y, mid2_x+NAV_EXTREMITY, y, "dotted");
-    const nav_datas = [
-    {
-        text: "Currently displayed article.",
-        x: mid_width,
-        y: y,
-        color: COLOR_CURR
-    }, {
-        text: "Navigate randomly to an article that reference the selected article.",
-        x: mid_width+NAV_DOT_SPACE,
-        y: y,
-        color: COLOR_NEXT
-    }, {
-        text: "Navigate to a founding article.",
-        x: mid1_x-NAV_EXTREMITY+5,
-        y: y,
-        color: COLOR_PRIMARY,
-    }
-    ];
-    for (var i=1; i<NAV_HISTORY_SIZE+1; ++i) {
-        nav_datas.push({
-            text: "Navigate to the "+i+"th node on the path to a founding article.",
-            x: mid_width-(i*NAV_DOT_SPACE),
-            y: y,
-            color: (i==1 ? COLOR_PREV : COLOR_PRIMARY)
-        });
-    }
-    draw_nav_nodes(nav_datas);
-}
-draw_nav();
-
-
-//####### FLEX-CONTAINER #######
 
 //####### KEYWORDS-PART #########
 function refresh_keywords(){
@@ -665,7 +571,7 @@ function retrieve_data_by_title(title, callback) {
         state.run = {prev:true, next:true};
         paper_counter = {prev:0, next:0}
         let drawn = false
-        
+
         function batman() {
             if (paper_counter.prev >= Math.min(papers_per_page, data.prev.length) &&
                 paper_counter.next >= Math.min(papers_per_page, data.next.length) &&
@@ -673,7 +579,7 @@ function retrieve_data_by_title(title, callback) {
                 drawn = true
                 callback()
             }
-            if (paper_counter.prev==data.prev.length) 
+            if (paper_counter.prev==data.prev.length)
                 state.run.prev = false;
             if (paper_counter.next==data.next.length)
                 state.run.next = false;
@@ -844,7 +750,7 @@ function add_one_marker(node, cls) {
             if (aff.geo) {
                 let location = [aff.geo.lat, aff.geo.lon]
                 var marker = L.marker(location, {icon: icon});
-                let authors = node.authors.length > 3 ? node.authors[0] + " et al." : node.authors
+                let authors = present_authors(node)
                 marker.bindPopup(`<b>${node.title}</b><br>${authors} - <b>${node.publication.cover_date.split(/-/)[0]}</b>`);
                 marker.cls = cls;
                 markers.addLayer(marker);

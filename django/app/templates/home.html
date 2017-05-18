@@ -27,7 +27,7 @@
          <span><b>Current article:</b></span>
          <h1 id= "article-name"> </h1>
         <form>
-            <input type="text" id="searchInput" class="search" placeholder="Enter title.." required>
+            <input type="text" id="searchInput" class="search" placeholder="Enter title.." required onkeydown="if (event.keyCode == 13){$('#searchButton').click(); event.preventDefault()}">
             <input type="button" id="searchButton" class="button" value="Search">
         </form>
         <br>
@@ -39,9 +39,11 @@
     <div id="graph-container">
         <svg xmlns="http://www.w3.org/2000/svg">
         </svg>
+        <div style="width:100%; position:relative">
+        <div id="forward" class="interactive main" onclick="scroll_to('#map-container')">
+            <span class="glyphicon glyphicon-menu-down"></span> Show the papers on a map
+        </div>
     </div>
-    <div id="forward" class="interactive main" onclick="scroll_to('#map-container')">
-        <span class="glyphicon glyphicon-menu-down"></span> Show the papers on a map
     </div>
 </div>
 
