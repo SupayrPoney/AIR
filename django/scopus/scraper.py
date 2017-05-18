@@ -66,7 +66,7 @@ def requests_get(*args, params={}, **kwargs):
         our_proxies = None
     else:
         our_proxies = proxies
-    return requests.get(*args, proxies=our_proxies, params=params, **kwargs).json()
+    return requests.get(*args, proxies=our_proxies, params=params, timeout=5, **kwargs).json()
 
 
 # search/find on scopus
