@@ -659,6 +659,7 @@ $('#searchButton').click((event) => {
     let value = $('#searchInput').val()
     retrieve_data_by_title(value, draw_scene);
     d3.selectAll("svg > *").remove();
+    display_loading()
     $("#forward").hide();
 
     draw_arrow_heads();
