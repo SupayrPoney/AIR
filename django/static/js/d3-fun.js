@@ -303,11 +303,8 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
         if (type=="curr") {
             return y-h;
         } else {
-            console.log(d)
             d.finalPos = y-h;
-            // console.log(pagin)
             if (pagin) return pagin>1 ? container_height+PAPER_HEIGHT : -PAPER_HEIGHT;
-            // console.log("not returned")
             var proj = (h*(PAPER_WIDTH+mid_width)/(col_offset))-h;
             return y<mid_height ? y-h-proj : y-h+proj;
         }
@@ -348,7 +345,6 @@ function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
         .duration(TRANSITION_UNIT)
         .attr("x", x-l)
         .attr("y", function(d) {
-            console.log(d)
             return d.finalPos;
         });
     }  
