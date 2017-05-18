@@ -842,7 +842,8 @@ function add_one_marker(node, cls) {
             if (aff.geo) {
                 let location = [aff.geo.lat, aff.geo.lon]
                 var marker = L.marker(location, {icon: icon});
-                marker.bindPopup(`<b>${node.title}</b><br>${node.authors} - <b>${node.publication.cover_date.split(/-/)[0]}</b>`);
+                let authors = node.authors.length > 3 ? node.authors[0] + " et al." : node.authors
+                marker.bindPopup(`<b>${node.title}</b><br>${authors} - <b>${node.publication.cover_date.split(/-/)[0]}</b>`);
                 marker.cls = cls;
                 markers.addLayer(marker);
             }
