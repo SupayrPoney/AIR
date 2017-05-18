@@ -285,7 +285,6 @@ function present_authors_date(data){
     
 
 function draw_papers(datas, x, y, image_url, type, onclick, pagin) {
-    $(".loading").remove();
     $("#forward").show();
     const l = PAPER_WIDTH/2;
     var papers = svg.selectAll("paper")
@@ -664,6 +663,7 @@ function refresh_keywords(){
 var state = {can:false, run:{prev:false, next:false}}
 //######## SEARCH-PART ########
 function retrieve_data_by_title(title, callback) {
+    display_loading()
     if (state.run.prev||state.run.next) {
         state.can = true;
         state.continue = function(){retrieve_data_by_title(title, callback)}
@@ -677,6 +677,7 @@ function retrieve_data_by_title(title, callback) {
                 paper_counter.next >= Math.min(papers_per_page, data.next.length) &&
                 !drawn) {
                 drawn = true
+                hide_loading()
                 callback()
             }
             if (paper_counter.prev==data.prev.length) 
@@ -719,6 +720,28 @@ function retrieve_data_by_title(title, callback) {
             })
         }, (error) => display_error_message(error))
     }
+}
+
+function display_loading(small) {
+    if (small == undefined) {
+        small = false
+    }
+    if (small) {
+
+    }
+    var loading_width = 210;
+    var loading_height = 210
+    svg.append("svg:image")
+    .attr("xlink:href","/static/images/magnify.svg")
+    .attr("width", loading_width)
+    .attr("height", loading_height)
+    .attr("class", "loading")
+    .attr("x",mid_width - loading_width/2)
+    .attr("y",mid_height-loading_width/2)
+}
+
+function hide_loading() {
+    $(".loading").remove();
 }
 
 function display_error_message(error) {
