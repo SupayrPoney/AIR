@@ -25,7 +25,7 @@ SECRET_KEY = '_pcg4=*wf$7%3+dddu_ea8-%+1)d*0%%l_9&tf5i7gboq10j!o'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -123,3 +123,10 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join('', '', 'static'),
 )
+
+PROD = False
+
+try:
+    from .local_settings import * # NOQA
+except ImportError:
+    print("No local settings found")

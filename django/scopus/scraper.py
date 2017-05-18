@@ -4,6 +4,7 @@ from functools import wraps
 import os
 import hashlib
 import string
+from django.conf import settings
 
 DEBUG = 0
 
@@ -61,7 +62,11 @@ def fd(x):
 def requests_get(*args, params={}, **kwargs):
     params['apiKey'] = API_KEY
     params['httpAccept'] = 'application/json'
-    return requests.get(*args, proxies=proxies, params=params, **kwargs).json()
+    if settings.PROD:
+        our_proxies = None
+    else:
+        our_proxies = proxies
+    return requests.get(*args, proxies=our_proxies, params=params, timeout=5, **kwargs).json()
 
 
 # search/find on scopus
