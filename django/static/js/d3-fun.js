@@ -33,7 +33,7 @@ var data = {
         }]
     }],
     curr: [{
-       title: "Start by looking up a title\n<small>(e.g.: 'A survey on reactive programming')</small>",
+       title: "Start by looking up a title\n<small style='color: white;'>(e.g.: 'A survey on reactive programming')</small>",
        authors: ["Author"],
        publication: {cover_date : "2015-12-08"},
        keywords: ["Keyword1", "Keyword2", "keyword3"],
